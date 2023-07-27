@@ -1,0 +1,23 @@
+/* change the colors */
+$primary: #ffb783;
+$secondary: #303235;
+$card-border-radius: 25px;
+$text-secondary: #FFFFFF;
+$danger: #dd0000;
+$success: lime;
+$warning: orange;
+$info: aqua;
+
+$body-bg: #171819;
+$body-color: #171819;
+$bg-dark: #171819;
+$dark: #171819;
+
+
+$enable-rounded: true;
+$enable-transitions: true;
+$enable-responsive-font-sizes: true;
+
+@import "bootstrap";
+//@import "bootstrap-vue";
+//@import "theme.dark.css";
