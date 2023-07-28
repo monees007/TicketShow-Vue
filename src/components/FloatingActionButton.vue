@@ -1,10 +1,11 @@
 <template>
-  <div
+  <b-button
+      variant="outline"
+      v-b-modal.modal-xl
       id="fab1"
-      class="d-flex align-items-center justify-content-center position-fixed "
-      style="">
+      class="d-flex align-items-center justify-content-center position-fixed ">
     <b-icon icon="plus-lg"></b-icon>
-  </div>
+  </b-button>
 </template>
 <script>
 export default {

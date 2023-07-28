@@ -1,9 +1,9 @@
 <template>
   <div id="parent1" class="d-flex position-fixed  align-items-center justify-content-evenly" style="flex-direction:column; height: 100vh; left: 0;width: 50px"  >
+    <router-link class="rotate" to="/">Home</router-link>
+    <router-link class="rotate" to="/bookings">Bookings</router-link>
+    <router-link class="rotate" to="/dashboard">Dashboard</router-link>
 
-    <div class="rotate ">Home</div>
-    <div class="rotate act">Bookings</div>
-    <div class="rotate ">Dashboard</div>
 
   </div>
 
@@ -15,7 +15,7 @@ export default {
 </script>
 <style>
 
-.act{
+.router-link-exact-active{
 
   font-weight: bolder;
   color: #f8f9fa !important;
