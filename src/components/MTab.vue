@@ -1,8 +1,9 @@
 <template>
   <div id="parent1" class="d-flex position-fixed  align-items-center justify-content-evenly" style="flex-direction:column; height: 100vh; left: 0;width: 50px"  >
-    <router-link class="rotate" to="/">Home</router-link>
-    <router-link class="rotate" to="/bookings">Bookings</router-link>
-    <router-link class="rotate" to="/dashboard">Dashboard</router-link>
+    <router-link class="rotate" to="/">HOME</router-link>
+    <router-link class="rotate" to="/bookings">BOOKINGS</router-link>
+    <router-link class="rotate" to="/dashboard">DASHBOARD</router-link>
+    <router-link class="rotate" to="/stats">STATS</router-link>
 
 
   </div>
@@ -29,7 +30,8 @@ export default {
   color: #f8f9fa;
   text-shadow:1px 1px 4px #fff;}
 .rotate{
-  font-size: large;
+  font-size: medium;
+  text-decoration: none;
   color: grey;
   vertical-align:top;
   transform:rotate(7deg);

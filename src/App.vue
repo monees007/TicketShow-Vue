@@ -36,6 +36,7 @@ export default {
   },
   data: ()=>{return{
     show: true,
+
     navs: {
       '/': 'Home',
       '/bookings': 'Bookings',

@@ -1,14 +1,14 @@
 <template>
   <div class="DashBoardView">
-    <b-alert v-show="flag_error" show variant="danger">CSV is incorrectly formatted</b-alert>
-    <b-button-toolbar key-nav>
-      <b-button-group>
+    <b-alert ref="flag" v-show="flag_error" show variant="danger">CSV is incorrectly formatted</b-alert>
+    <b-button-toolbar key-nav class="mb-3">
+      <b-button-group class="col" cols="3" >
         <b-button :pressed="activeTab===0" @click="activeTab=0">Shows</b-button>
         <b-button :pressed="activeTab===1" @click="activeTab=1">Theatres</b-button>
         <b-button :pressed="activeTab===2" @click="activeTab=2">Running</b-button>
       </b-button-group>
-      <b-button-group>
-        <b-button v-show="activeTab===2" :pressed.sync="separateTheatresToggle" class="mx-3" size="sm"
+      <b-button-group class="col" cols="2">
+        <b-button v-show="activeTab===2" :pressed.sync="separateTheatresToggle" class="sm"
                   variant="secondary">Separate Theatres
           <b-icon class="me-2" :icon="separateTheatresToggle ? 'check-square-fill' : 'square'"></b-icon>
         </b-button>
@@ -17,69 +17,18 @@
 
     </b-button-toolbar>
 
-    <ShowsTableEditor ref="shows-table" />
+    <ShowsTableEditor class="rounded-5 " ref="shows-table" />
 
-    <div class="d-none rounded-5 mt-5">
-      <b-table :fields="fields" :items="items">
-        <template #cell(name)="data">
-          <b-form-input :value="data.value" type="text"></b-form-input>
-        </template>
-        <template #cell(image_url)="data">
-          <b-form-input :value="data.value" type="url"></b-form-input>
-        </template>
-        <template #cell(image_sqr)="data">
-          <b-form-input :value="data.value" type="url"></b-form-input>
-        </template>
-        <template #cell(ticket_price)="data">
-          <b-input-group prepend="₹">
-            <b-form-input :value="data.value" prepend="₹" type="number"></b-form-input>
-          </b-input-group>
-        </template>
-        <template #cell(tags)="data">
-          <b-form-tags
-              v-model="data.value"
-              input-id="tags-remove-on-delete"
-              remove-on-delete
-              separator=" "
-          ></b-form-tags>
-        </template>
-        <template #cell(format)="data">
-          <b-form-input v-model="data.value" list="format-list"></b-form-input>
 
-          <datalist id="format-list">
-            <option>2D</option>
-            <option>3D</option>
-            <option>2D IMAX</option>
-            <option>HD 3D</option>
-          </datalist>
-
-        </template>
-        <template #cell(language)="data">
-          <b-form-input v-model="data.value" list="language-list"></b-form-input>
-
-          <datalist id="language-list">
-            <option>English</option>
-            <option>Hindi</option>
-            <option>Tamil</option>
-            <option>Kannada</option>
-          </datalist>
-
-        </template>
-        <template #cell()>
-          <b-button variant="outline-danger"><b-icon icon="trash"></b-icon> </b-button>
-        </template>
-      </b-table>
-
-    </div>
-    <b-button-toolbar key-nav>
+    <b-button-toolbar key-nav class="mt-3">
       <b-button-group class="mx-1">
         <b-button class="me-2" @click="$refs['shows-table'].handleAdd()" pill variant="outline-secondary">Add Row</b-button>
-        <b-button class="me-2" @click="$refs['shows-table'].handleSubmit(false)" pill variant="outline-danger">Reset</b-button>
-        <b-button class="me-2" @click="$refs['shows-table'].handleSubmit(true)" pill variant="outline-success">Save</b-button>
+        <b-button class="me-2" @click="$refs['shows-table'].update_records()" pill variant="outline-danger">Reset</b-button>
+        <b-button class="me-2" @click="$refs['shows-table'].handleSave()" pill variant="outline-success">Save</b-button>
       </b-button-group>
       <b-button-group class="mx-1">
-        <b-button>Upload CSV</b-button>
-        <b-button>Download CSV</b-button>
+        <b-button @click="$refs['shows-table'].csvToJson()">Upload CSV</b-button>
+        <b-button @click="$refs['shows-table'].jsonToCSV()">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
 

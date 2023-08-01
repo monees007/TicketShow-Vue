@@ -12,7 +12,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="container-fluid">
+  <div  class="container-fluid">
     <h2>Cannaught Place</h2>
     <div class="row flex-nowrap show-list my-3">
       <MovieCard >Book</MovieCard>

@@ -2,7 +2,7 @@
   <div class="NavBar">
     <b-navbar class="text-primary fixed-top bg-dark " style="justify-content: space-between !important;">
       <b-navbar-nav>
-        <b-avatar v-show="search_not_toggled" class="d-flex justify-content-center align-items-center mx-3 bg-secondary" style="width: 50px"/>
+        <b-avatar :href="App.data.logged ? '#/user': '#/login' " v-show="search_not_toggled" class="d-flex justify-content-center align-items-center mx-3 bg-secondary" style="height: 50px;width: 50px"/>
         <b-navbar-brand v-show="search_not_toggled" class="hide text-light" href="#">
           <img alt="Kitten"
                class="d-inline-block align-top"
@@ -41,8 +41,15 @@
 
 <script>
 
+import App from "@/App.vue";
+
 export default {
   name: 'NavBar',
+  computed: {
+    App() {
+      return App
+    }
+  },
   data: () => {
     return {
       search_not_toggled: true
