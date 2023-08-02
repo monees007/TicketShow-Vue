@@ -1,19 +1,22 @@
 <template>
   <div class="home">
-    <CarouselM/>
-    <TheaterList/>
+    <CarouselM class=""/>
+    <TheatreListAsync/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import CarouselM from "@/components/Carousel.vue";
-import TheaterList from "@/components/TheaterList.vue";
+import {defineAsyncComponent} from "vue";
 
 export default {
   name: 'HomeView',
   components: {
-    TheaterList, CarouselM,
+    CarouselM,
+    TheatreListAsync: defineAsyncComponent(() =>
+        import('@/components/TheaterList.vue')
+    )
   }
 }
 </script>

@@ -14,10 +14,15 @@
         </b-button>
 
       </b-button-group>
+      <b-button-group class="col" cols="3" >
+        <b-button :pressed="displaymode===0" @click="displaymode=0">Table</b-button>
+        <b-button :pressed="displaymode===1" @click="displaymode=1">Grid</b-button>
+        <b-button :pressed="displaymode===2" @click="displaymode=2">CSV</b-button>
+      </b-button-group>
 
     </b-button-toolbar>
 
-    <ShowsTableEditor class="rounded-5 " ref="shows-table" />
+    <ShowsTableEditor :displaymode="displaymode" class="rounded-5 d-flex" ref="shows-table" />
 
 
     <b-button-toolbar key-nav class="mt-3">
@@ -43,6 +48,7 @@ export default {
   components: {ShowsTableEditor},
   data: () => {
     return {
+      displaymode:0,
       flag_error: false,
       separateTheatresToggle: false,
       activeTab: 0,

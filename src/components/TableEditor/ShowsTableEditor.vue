@@ -1,59 +1,125 @@
 <template>
   <div>
-    <b-editable-table
-        v-model="data"
-        :busy="loading"
-        :editMode="'row'"
-        :fields="fields"
-        :rowUpdate="rowUpdate"
-        bordered
+    <Transition>
+      <KeepAlive>
+        <b-editable-table
+            v-if="displaymode===0"
+            v-model="rows"
+            :busy="loading"
+            :editMode="'row'"
+            :fields="fields"
+            :rowUpdate="rowUpdate"
+            bordered
 
-        data-bs-theme="dark"
-        class="editable-table table-hover shadow-z-1 "
+            class=" editable-table table-hover shadow-z-1 "
+            data-bs-theme="dark"
 
-    >
-      <template #cell-isActive="data">
-        <span v-if="data.value">Yes</span>
-        <span v-else>No</span>
-      </template>
+        >
+          <template #cell-isActive="data">
+            <span v-if="data.value">Yes</span>
+            <span v-else>No</span>
+          </template>
 
-      <template #table-busy>
-        <div class="text-center text-danger my-2">
-          <b-spinner class="align-middle"></b-spinner>
-          <strong>Loading...</strong>
+          <template #table-busy>
+            <div class="text-center text-danger my-2">
+              <b-spinner class="align-middle"></b-spinner>
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template #cell(edit)="data">
+            <div v-if="data.isEdit">
+
+              <b-button class="edit-icon bg-danger me-2" @click="handleSubmit(data, false)">
+                <b-icon icon="x-lg"></b-icon>
+              </b-button>
+              <b-button ref="row_btn" class="edit-icon bg-success" @click="handleSubmit(data, true)">
+                <b-icon icon="save2"></b-icon>
+              </b-button>
+            </div>
+            <BIconPencil
+                v-else
+                class="edit-icon"
+                @click="handleEdit(data, true)"
+            ></BIconPencil>
+          </template>
+          <template #cell(delete)="data">
+            <BIconTrash
+                class="remove-icon"
+                @click="handleDelete(data)"
+            ></BIconTrash>
+          </template>
+          <template #cell(index)="data">
+            {{ data.index + 1 }}
+          </template>
+        </b-editable-table>
+      </KeepAlive>
+    </Transition>
+
+    <Transition>
+      <KeepAlive>
+        <div v-if="displaymode===1" class="">
+          <MovieCard2 v-for="m in rows" :key="m.id" :m="m"/>
         </div>
-      </template>
-      <template #cell(edit)="data">
-        <div v-if="data.isEdit">
+      </KeepAlive>
+    </Transition>
 
-          <b-button @click="handleSubmit(data, false)" class="edit-icon bg-danger me-2"><b-icon icon="x-lg"></b-icon> </b-button>
-          <b-button @click="handleSubmit(data, true)" class="edit-icon bg-success"><b-icon icon="save2"></b-icon> </b-button>
+    <Transition>
+      <KeepAlive>
+        <div v-if="displaymode===2" class="d-flex flex-wrap">
+          <div v-for="r in rows" :key="r.id" class="card bg-dark-subtle border-0 text-white mx-3 my-3"
+               data-bs-theme="dark" style="min-width: 18rem; min-height: 30rem">
+            <b-overlay bg-color="dark" data-bs-theme="dark" no-center opacity="1" rounded="sm" show>
+              <template #overlay>
+
+                <b-icon
+
+                    class="position-absolute"
+                    scale="2"
+                    shift-h="8"
+                    shift-v="8"
+                    style="top: 0; right: 0"
+                ></b-icon>
+              </template>
+              <b-img :src="r.image_url" alt="Card image" class="card-image-top" fluid
+                     style="max-width: 23rem;    background:rgba(0,0,0,0.6);"/>
+            </b-overlay>
+            <div class="card-img-overlay border-0" style="z-index: 11;">
+              <h1 class="card-title">{{ r.name }}</h1>
+              <span v-for="t in r.tags.split()" :key="t" class="badge bg-secondary-subtle">{{ t }}</span>
+              <div class="input-group mb-3">
+                <b-input :value="r.format" prepend="" type="text"/>
+                <b-input :value="r.language" prepend="" type="text"/>
+              </div>
+              <b-textarea v-model="r.image_sqr" class="card-text mb-3"/>
+
+              <div class="input-group mb-3 d-inline-flex">
+                <div class="input-group-prepend d-inline-flex">
+                  <span class="input-group-text">Ticket Price</span>
+                  <span class="input-group-text">₹</span>
+                </div>
+                <b-input :value="r.ticket_price" prepend="Ticket Price" type="text"/>
+              </div>
+
+
+            </div>
+          </div>
         </div>
-        <BIconPencil
-            v-else
-            class="edit-icon"
-            @click="handleEdit(data, true)"
-        ></BIconPencil>
-      </template>
-      <template #cell(delete)="data">
-        <BIconTrash
-            class="remove-icon"
-            @click="handleDelete(data)"
-        ></BIconTrash>
-      </template>
-    </b-editable-table>
+      </KeepAlive>
+    </Transition>
   </div>
-
 </template>
 
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
 import App from "@/App.vue";
+import MovieCard2 from "@/components/MovieCard2.vue";
+import router from "@/router";
 
 export default {
   name: 'ShowsTableEditor',
   components: {
+    MovieCard2,
     BEditableTable,
     BSpinner,
   },
@@ -76,18 +142,16 @@ export default {
           let csv = readerEvent.target.result; // this is the content!
           let data = require('jquery-csv').toObjects(csv);
           console.log(data)
-          this.data = data
+          this.rows = data
         }
 
       }
 
       input.click();
     },
-
-
     jsonToCSV(fileTitle = 'export') {
 
-      const items = this.data
+      const items = this.rows
       const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
       const header = Object.keys(items[0])
       let csv = [
@@ -115,10 +179,25 @@ export default {
       }
     },
     async update_records() {
-      this.loading = true;
-      const response = await fetch("http://127.0.0.1:4433/api/shows", App.$header('GET'));
-      this.data = await response.json();
-      this.loading = false;
+      try {
+        this.loading = true;
+        const response = await fetch("http://127.0.0.1:4433/api/bulk/shows", {
+          method: 'GET',
+          headers: App.$header('GET')
+        });
+        console.log(response.status)
+        if (response.status === 200) {
+          this.rows = await response.json();
+          this.loading = false;
+        } else {
+          throw new TypeError("Token expired"); // will check for token and push to log in
+        }
+      } catch (e) {
+        App.$next = router.currentRoute.path
+        router.push({path: 'login'})
+      }
+
+
     },
     handleAdd() {
       const newId = Date.now();
@@ -131,8 +210,6 @@ export default {
         data: {
           id: newId,
           name: "",
-          // email: "",
-          // phone: "",
           image_url: "",
           image_sqr: "",
           tags: "",
@@ -142,54 +219,86 @@ export default {
         },
       };
     },
-    handleSubmit(data, update) {
+    async handleSubmit(data, update, repeat = true) {
       this.rowUpdate = {
         edit: false,
         id: data.id,
+
         action: update ? "update" : "cancel",
       };
+      if (update) {
+        const rawResponse = await fetch('http://127.0.0.1:4433/api/shows?' +
+            new URLSearchParams({
+              id: data.id
+            }), {
+              method: 'PUT',
+              headers: App.$header(),
+              body: JSON.stringify(this.rows[data.index])
+            }
+        );
+        const content = await rawResponse.json();
+        if (repeat) {
+          await this.handleSubmit(data, update, repeat = false)
+        }
+        console.log(content);
+
+      }
     },
     handleEdit(data) {
       this.rowUpdate = {edit: true, id: data.id};
     },
-    handleDelete(data) {
+    async handleDelete(data) {
+      const rawResponse = await fetch('http://127.0.0.1:4433/api/shows?' +
+          new URLSearchParams({
+            id: data.id
+          }), {
+            method: 'DELETE',
+            headers: App.$header(),
+            body: JSON.stringify(this.rows)
+          }
+      );
+      const content = await rawResponse.json();
+      console.log(content);
       this.rowUpdate = {id: data.id, action: "delete"};
     },
     async handleSave() {
 
-      const rawResponse = await fetch('http://127.0.0.1:4433/api/shows', {
-        method: 'PUT',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.data)
+      const rawResponse = await fetch('http://127.0.0.1:4433/api/bulk/shows', {
+        method: 'POST',
+        headers: App.$header(),
+        body: JSON.stringify(this.rows)
       });
       const content = await rawResponse.json();
 
       console.log(content);
     }
   },
+  props: {
+    displaymode: null,
+  },
 
   data() {
     return {
+
       rowUpdate: {},
       fields: [
-        {key: "name", label: "Name", type: "text", editable: true},
-        {key: "image_url", label: "Poster", type: "url", editable: true},
-        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true},
+        {key: 'index', class: 'id-col'},
+        {key: "name", label: "Name", type: "text", editable: true,},
+        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
+        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
+        {key: "year", label: "Year", editable: true},
+        {key: "description", label: "Description", editable: true},
+        {key: "director", label: "Director", editable: true},
+        {key: "duration", label: "Duration", editable: true},
         {key: "tags", label: "Tags", type: "text", editable: true},
         {key: "ticket_price", label: "Ticket Price", type: "text", editable: true},
         {key: "format", label: "Format", type: "text", editable: true},
         {key: "language", label: "Language", type: "text", editable: true},
         {key: "edit", label: ''},
-        // {id: 1, key: "name", label: "Name", type: "text", editable: true},
-        // {id: 2, key: "email", label: "Email", type: "email", editable: true},
-        // {id: 3, key: "phone", label: "Phone", type: "text", editable: true},
         {key: "delete", label: ""},
         {key: "edit", label: ""},
       ],
-      data: [],
+      rows: [],
       loading: false,
     };
   },
@@ -202,16 +311,25 @@ export default {
 
 <style lang="less">
 /* -- import Roboto Font ---------------------------- */
-@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
+//@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
 
-
-*,
-*:after,
-*:before {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+.link-col {
+  max-width: 150px !important;
+  overflow: hidden;
 }
+
+.id-col {
+  max-width: 0;
+  display: none;
+}
+
+//*,
+//*:after,
+//*:before {
+//  -webkit-box-sizing: border-box;
+//  -moz-box-sizing: border-box;
+//  box-sizing: border-box;
+//}
 
 
 // Material Design shadows
@@ -309,7 +427,7 @@ export default {
 
   // Nesting
   .table {
-    background-color:  @table-bg;
+    background-color: @table-bg;
   }
 
   // Remove border
@@ -356,9 +474,6 @@ export default {
     }
   }
 }
-
-
-
 
 
 </style>

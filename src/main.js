@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import {BootstrapVue , IconsPlugin} from "bootstrap-vue";
+import {BootstrapVue, IconsPlugin} from "bootstrap-vue";
 
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -9,7 +9,6 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import router from './router'
 // import '@/style/custom.scss'
-
 
 
 // Make BootstrapVue available throughout your project
@@ -22,16 +21,11 @@ Vue.config.productionTip = true
 // Router setup
 
 
-
 new Vue({
-  router,
-  data:{
-    logged: false,
-    admin:true,
-    token: null,
+    router, data: {
+        logged: false, admin: true, token: null,
 
-  },
-  render: h => h(App)
+    }, render: h => h(App)
 }).$mount('#app')
 
 App.$appname = 'TicketShow'
@@ -39,19 +33,17 @@ App.$server = 'http://localhost:4433'
 App.$api = 'http://localhost:8080/api'
 App.$next = ''
 App.$router = router
-App.$header = (rType) => {
-  if (App.$auth_token != null){
-    return {
-      method: rType,
-      headers: {
-        "Content-Type": "application/json",
-        "Authentication-Token": App.$auth_token,
-      }
+App.$header = () => {
+    if (App.$auth_token == null) {
+        App.$auth_token = window.localStorage.getItem('Authentication-Token');
+        App.$$csrf = window.localStorage.getItem('csrf_token');
+    }else if(App.$auth_token){
+        return {
+            "Content-Type": "application/json", "Authentication-Token": App.$auth_token,
+        }
+    } else {
+        console.log('token missing')
+        App.$next = router.currentRoute.path
+        router.push({path: 'login'})
     }
-  }
-  else {
-    console.log('token missing')
-    App.$next = router.currentRoute.path
-    router.push({ path: 'login'})
-  }
 }

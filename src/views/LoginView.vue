@@ -38,6 +38,9 @@ export default defineComponent({
           .then(function (response) {
             App.$auth_token = response.data.response.user['authentication_token']
             App.$csrf = response.data.response['csrf_token']
+            window.localStorage.setItem("Authentication-Token", App.$auth_token);
+            window.localStorage.setItem("csrf_token", App.$csrf);
+
             App.data.logged = true
             console.log('Logged in Successfully')
             if (App.$next === '#/login'){
