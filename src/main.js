@@ -10,7 +10,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import router from './router'
 import './registerServiceWorker'
 import {createPinia, PiniaVuePlugin} from 'pinia'
-
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
 // import '@/style/custom.scss'
@@ -18,7 +17,6 @@ const pinia = createPinia()
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
-// Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
 
 Vue.config.productionTip = true
@@ -27,13 +25,10 @@ Vue.config.productionTip = true
 
 
 new Vue({
-    router,
-
-    data: {
+    router, data: {
         logged: false, admin: true, token: null,
 
     },
-
     pinia,
     render: h => h(App)
 }).$mount('#app')
