@@ -6,7 +6,7 @@
            footer-text-variant="light"
            header-bg-variant="dark"
            header-text-variant="light"
-           size="xl" title="Create" visible>
+           size="xl" title="Create">
     <b-button-group class="col mb-3 " cols="3">
       <b-button :pressed="displaymode===0" class="bg-dark-subtle" @click="displaymode=0">New Theatre</b-button>
       <b-button :pressed="displaymode===1" class="bg-dark-subtle" @click="displaymode=1">New Show</b-button>

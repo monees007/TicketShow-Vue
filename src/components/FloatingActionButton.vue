@@ -1,33 +1,33 @@
 <template>
-<!--  <b-button-->
-<!--      variant="outline"-->
-<!--      v-b-modal.modal-xl-->
-<!--      id="fab1"-->
-<!--      class="d-flex align-items-center justify-content-center position-fixed ">-->
-<!--    <b-icon icon="plus-lg"></b-icon>-->
-<!--  </b-button>-->
-  <div class="fab-wrapper">
-    <input id="fabCheckbox" type="checkbox" class="fab-checkbox" />
-    <label class="fab" for="fabCheckbox">
-      <span class="fab-dots fab-dots-1"></span>
-      <span class="fab-dots fab-dots-2"></span>
-      <span class="fab-dots fab-dots-3"></span>
-    </label>
-    <div class="fab-wheel">
-      <a class="btn pill fab-action fab-action-1">
-        Show
-      </a>
-      <a class="fab-action fab-action-2">
-        <i class="fas fa-book"></i>
-      </a>
-      <a class="fab-action fab-action-3">
-        <i class="fas fa-address-book"></i>
-      </a>
-      <a class="fab-action fab-action-4">
-        <i class="fas fa-info"></i>
-      </a>
-    </div>
-  </div>
+  <b-button
+      variant="outline"
+      v-b-modal.modal-xl
+      id="fab1"
+      class="d-flex align-items-center justify-content-center position-fixed ">
+    <b-icon icon="plus-lg"></b-icon>
+  </b-button>
+<!--  <div class="fab-wrapper">-->
+<!--    <input id="fabCheckbox" type="checkbox" class="fab-checkbox" />-->
+<!--    <label class="fab" for="fabCheckbox">-->
+<!--      <span class="fab-dots fab-dots-1"></span>-->
+<!--      <span class="fab-dots fab-dots-2"></span>-->
+<!--      <span class="fab-dots fab-dots-3"></span>-->
+<!--    </label>-->
+<!--    <div class="fab-wheel">-->
+<!--      <a class="btn pill fab-action fab-action-1">-->
+<!--        Show-->
+<!--      </a>-->
+<!--      <a class="fab-action fab-action-2">-->
+<!--        <i class="fas fa-book"></i>-->
+<!--      </a>-->
+<!--      <a class="fab-action fab-action-3">-->
+<!--        <i class="fas fa-address-book"></i>-->
+<!--      </a>-->
+<!--      <a class="fab-action fab-action-4">-->
+<!--        <i class="fas fa-info"></i>-->
+<!--      </a>-->
+<!--    </div>-->
+<!--  </div>-->
 </template>
 <script>
 export default {

@@ -127,7 +127,7 @@ export default defineComponent({
 
 
       <hr>
-      <MovieCard2 v-for="m in theatre[n][1]" :key="m.id" :m="m"/>
+      <MovieCard2 v-for="m in theatre[n][1]" :key="m.id" :m="m" :t="theatre[n][0]"/>
     </div>
   </div>
   <!--d

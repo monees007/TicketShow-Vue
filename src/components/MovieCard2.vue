@@ -1,7 +1,10 @@
 <script>
+import BookingModal from "@/BookingModal.vue";
+
 export default {
   name: "MovieCard2",
-  props:['m']
+  components: {BookingModal},
+  props:['m','t']
 }
 </script>
 
@@ -32,6 +35,7 @@ export default {
         <b-rating class="w-25 rating-el bg-black"  data-bs-theme="dark" inline no-border size="lg" variant=""></b-rating>
 
         <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light">Reviews</b-button>
+        <b-button class="mx-2 btn-outline-secondary btn-dark" v-b-modal.modal-booking data-bs-theme="light">Book</b-button>
         <b-button class="me-2" pill size="sm">
           <b-icon icon="pen"/>
         </b-button>
@@ -45,6 +49,7 @@ export default {
       <img style="    max-height: -webkit-fill-available;"
           :src="m.image_sqr">
     </div>
+    <BookingModal :show="m" :theatre="t"/>
   </div>
 </template>
 
