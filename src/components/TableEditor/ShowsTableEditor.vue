@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="d-flex flex-column">
     <Transition>
       <KeepAlive>
         <b-editable-table
@@ -106,6 +106,17 @@
         </div>
       </KeepAlive>
     </Transition>
+    <b-button-toolbar key-nav class="mt-3">
+      <b-button-group class="mx-1">
+        <b-button class="me-2" @click="handleAdd()" pill variant="outline-secondary">Add Row</b-button>
+        <b-button class="me-2" @click="update_records()" pill variant="outline-danger">Reset</b-button>
+        <b-button class="me-2" @click="handleSave()" pill variant="outline-success">Save</b-button>
+      </b-button-group>
+      <b-button-group class="mx-1">
+        <b-button @click="csvToJson()">Upload CSV</b-button>
+        <b-button @click="jsonToCSV()">Download CSV</b-button>
+      </b-button-group>
+    </b-button-toolbar>
   </div>
 </template>
 
@@ -193,7 +204,7 @@ export default {
           throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
-        App.$next = router.currentRoute.path
+        App.$next = '#/dashboard'
         router.push({path: 'login'})
       }
 
@@ -216,6 +227,10 @@ export default {
           ticket_price: "",
           format: "",
           language: "",
+          year:'',
+          director:'',
+          description:'',
+          duration:'',
         },
       };
     },
@@ -282,21 +297,21 @@ export default {
 
       rowUpdate: {},
       fields: [
+        {key: "edit", label: ''},
+        {key: "delete", label: ""},
+        {key: "edit", label: ""},
         {key: 'index', class: 'id-col'},
         {key: "name", label: "Name", type: "text", editable: true,},
-        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
-        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
         {key: "year", label: "Year", editable: true},
-        {key: "description", label: "Description", editable: true},
         {key: "director", label: "Director", editable: true},
         {key: "duration", label: "Duration", editable: true},
         {key: "tags", label: "Tags", type: "text", editable: true},
         {key: "ticket_price", label: "Ticket Price", type: "text", editable: true},
         {key: "format", label: "Format", type: "text", editable: true},
         {key: "language", label: "Language", type: "text", editable: true},
-        {key: "edit", label: ''},
-        {key: "delete", label: ""},
-        {key: "edit", label: ""},
+        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
+        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
+        {key: "description", label: "Description", editable: true},
       ],
       rows: [],
       loading: false,

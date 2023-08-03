@@ -118,7 +118,7 @@ export default defineComponent({
         </h1>
         <b-row>
           <span  class="disabled w-50 "> {{ theatre[n][0].place }}</span>
-          <b-form-rating v-model="theatre[n][0].rating" class="bg-black border-0 w-25" color="" data-bs-theme="dark"
+          <b-form-rating v-model="theatre[n][0].rating" class="bg-black border-0 w-25 flex-row" color="" data-bs-theme="dark"
                          readonly style="max-width: 125px"></b-form-rating>
         </b-row>
 

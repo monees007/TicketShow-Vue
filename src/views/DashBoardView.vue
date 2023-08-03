@@ -22,20 +22,12 @@
 
     </b-button-toolbar>
 
-    <ShowsTableEditor :displaymode="displaymode" class="rounded-5 d-flex" ref="shows-table" />
+    <ShowsTableEditor v-if="activeTab===0" :displaymode="displaymode" class="rounded-5 d-flex" />
+    <TheatresTableEditor v-if="activeTab===1" :displaymode="displaymode" class="rounded-5 d-flex" />
+    <RunningTableEditor v-if="activeTab===2" :displaymode="displaymode" class="rounded-5 d-flex" />
 
 
-    <b-button-toolbar key-nav class="mt-3">
-      <b-button-group class="mx-1">
-        <b-button class="me-2" @click="$refs['shows-table'].handleAdd()" pill variant="outline-secondary">Add Row</b-button>
-        <b-button class="me-2" @click="$refs['shows-table'].update_records()" pill variant="outline-danger">Reset</b-button>
-        <b-button class="me-2" @click="$refs['shows-table'].handleSave()" pill variant="outline-success">Save</b-button>
-      </b-button-group>
-      <b-button-group class="mx-1">
-        <b-button @click="$refs['shows-table'].csvToJson()">Upload CSV</b-button>
-        <b-button @click="$refs['shows-table'].jsonToCSV()">Download CSV</b-button>
-      </b-button-group>
-    </b-button-toolbar>
+
 
   </div>
 </template>
@@ -43,9 +35,11 @@
 <script>
 
 import ShowsTableEditor from "@/components/TableEditor/ShowsTableEditor.vue";
+import TheatresTableEditor from "@/components/TableEditor/TheatresTableEditor.vue";
+import RunningTableEditor from "@/components/TableEditor/RunningTableEditor.vue";
 export default {
   name: 'DashboardView',
-  components: {ShowsTableEditor},
+  components: {RunningTableEditor, TheatresTableEditor, ShowsTableEditor},
   data: () => {
     return {
       displaymode:0,
