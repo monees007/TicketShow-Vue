@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 // import '@/style/bootstrap.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import router from './router'
+import './registerServiceWorker'
 // import '@/style/custom.scss'
 
 
