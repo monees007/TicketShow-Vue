@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import {BootstrapVue, IconsPlugin} from "bootstrap-vue";
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 
 import 'bootstrap/dist/css/bootstrap.css'
 // import '@/style/bootstrap-vue.css'
@@ -9,21 +9,11 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import router from './router'
 import './registerServiceWorker'
-// import '@/style/custom.scss'
-import router from './router'
-import './registerServiceWorker'
 import {createPinia, PiniaVuePlugin} from 'pinia'
-/* import the fontawesome core */
-import {library} from '@fortawesome/fontawesome-svg-core'
-
-/* import font awesome icon component */
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
-import {far} from '@fortawesome/free-regular-svg-icons'
-import {fas} from '@fortawesome/free-solid-svg-icons'
-
 
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
+// import '@/style/custom.scss'
 
 
 // Make BootstrapVue available throughout your project
@@ -36,17 +26,14 @@ Vue.config.productionTip = true
 // Router setup
 
 
-library.add(far, fas)
-
-/* add font awesome icon component */
-Vue.component('font-awesome-icon', FontAwesomeIcon)
-
-
 new Vue({
-    router, data: {
+    router,
+
+    data: {
         logged: false, admin: true, token: null,
 
     },
+
     pinia,
     render: h => h(App)
 }).$mount('#app')

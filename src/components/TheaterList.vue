@@ -1,10 +1,9 @@
 <script>
 import {defineComponent} from 'vue'
+import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
-import BookingModal from "@/components/BookingModal.vue";
+import BookingModal from "@/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
-import {useAppStore} from "@/store";
-import router from "@/router";
 
 
 export default defineComponent({
@@ -12,13 +11,12 @@ export default defineComponent({
   components: {BookingModal, MovieCard2},
   data: () => {
     return {
-      failed: false,
-      app_store: useAppStore(),
       storeX: useBookingStore(),
       loading: false,
       theatre: {},
       order: [],
-
+      loadingTime: 0,
+      maxLoadingTime: 3,
     }
   },
   computed: {
@@ -27,24 +25,47 @@ export default defineComponent({
     //   return this.theatre[x].slice(1)
     // }
   },
+  watch: {
+    loading(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.clearLoadingTimeInterval()
 
+        if (newValue) {
+          this.$_loadingTimeInterval = setInterval(() => {
+            this.loadingTime++
+          }, 1000)
+        }
+      }
+    },
+    loadingTime(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        if (newValue === this.maxLoadingTime) {
+          this.loading = false
+        }
+      }
+    }
+  },
   created() {
-
+    this.$_loadingTimeInterval = null
   },
   mounted() {
-
+    this.startLoading()
   },
   methods: {
-    router() {
-      return router
+    clearLoadingTimeInterval() {
+      clearInterval(this.$_loadingTimeInterval)
+      this.$_loadingTimeInterval = null
     },
-
+    startLoading() {
+      this.loading = true
+      this.loadingTime = 0
+    },
     async loadx() {
       try { // get theatres
         this.loading = true;
-        const response = await fetch(this.app_store.api + "/homepage", {
+        const response = await fetch("http://127.0.0.1:4433/api/homepage", {
           method: 'GET',
-          // headers: this.app_store.getheader()
+          headers: App.$header('GET')
         });
         if (response.status === 200) {
           let res = await response.json();
@@ -52,13 +73,11 @@ export default defineComponent({
           this.order = res[1]
           this.loading = false;
         } else {
-          console.log(response.status, "Failed at TheatreList")
-
           throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
-        this.failed = true;
-        console.log("Failed at TheatreList", e)
+        App.$next = App.$router.currentRoute.path
+        App.$router.push({path: 'login'})
       }
     },
   },
@@ -72,20 +91,35 @@ export default defineComponent({
 
 <template>
   <div class="">
-    <b-alert v-show="failed" variant="danger">Server not found</b-alert>
+    <div class="d-none">
+      <div class="d-flex align-items-center mb-3">
+        <b-progress :max="maxLoadingTime" class="w-100" height="1.5rem">
+          <b-progress-bar :label="`${((loadingTime / maxLoadingTime) * 100).toFixed(2)}%`"
+                          :value="loadingTime"></b-progress-bar>
+        </b-progress>
 
+        <b-button class="ml-3" @click="startLoading()">Reload</b-button>
+      </div>
+    </div>
+    <!--    <b-skeleton-wrapper :loading="loading">-->
+    <!--      <template #loading>-->
+    <!--        <b-card>-->
+    <!--          <b-skeleton data-bs-theme="dark" height="20%" variant="secondary" width="85%"></b-skeleton>-->
+    <!--          <b-skeleton animation="fade" height="150px" type="input" width="55%"></b-skeleton>-->
+    <!--          <b-skeleton width="70%"></b-skeleton>-->
+    <!--        </b-card>-->
+    <!--      </template>-->
+    <!--    </b-skeleton-wrapper>-->
     <div v-for="n in order" :key="n">
       <hr>
-      <div class="d-flex flex-row" @click="app_store.router.push('/theatre/'+theatre[n][0].id)">
+      <div class="d-flex flex-row">
         <h1 class="align-items-start">
           {{ theatre[n][0].name }}
         </h1>
         <b-row>
-          <span class="disabled w-75 "> {{ theatre[n][0].place }}</span>
-
-          <b-form-rating v-model="theatre[n][0].rating" class="d-none d-md-block bg-black border-0 w-75 flex-row"
-                         :data-bs-theme="app_store.app_theme" color=""
-                         readonly></b-form-rating>
+          <span  class="disabled w-50 "> {{ theatre[n][0].place }}</span>
+          <b-form-rating v-model="theatre[n][0].rating" class="bg-black border-0 w-25 flex-row" color="" data-bs-theme="dark"
+                         readonly style="max-width: 125px"></b-form-rating>
         </b-row>
       </div>
       <hr>
@@ -94,6 +128,13 @@ export default defineComponent({
     <BookingModal :show="storeX.show" :theatre="storeX.theatre"/>
 
   </div>
+  <!--d
+   // get all theatres of current user,
+   // get running shows of current user,
+   render lazily
+  -->
+
+
 </template>
 
 
