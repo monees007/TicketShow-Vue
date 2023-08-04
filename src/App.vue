@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <NavBar data-bs-theme="dark"/>
+
     <b-sidebar data-bs-theme="dark" id="sidebar-1" class shadow title="Sidebar">
       <div class="px-3 py-2">
         <nav>

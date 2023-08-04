@@ -1,14 +1,14 @@
 <template>
   <div>
-    <b-modal id="modal-booking" body-bg-variant="dark" body-text-variant="light" class="d-flex flex-column"
-             data-bs-theme="dark"
+    <b-modal id="modal-booking" v-model="storeX.showModal1" body-bg-variant="dark" body-text-variant="light"
+             class="d-flex flex-column" title="Book Tickets"
              footer-bg-variant="dark"
              footer-text-variant="light"
              header-bg-variant="dark"
              header-text-variant="light"
              no-stacking
              size="lg"
-             title="Book Tickets" visible>
+             visible>
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ show.name }}</h3>
@@ -25,9 +25,9 @@
       </b-row>
       <b-row class="mt-3">
         <span class="left">Date</span>
-        <b-col class="right">
-          <b-form-datepicker class="w-100" v-model="date" :max="max" :min="min" :readonly="true" size="sm"
-                             variant="dark"></b-form-datepicker>
+        <b-col class="right d-inline">
+
+          <b-datepicker id="datepicker" v-model="value" class=""></b-datepicker>
         </b-col>
 
       </b-row>
@@ -40,16 +40,14 @@
       <b-row class="mt-3">
         <span class="left">Seats</span>
         <b-col class="right">
-          <span>{{this.selectedSeats}}</span>
+          <span v-for="x in (this.storeX.selectedSeats.split(',').splice(1))" :key="x" class="pillx">{{ x }}</span>
           <b-button v-b-modal.modal-multi-2>Select Seats</b-button>
-
-          <b-form-select class="w-100" v-model="seats" :options="seatOptions" size="sm" variant="dark"></b-form-select>
         </b-col>
 
       </b-row>
     </b-modal>
 
-    <b-modal id="modal-multi-2"
+    <b-modal id="modal-multi-2" v-model="storeX.showModal2"
              body-bg-variant="dark"
              body-text-variant="light"
              data-bs-theme="dark"
@@ -80,30 +78,42 @@
           <div class="screen">Screen this side.</div>
 
           <div v-for="j in alphas" :key="j" class="row">
-            <div v-for="i in 8" :id="j+i" :key="i" :class="['seat', (occupiedSeat.includes(''+j+i))? 'occupied': '' ]"
+            <div v-for="i in 8" :id="j+i" :key="i"
+                 :class="['seat', (occupiedSeat.includes(''+j+i))? 'occupied': '',(storeX.selectedSeats.includes(''+j+i))? 'selected': ''  ]"
                  @click="seatclick">{{ j + i }}
             </div>
 
           </div>
+          <p class="mt-3">
+            <span v-for="x in (this.storeX.selectedSeats.split(',').splice(1))" :key="x" class="pillx">{{ x }}</span>
 
-          <p class="text">
-            {{ this.selectedSeats }}
           </p>
         </div>
+
       </div>
+      <template #modal-footer="{cancel}">
+        <b-button v-b-modal.modal-booking size="md" variant="success" @click="cancel()">
+          {{ 'Done' }}
+        </b-button>
+
+
+      </template>
     </b-modal>
 
 
   </div>
 </template>
 <script>
+import {useBookingStore} from "@/store/useBookingStore";
+
 export default {
   name: 'BookingModal',
   props: ['show', 'theatre'],
   data: () => {
     return {
+      storeX: useBookingStore(),
+
       lang: "",
-      selectedSeats: '',
       occupiedSeat: ['D6', 'E5', 'C5', 'C3',],
 
     }
@@ -122,9 +132,9 @@ export default {
           !e.target.classList.contains('occupied')) {
 
         if (e.target.classList.contains('selected')) {
-          this.selectedSeats = this.selectedSeats.replace("'" + e.target.id + "',", '');
+          this.storeX.updateSeats(this.storeX.selectedSeats.replace(',' + e.target.id, ''));
         } else
-          this.selectedSeats += "'" + e.target.id + "',"
+          this.storeX.updateSeats(this.storeX.selectedSeats + "," + e.target.id)
         e.target.classList.toggle('selected');
       }
     }
@@ -132,7 +142,15 @@ export default {
 }
 
 </script>
-<style scoped>
+<style>
+
+.b-calendar-grid {
+  width: 100% !important;
+}
+
+#datepicker__outer_ {
+  display: inline-flex;
+}
 .left {
   width: 100px;
   margin-right: 10px;
@@ -142,6 +160,7 @@ export default {
 .right {
   padding-left: 20px;
   border-left: darkcyan dashed 2px;
+}
 .pillx{
   padding: 3px 5px;
   border-radius: 90px;
@@ -149,7 +168,7 @@ export default {
   font-weight: bold;
   background: #121212;
 }
-}
+
 </style>
 <style>
 

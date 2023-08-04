@@ -2,13 +2,16 @@
 import {defineComponent} from 'vue'
 import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
+import BookingModal from "@/BookingModal.vue";
+import {useBookingStore} from "@/store/useBookingStore";
 
 
 export default defineComponent({
   name: "TheaterList",
-  components: {MovieCard2},
+  components: {BookingModal, MovieCard2},
   data: () => {
     return {
+      storeX: useBookingStore(),
       loading: false,
       theatre: {},
       order: [],
@@ -64,11 +67,9 @@ export default defineComponent({
           method: 'GET',
           headers: App.$header('GET')
         });
-        console.log(response.status)
         if (response.status === 200) {
           let res = await response.json();
           this.theatre = res[0]
-          console.log(res)
           this.order = res[1]
           this.loading = false;
         } else {
@@ -112,7 +113,6 @@ export default defineComponent({
     <div v-for="n in order" :key="n">
       <hr>
       <div class="d-flex flex-row">
-
         <h1 class="align-items-start">
           {{ theatre[n][0].name }}
         </h1>
@@ -121,14 +121,12 @@ export default defineComponent({
           <b-form-rating v-model="theatre[n][0].rating" class="bg-black border-0 w-25 flex-row" color="" data-bs-theme="dark"
                          readonly style="max-width: 125px"></b-form-rating>
         </b-row>
-
       </div>
-
-
-
       <hr>
       <MovieCard2 v-for="m in theatre[n][1]" :key="m.id" :m="m" :t="theatre[n][0]"/>
     </div>
+    <BookingModal :show="storeX.show" :theatre="storeX.theatre"/>
+
   </div>
   <!--d
    // get all theatres of current user,

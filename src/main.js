@@ -8,6 +8,10 @@ import 'bootstrap/dist/css/bootstrap.css'
 // import '@/style/bootstrap.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import router from './router'
+import {createPinia, PiniaVuePlugin} from 'pinia'
+
+Vue.use(PiniaVuePlugin)
+const pinia = createPinia()
 // import '@/style/custom.scss'
 
 
@@ -15,17 +19,20 @@ import router from './router'
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
-
 Vue.config.productionTip = true
-
 // Router setup
 
 
 new Vue({
-    router, data: {
+    router,
+
+    data: {
         logged: false, admin: true, token: null,
 
-    }, render: h => h(App)
+    },
+
+    pinia,
+    render: h => h(App)
 }).$mount('#app')
 
 App.$appname = 'TicketShow'
