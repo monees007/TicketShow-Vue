@@ -3,19 +3,11 @@
 <script>
 
 import {useBookingStore} from "@/store/useBookingStore";
-import {useAppStore} from "@/store";
-import router from "@/router";
 
 export default {
   name: "MovieCard2",
-  methods: {
-    router() {
-      return router
-    }
-  },
   data: () => {
     return {
-      appstore: useAppStore(),
       storeX: useBookingStore()
     }
   },
@@ -28,46 +20,43 @@ export default {
   <div id="bright" class="movie_card">
     <div class="info_section d-flex flex-column">
       <div class="movie_header">
-        <img :src="m.image_url" class="locandina"/>
-        <div class="d-flex flex-column align-items-start" style="text-align: left">
-          <h1 style="overflow: hidden">{{ m.name }}</h1>
+        <img class="locandina"
+             :src="m.image_url"/>
+        <div class="d-flex flex-column align-items-start">
+          <h1 style="text-wrap: nowrap; overflow: hidden">{{ m.name }}</h1>
           <h4>{{m.year}}, {{ m.director}}</h4>
           <div><span class="minutes">{{ m.format}}</span>
-            <p class="type mb-2">{{ m.tags }}</p></div>
+            <p class="type">{{ m.tags }}</p></div>
 
         </div>
 
       </div>
-      <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5 mx-4">
-        <p class="text ">
-          {{ m.description }}
+      <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5">
+        <p class="text">
+          Set in a world where fantasy creatures live side by side with humans. A human cop is forced to work with an
+          Orc to find a weapon everyone is prepared to kill for.
         </p>
 
       </div>
 
-      <div v-if="t != null" class="d-flex flex-row mb-3 mx-3">
-        <b-rating :value="m.rating" class="ml-5  bg-dark border-0" inline size="lg"
-                  variant="warning"></b-rating>
+      <div class="d-flex flex-row mb-3 mx-3">
+        <b-rating class="w-25 rating-el bg-black"  data-bs-theme="dark" inline no-border size="lg" variant=""></b-rating>
 
-
-        <b-button :data-bs-theme="appstore.app_theme" class="mx-2 btn-outline-secondary btn-dark" pill
-                  @click="$router.push({path:'/show/'+m.id})">Reviews
-        </b-button>
-        <b-button v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
-                  class="mx-2 btn-outline-secondary btn-dark" pill
+        <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light">Reviews</b-button>
+        <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
                   @click="storeX.setValue(t,m)">Book
         </b-button>
-        <b-button v-if="false && appstore.user.role==='admin'" class="me-2" pill size="sm">
+        <b-button class="me-2" pill size="sm">
           <b-icon icon="pen"/>
         </b-button>
-        <b-button v-if="false && appstore.user.role==='admin'" class="me-2" pill size="sm">
+        <b-button class="me-2" pill size="sm">
           <b-icon icon="trash"/>
         </b-button>
 
       </div>
     </div>
     <div class="blur_back bright_back " style="max-width: fit-content;">
-      <img style="    /*noinspection CssInvalidPropertyValue*/max-height: -webkit-fill-available;"
+      <img style="    max-height: -webkit-fill-available;"
           :src="m.image_sqr">
     </div>
   </div>
@@ -94,7 +83,7 @@ html, body {
   display: block;
   width: 800px;
   height: 350px;
-  margin: 50px auto;
+  margin: 100px auto;
   overflow: hidden;
   border-radius: 10px;
   transition: all 0.4s;
@@ -230,6 +219,9 @@ html, body {
   }
 }
 
+.bright_back {
+  background: url("https://occ-0-2433-448.1.nflxso.net/art/cd5c9/3e192edf2027c536e25bb5d3b6ac93ced77cd5c9.jpg");
+}
 
 #tomb {
   box-shadow: 0px 0px 150px -45px rgba(19, 160, 134, 0.6);
