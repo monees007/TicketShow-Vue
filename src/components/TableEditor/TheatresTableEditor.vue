@@ -4,10 +4,10 @@
       <KeepAlive>
         <b-editable-table
             v-if="displaymode===0"
-            v-model="rows"
+            v-model="storeX.theatre_data"
             :busy="loading"
             :editMode="'row'"
-            :fields="fields"
+            :fields="storeX.theatre_field"
             :rowUpdate="rowUpdate"
             bordered
 
@@ -57,8 +57,47 @@
 
     <Transition>
       <KeepAlive>
-        <div v-if="displaymode===1" class="">
-          <MovieCard2 v-for="m in rows" :key="m.id" :m="m"/>
+        <div class="accordion" data-bs-theme="dark" role="tablist" style="width: 100vh">
+          <b-card v-for="(t,index) in storeX.theatre_data" :key="t.id" class="mb-1" no-body>
+            <b-card-header v-b-toggle="'acc'+index" class="p-1" header-tag="header" role="tab">
+              <hr>
+              <div class="d-flex flex-row">
+                <h1 class="align-items-start">
+                  {{ t.name }}
+                </h1>
+                <b-row>
+                  <span class="disabled w-50 "> {{ t.place }}</span>
+                  <b-form-rating v-model="t.rating" class="bg-black border-0  flex-row" data-bs-theme="dark"
+                                 readonly style="max-width: 125px"></b-form-rating>
+                </b-row>
+              </div>
+              <hr>
+            </b-card-header>
+            <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel" visible>
+              <b-card-body>
+                <!--                <span>{{ r.sname }}</span>-->
+                <!--                <span>{{ r.days }}</span>-->
+                <!--                <span>{{ r.start }}</span>-->
+                <!--                <span>{{ r.end }}</span>-->
+                <!--                <span>{{ r.end }}</span>-->
+                <!--                <span>{{ r.language }}</span>-->
+                <!--                <span>{{ r.format }}</span>-->
+                <!--                <span>{{ r.ticket_price }}</span>-->
+                <b-button pill>
+                  <b-icon icon="plus-lg"/>
+                </b-button>
+                <b-row>
+                  <!--                  <span class="left">Show</span>-->
+                  <!--                  <b-col class="right"><h3> {{ show.name }}</h3>-->
+                  <!--                    <span class="pillx" >{{ show.format }}</span>-->
+                  <!--                    <span class="pillx" >{{ lang || 'ENG' }}</span>-->
+                  <!--                  </b-col>-->
+                </b-row>
+              </b-card-body>
+            </b-collapse>
+          </b-card>
+
+
         </div>
       </KeepAlive>
     </Transition>
@@ -106,15 +145,15 @@
         </div>
       </KeepAlive>
     </Transition>
-    <b-button-toolbar key-nav class="mt-3">
+    <b-button-toolbar class="mt-3" key-nav>
       <b-button-group class="mx-1">
-        <b-button class="me-2" @click="handleAdd()" pill variant="outline-secondary">Add Row</b-button>
-        <b-button class="me-2" @click="update_records()" pill variant="outline-danger">Reset</b-button>
-        <b-button class="me-2" @click="handleSave()" pill variant="outline-success">Save</b-button>
+        <b-button class="me-2" pill variant="outline-secondary" @click="handleAdd()">Add Row</b-button>
+        <b-button class="me-2" pill variant="outline-danger" @click="storeX.update_data(1)">Reset</b-button>
+        <b-button class="me-2" pill variant="outline-success" @click="handleSave()">Save</b-button>
       </b-button-group>
       <b-button-group class="mx-1">
-        <b-button @click="csvToJson()">Upload CSV</b-button>
-        <b-button @click="jsonToCSV()">Download CSV</b-button>
+        <b-button @click="storeX.csvToJson()">Upload CSV</b-button>
+        <b-button @click="storeX.jsonToCSV(1)">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
   </div>
@@ -123,93 +162,17 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
-import App from "@/App.vue";
-import MovieCard2 from "@/components/MovieCard2.vue";
-import router from "@/router";
+import {useTableEditorStore} from "@/store/useTableEditorStore";
 
 export default {
   name: 'TheatresTableEditor',
   components: {
-    MovieCard2,
     BEditableTable,
     BSpinner,
   },
   methods: {
-    csvToJson() {
-      var input = document.createElement('input');
-      input.type = 'file';
-
-      input.onchange = e => {
-
-        // getting a hold of the file reference
-        let file = e.target.files[0];
-
-        // setting up the reader
-        let reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-
-        // here we tell the reader what to do when it's done reading...
-        reader.onload = readerEvent => {
-          let csv = readerEvent.target.result; // this is the content!
-          let data = require('jquery-csv').toObjects(csv);
-          console.log(data)
-          this.rows = data
-        }
-
-      }
-
-      input.click();
-    },
-    jsonToCSV(fileTitle = 'export') {
-
-      const items = this.rows
-      const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
-      const header = Object.keys(items[0])
-      let csv = [
-        header.join(','), // header row first
-        ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer).replace(/"/g, '')).join(','))
-      ].join('\n')
-      console.log(csv)
-      let exportedFilename = fileTitle + '.csv' || 'export.csv';
-
-      let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-      if (navigator.msSaveBlob) { // IE 10+
-        navigator.msSaveBlob(blob, exportedFilename);
-      } else {
-        let link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          let url = URL.createObjectURL(blob);
-          link.setAttribute("href", url);
-          link.setAttribute("download", exportedFilename);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }
-    },
-    async update_records() {
-      try {
-        this.loading = true;
-        const response = await fetch("http://127.0.0.1:4433/api/bulk/theatre", {
-          method: 'GET',
-          headers: App.$header('GET')
-        });
-        console.log(response.status)
-        if (response.status === 200) {
-          this.rows = await response.json();
-          this.loading = false;
-        } else {
-          throw new TypeError("Token expired"); // will check for token and push to log in
-        }
-      } catch (e) {
-        App.$next = '#/dashboard'
-        router.push({path: 'login'})
-      }
 
 
-    },
     handleAdd() {
       const newId = Date.now();
       this.rowUpdate = {
@@ -240,7 +203,7 @@ export default {
               id: data.id
             }), {
               method: 'PUT',
-              headers: App.$header(),
+          headers: this.storeX.header,
               body: JSON.stringify(this.rows[data.index])
             }
         );
@@ -261,7 +224,7 @@ export default {
             id: data.id
           }), {
             method: 'DELETE',
-            headers: App.$header(),
+        headers: this.storeX.header,
             body: JSON.stringify(this.rows)
           }
       );
@@ -273,7 +236,7 @@ export default {
 
       const rawResponse = await fetch('http://127.0.0.1:4433/api/bulk/theater', {
         method: 'POST',
-        headers: App.$header(),
+        headers: this.storeX.header,
         body: JSON.stringify(this.rows)
       });
       const content = await rawResponse.status;
@@ -287,29 +250,37 @@ export default {
 
   data() {
     return {
-
+      storeX: useTableEditorStore(),
       rowUpdate: {},
-      fields: [
-        {key: "edit", label: ''},
-        {key: "edit", label: ''},
-        {key: "delete", label: ""},
-        {key: 'index', class: 'id-col'},
-        {key: "name", label: "Name", type: "text", editable: true,},
-        {key: "place", label: "Place", editable: true},
-        {key: "capacity", label: "Capacity", editable: true},
-
-
-      ],
-      rows: [],
       loading: false,
     };
   },
   async mounted() {
-    await this.update_records()
+    await this.storeX.update_data(1)
   },
 };
 </script>
 
+<style>
+.left {
+  width: 100px;
+  margin-right: 10px;
+  margin-left: 50px;
+}
+
+.right {
+  padding-left: 20px;
+  border-left: darkcyan dashed 2px;
+}
+
+.pillx {
+  padding: 3px 5px;
+  border-radius: 90px;
+  margin: 5px;
+  font-weight: bold;
+  background: #121212;
+}
+</style>
 
 <style lang="less">
 /* -- import Roboto Font ---------------------------- */

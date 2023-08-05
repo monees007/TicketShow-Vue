@@ -4,17 +4,14 @@
       <KeepAlive>
         <b-editable-table
             v-if="displaymode===0"
-            v-model="rows"
+            v-model="storeX.show_data"
             :busy="loading"
             :editMode="'row'"
-            :fields="fields"
+            :fields="storeX.show_field"
             :rowUpdate="rowUpdate"
             bordered
-
             class=" editable-table table-hover shadow-z-1 "
-            data-bs-theme="dark"
-
-        >
+            data-bs-theme="dark">
           <template #cell-isActive="data">
             <span v-if="data.value">Yes</span>
             <span v-else>No</span>
@@ -66,7 +63,7 @@
     <Transition>
       <KeepAlive>
         <div v-if="displaymode===2" class="d-flex flex-wrap">
-          <div v-for="r in rows" :key="r.id" class="card bg-dark-subtle border-0 text-white mx-3 my-3"
+          <div v-for="r in storeX.show_data" :key="r.id" class="card bg-dark-subtle border-0 text-white mx-3 my-3"
                data-bs-theme="dark" style="min-width: 18rem; min-height: 30rem">
             <b-overlay bg-color="dark" data-bs-theme="dark" no-center opacity="1" rounded="sm" show>
               <template #overlay>
@@ -109,12 +106,12 @@
     <b-button-toolbar key-nav class="mt-3">
       <b-button-group class="mx-1">
         <b-button class="me-2" @click="handleAdd()" pill variant="outline-secondary">Add Row</b-button>
-        <b-button class="me-2" @click="update_records()" pill variant="outline-danger">Reset</b-button>
+        <b-button class="me-2" pill variant="outline-danger" @click="storeX.update_data(0)">Reset</b-button>
         <b-button class="me-2" @click="handleSave()" pill variant="outline-success">Save</b-button>
       </b-button-group>
       <b-button-group class="mx-1">
         <b-button @click="csvToJson()">Upload CSV</b-button>
-        <b-button @click="jsonToCSV()">Download CSV</b-button>
+        <b-button @click="storeX.jsonToCSV(0)">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
   </div>
@@ -123,9 +120,8 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
-import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
-import router from "@/router";
+import {useTableEditorStore} from "@/store/useTableEditorStore";
 
 export default {
   name: 'ShowsTableEditor',
@@ -160,56 +156,8 @@ export default {
 
       input.click();
     },
-    jsonToCSV(fileTitle = 'export') {
-
-      const items = this.rows
-      const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
-      const header = Object.keys(items[0])
-      let csv = [
-        header.join(','), // header row first
-        ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer).replace(/"/g, '')).join(','))
-      ].join('\n')
-      console.log(csv)
-      let exportedFilename = fileTitle + '.csv' || 'export.csv';
-
-      let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-      if (navigator.msSaveBlob) { // IE 10+
-        navigator.msSaveBlob(blob, exportedFilename);
-      } else {
-        let link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          let url = URL.createObjectURL(blob);
-          link.setAttribute("href", url);
-          link.setAttribute("download", exportedFilename);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }
-    },
-    async update_records() {
-      try {
-        this.loading = true;
-        const response = await fetch("http://127.0.0.1:4433/api/bulk/shows", {
-          method: 'GET',
-          headers: App.$header('GET')
-        });
-        console.log(response.status)
-        if (response.status === 200) {
-          this.rows = await response.json();
-          this.loading = false;
-        } else {
-          throw new TypeError("Token expired"); // will check for token and push to log in
-        }
-      } catch (e) {
-        App.$next = '#/dashboard'
-        router.push({path: 'login'})
-      }
 
 
-    },
     handleAdd() {
       const newId = Date.now();
       this.rowUpdate = {
@@ -247,7 +195,7 @@ export default {
               id: data.id
             }), {
               method: 'PUT',
-              headers: App.$header(),
+          headers: this.storeX.header,
               body: JSON.stringify(this.rows[data.index])
             }
         );
@@ -268,7 +216,7 @@ export default {
             id: data.id
           }), {
             method: 'DELETE',
-            headers: App.$header(),
+        headers: this.storeX.header,
             body: JSON.stringify(this.rows)
           }
       );
@@ -280,7 +228,7 @@ export default {
 
       const rawResponse = await fetch('http://127.0.0.1:4433/api/bulk/shows', {
         method: 'POST',
-        headers: App.$header(),
+        headers: this.storeX.header,
         body: JSON.stringify(this.rows)
       });
       const content = await rawResponse.json();
@@ -294,31 +242,14 @@ export default {
 
   data() {
     return {
-
+      storeX: useTableEditorStore(),
       rowUpdate: {},
-      fields: [
-        {key: "edit", label: ''},
-        {key: "delete", label: ""},
-        {key: "edit", label: ""},
-        {key: 'index', class: 'id-col'},
-        {key: "name", label: "Name", type: "text", editable: true,},
-        {key: "year", label: "Year", editable: true},
-        {key: "director", label: "Director", editable: true},
-        {key: "duration", label: "Duration", editable: true},
-        {key: "tags", label: "Tags", type: "text", editable: true},
-        {key: "ticket_price", label: "Ticket Price", type: "text", editable: true},
-        {key: "format", label: "Format", type: "text", editable: true},
-        {key: "language", label: "Language", type: "text", editable: true},
-        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
-        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
-        {key: "description", label: "Description", editable: true},
-      ],
-      rows: [],
+
       loading: false,
     };
   },
   async mounted() {
-    await this.update_records()
+    await this.storeX.update_data(0)
   },
 };
 </script>

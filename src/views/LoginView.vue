@@ -1,7 +1,7 @@
 <script>
 import {defineComponent} from 'vue'
 import App from "../App.vue";
-import axios from "axios";
+import {useTableEditorStore} from "@/store/useTableEditorStore";
 
 export default defineComponent({
   name: "LoginPage",
@@ -10,53 +10,18 @@ export default defineComponent({
       return App
     }
   },
-  data: ()=>{
+  data: function dat() {
     return {
+      storeX: useTableEditorStore(),
       eye: false,
       disable_button: false,
-      password:'',
-      email:'',
-      remember:true,
+      password: '',
+      email: '',
+      remember: false,
     }
   },
-  methods: {
-    async login() {
-      this.disable_button = true
-      console.log('next='+ App.$next)
-      await axios.post(App.$server + '/login?&include_auth_token=true', {
-            email: this.email,
-            password: this.password,
-            remember: this.remember
-          }, {
-            headers: {
-              'Content-Type': 'application/json',
-              'accept': 'application/json'
-            },
+  methods: {},
 
-          }
-      )
-          .then(function (response) {
-            App.$auth_token = response.data.response.user['authentication_token']
-            App.$csrf = response.data.response['csrf_token']
-            window.localStorage.setItem("Authentication-Token", App.$auth_token);
-            window.localStorage.setItem("csrf_token", App.$csrf);
-
-            App.data.logged = true
-            console.log('Logged in Successfully')
-            if (App.$next === '#/login'){
-              App.$next = '#/'
-            }
-            App.$router.push(App.$next)
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      this.disable_button = false
-
-
-
-    }
-  }
 })
 </script>
 
@@ -76,7 +41,7 @@ export default defineComponent({
                     <b-icon class="primary far fa-user " icon="person"/>
                   </b-col>
                   <b-col cols="10">
-                    <b-form-input v-model="email"  class="" placeholder="Username or Email" required type="text"/>
+                    <b-form-input v-model="email" class="" placeholder="Username or Email" required type="text"/>
 
                   </b-col>
                 </b-input-group>
@@ -85,11 +50,12 @@ export default defineComponent({
                     <b-icon class="primary far " icon="lock"/>
                   </b-col>
                   <b-col cols="">
-                    <b-form-input v-model="password" :type="eye ?'text' : 'password'" placeholder="Enter your Password" required/>
+                    <b-form-input v-model="password" :type="eye ?'text' : 'password'" placeholder="Enter your Password"
+                                  required/>
 
                   </b-col>
                   <b-col cols="2">
-                    <b-button variant="outline" class="border-0 btn text-muted" @click="eye = !eye">
+                    <b-button class="border-0 btn text-muted" variant="outline" @click="eye = !eye">
                       <b-icon :icon="eye ? 'eye-fill': 'eye-slash-fill' " class="primary"></b-icon>
                     </b-button>
                   </b-col>
@@ -97,13 +63,13 @@ export default defineComponent({
               </b-form-group>
 
 
-              <b-form  class="form-inline" inline>
-                <input v-model="remember" id="remember" name="remember" type="checkbox">
+              <b-form class="form-inline" inline>
+                <input id="remember" v-model="remember" name="remember" type="checkbox">
                 <label class="text-muted me-2" for="remember">Remember me</label>
                 <a id="forgot" class="font-weight-bold" href="#">Forgot password?</a></b-form>
 
               <b-button :disabled="disable_button" class=" btn btn-primary btn-block px-3 py-1 mt-3" pill
-                        @click="login">Login
+                        @click="storeX.login(email,password,remember)">Login
               </b-button>
 
               <div class="text-center pt-4 text-muted">Don't have an account? <a href="#/signup">Sign up</a></div>
@@ -112,7 +78,7 @@ export default defineComponent({
           <b-card-footer class="mx-3 my-2 py-2 bordert">
             <div class="text-center py-3"><a class="px-2" href="https://wwww.facebook.com" target="_blank"> <img
                 alt="" src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg"> </a> <a
-                class="px-2" :href="App.$server+'/login/oauthstart/google'" target="_blank"> <img
+                :href="storeX.server+'/login/oauthstart/google'" class="px-2" target="_blank"> <img
                 alt=""
                 src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png">
             </a> <a class="px-2" href="https://www.github.com" target="_blank"> <img

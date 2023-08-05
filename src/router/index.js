@@ -1,49 +1,35 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import DashBoardView from "@/views/DashBoardView.vue";
+// import pinia from "@/store/useTableEditorStore";
+import {useTableEditorStore} from "@/store/useTableEditorStore"
 
 Vue.use(VueRouter)
 
+
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: DashBoardView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },
-  {
-    path:'/bookings',
-    name: 'booking',
-    component: () => import('../views/BookingView.vue')
-  },
-  {
-    path: '/login',
-    name: 'login',
-    params: { next: '' },
-    component: () => import('../views/LoginView.vue')
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: () => import('../views/SignUpView.vue')
-  }
+  //
 ]
 
 const router = new VueRouter({
   routes
 })
+
+// router.beforeEach((to, from, next) => {
+//   // we wanted to use the store here
+//   const store = useTableEditorStore()
+//
+//   if (store.logged_in) next()
+//   else next('/login')
+// })
+
+router.beforeEach((to) => {
+  // ✅ This will work because the router starts its navigation after
+  // the router is installed and pinia will be installed too
+  const store = useTableEditorStore()
+
+  if (to.meta && !store.logged_in) return '/login'
+
+})
+
 
 export default router

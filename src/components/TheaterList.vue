@@ -2,7 +2,7 @@
 import {defineComponent} from 'vue'
 import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
-import BookingModal from "@/BookingModal.vue";
+import BookingModal from "@/components/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
 
 
