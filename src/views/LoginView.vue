@@ -1,7 +1,7 @@
 <script>
 import {defineComponent} from 'vue'
 import App from "../App.vue";
-import axios from "axios";
+import {useAppStore} from "@/store";
 
 export default defineComponent({
   name: "LoginPage",
@@ -12,6 +12,7 @@ export default defineComponent({
   },
   data: ()=>{
     return {
+      appstore: useAppStore(),
       eye: false,
       disable_button: false,
       password:'',
@@ -22,35 +23,7 @@ export default defineComponent({
   methods: {
     async login() {
       this.disable_button = true
-      console.log('next='+ App.$next)
-      await axios.post(App.$server + '/login?&include_auth_token=true', {
-            email: this.email,
-            password: this.password,
-            remember: this.remember
-          }, {
-            headers: {
-              'Content-Type': 'application/json',
-              'accept': 'application/json'
-            },
-
-          }
-      )
-          .then(function (response) {
-            App.$auth_token = response.data.response.user['authentication_token']
-            App.$csrf = response.data.response['csrf_token']
-            window.localStorage.setItem("Authentication-Token", App.$auth_token);
-            window.localStorage.setItem("csrf_token", App.$csrf);
-
-            App.data.logged = true
-            console.log('Logged in Successfully')
-            if (App.$next === '#/login'){
-              App.$next = '#/'
-            }
-            App.$router.push(App.$next)
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      await this.appstore.login(this.email, this.password)
       this.disable_button = false
 
 

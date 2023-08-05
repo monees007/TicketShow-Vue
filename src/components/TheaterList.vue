@@ -4,6 +4,7 @@ import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
 import BookingModal from "@/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
+import {useAppStore} from "@/store";
 
 
 export default defineComponent({
@@ -11,6 +12,8 @@ export default defineComponent({
   components: {BookingModal, MovieCard2},
   data: () => {
     return {
+      failed: false,
+      app_store: useAppStore(),
       storeX: useBookingStore(),
       loading: false,
       theatre: {},
@@ -63,7 +66,7 @@ export default defineComponent({
     async loadx() {
       try { // get theatres
         this.loading = true;
-        const response = await fetch("http://127.0.0.1:4433/api/homepage", {
+        const response = await fetch(this.app_store.api + "/homepage", {
           method: 'GET',
           headers: App.$header('GET')
         });
@@ -73,11 +76,12 @@ export default defineComponent({
           this.order = res[1]
           this.loading = false;
         } else {
+          console.log(response.status, "Failed at TheatreList")
+
           throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
-        App.$next = App.$router.currentRoute.path
-        App.$router.push({path: 'login'})
+        console.log("Failed at TheatreList", e)
       }
     },
   },
@@ -110,6 +114,8 @@ export default defineComponent({
     <!--        </b-card>-->
     <!--      </template>-->
     <!--    </b-skeleton-wrapper>-->
+    <b-alert v-show="failed" variant="danger">Danger Alert</b-alert>
+
     <div v-for="n in order" :key="n">
       <hr>
       <div class="d-flex flex-row">

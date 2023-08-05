@@ -123,9 +123,8 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
-import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
-import router from "@/router";
+import {useAppStore} from "@/store";
 
 export default {
   name: 'TheatresTableEditor',
@@ -192,20 +191,20 @@ export default {
     async update_records() {
       try {
         this.loading = true;
-        const response = await fetch("http://127.0.0.1:4433/api/bulk/theatre", {
+        const response = await fetch(this.appstore.api + "/bulk/theatre", {
           method: 'GET',
-          headers: App.$header('GET')
+          headers: this.appstore.getheader()
         });
         console.log(response.status)
         if (response.status === 200) {
           this.rows = await response.json();
           this.loading = false;
         } else {
+          console.log(response.status, "Failed to load bulk shows")
           throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
-        App.$next = '#/dashboard'
-        router.push({path: 'login'})
+        console.log("Failed to load bulk shows", e)
       }
 
 
@@ -235,12 +234,12 @@ export default {
         action: update ? "update" : "cancel",
       };
       if (update) {
-        const rawResponse = await fetch('http://127.0.0.1:4433/api/theater?' +
+        const rawResponse = await fetch(this.appstore.api + '/theater?' +
             new URLSearchParams({
               id: data.id
             }), {
               method: 'PUT',
-              headers: App.$header(),
+          headers: this.appstore.getheader(),
               body: JSON.stringify(this.rows[data.index])
             }
         );
@@ -256,12 +255,12 @@ export default {
       this.rowUpdate = {edit: true, id: data.id};
     },
     async handleDelete(data) {
-      const rawResponse = await fetch('http://127.0.0.1:4433/api/theater?' +
+      const rawResponse = await fetch(this.appstore.api + '/theater?' +
           new URLSearchParams({
             id: data.id
           }), {
             method: 'DELETE',
-            headers: App.$header(),
+        headers: this.appstore.getheader(),
             body: JSON.stringify(this.rows)
           }
       );
@@ -271,9 +270,9 @@ export default {
     },
     async handleSave() {
 
-      const rawResponse = await fetch('http://127.0.0.1:4433/api/bulk/theater', {
+      const rawResponse = await fetch(this.appstore.api + '/bulk/theater', {
         method: 'POST',
-        headers: App.$header(),
+        headers: this.appstore.getheader(),
         body: JSON.stringify(this.rows)
       });
       const content = await rawResponse.status;
@@ -287,7 +286,7 @@ export default {
 
   data() {
     return {
-
+      appstore: useAppStore(),
       rowUpdate: {},
       fields: [
         {key: "edit", label: ''},

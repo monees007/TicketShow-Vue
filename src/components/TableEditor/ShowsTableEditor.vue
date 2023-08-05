@@ -125,7 +125,7 @@ import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
 import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
-import router from "@/router";
+import {useAppStore} from "@/store";
 
 export default {
   name: 'ShowsTableEditor',
@@ -133,6 +133,32 @@ export default {
     MovieCard2,
     BEditableTable,
     BSpinner,
+  },
+
+  data() {
+    return {
+      appstore: useAppStore(),
+      rowUpdate: {},
+      fields: [
+        {key: "edit", label: ''},
+        {key: "delete", label: ""},
+        {key: "edit", label: ""},
+        {key: 'index', class: 'id-col'},
+        {key: "name", label: "Name", type: "text", editable: true,},
+        {key: "year", label: "Year", editable: true},
+        {key: "director", label: "Director", editable: true},
+        {key: "duration", label: "Duration", editable: true},
+        {key: "tags", label: "Tags", type: "text", editable: true},
+        {key: "ticket_price", label: "Ticket Price", type: "text", editable: true},
+        {key: "format", label: "Format", type: "text", editable: true},
+        {key: "language", label: "Language", type: "text", editable: true},
+        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
+        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
+        {key: "description", label: "Description", editable: true},
+      ],
+      rows: [],
+      loading: false,
+    };
   },
   methods: {
     csvToJson() {
@@ -190,22 +216,23 @@ export default {
       }
     },
     async update_records() {
+      const appstoreX = this.appstore
       try {
         this.loading = true;
-        const response = await fetch("http://127.0.0.1:4433/api/bulk/shows", {
+        const response = await fetch(appstoreX.server + "/api/bulk/shows", {
           method: 'GET',
-          headers: App.$header('GET')
+          headers: appstoreX.getheader()
         });
-        console.log(response.status)
+        console.log(response.status, "ShowList Updated")
         if (response.status === 200) {
           this.rows = await response.json();
           this.loading = false;
         } else {
+          console.log(response.status, "Failed to load bulk shows")
           throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
-        App.$next = '#/dashboard'
-        router.push({path: 'login'})
+        console.log("Failed to load bulk shows", e)
       }
 
 
@@ -244,9 +271,9 @@ export default {
       if (update) {
         const rawResponse = await fetch('http://127.0.0.1:4433/api/shows?' +
             new URLSearchParams({
-              id: data.id
+
             }), {
-              method: 'PUT',
+          method: 'POST',
               headers: App.$header(),
               body: JSON.stringify(this.rows[data.index])
             }
@@ -290,32 +317,6 @@ export default {
   },
   props: {
     displaymode: null,
-  },
-
-  data() {
-    return {
-
-      rowUpdate: {},
-      fields: [
-        {key: "edit", label: ''},
-        {key: "delete", label: ""},
-        {key: "edit", label: ""},
-        {key: 'index', class: 'id-col'},
-        {key: "name", label: "Name", type: "text", editable: true,},
-        {key: "year", label: "Year", editable: true},
-        {key: "director", label: "Director", editable: true},
-        {key: "duration", label: "Duration", editable: true},
-        {key: "tags", label: "Tags", type: "text", editable: true},
-        {key: "ticket_price", label: "Ticket Price", type: "text", editable: true},
-        {key: "format", label: "Format", type: "text", editable: true},
-        {key: "language", label: "Language", type: "text", editable: true},
-        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
-        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
-        {key: "description", label: "Description", editable: true},
-      ],
-      rows: [],
-      loading: false,
-    };
   },
   async mounted() {
     await this.update_records()
