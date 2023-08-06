@@ -3,11 +3,13 @@
 <script>
 
 import {useBookingStore} from "@/store/useBookingStore";
+import {useAppStore} from "@/store";
 
 export default {
   name: "MovieCard2",
   data: () => {
     return {
+      appstore: useAppStore(),
       storeX: useBookingStore()
     }
   },
@@ -22,8 +24,8 @@ export default {
       <div class="movie_header">
         <img class="locandina"
              :src="m.image_url"/>
-        <div class="d-flex flex-column align-items-start">
-          <h1 style="text-wrap: nowrap; overflow: hidden">{{ m.name }}</h1>
+        <div class="d-flex flex-column align-items-start" style="text-align: left">
+          <h1 style="overflow: hidden">{{ m.name }}</h1>
           <h4>{{m.year}}, {{ m.director}}</h4>
           <div><span class="minutes">{{ m.format}}</span>
             <p class="type">{{ m.tags }}</p></div>
@@ -46,10 +48,10 @@ export default {
         <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
                   @click="storeX.setValue(t,m)">Book
         </b-button>
-        <b-button class="me-2" pill size="sm">
+        <b-button v-if="appstore.user.role==='admin'" class="me-2" pill size="sm">
           <b-icon icon="pen"/>
         </b-button>
-        <b-button class="me-2" pill size="sm">
+        <b-button v-if="appstore.user.role==='admin'" class="me-2" pill size="sm">
           <b-icon icon="trash"/>
         </b-button>
 
@@ -83,7 +85,7 @@ html, body {
   display: block;
   width: 800px;
   height: 350px;
-  margin: 100px auto;
+  margin: 50px auto;
   overflow: hidden;
   border-radius: 10px;
   transition: all 0.4s;

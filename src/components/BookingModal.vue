@@ -116,6 +116,7 @@ export default {
       lang: "",
       occupiedSeat: ['D6', 'E5', 'C5', 'C3',],
 
+      value: null
     }
   },
   computed: {

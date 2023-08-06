@@ -1,10 +1,11 @@
+<!--suppress JSCheckFunctionSignatures -->
 <template>
   <div class="d-flex flex-column">
     <Transition>
       <KeepAlive>
         <b-editable-table
             v-if="displaymode===0"
-            v-model="rows"
+            v-model="storeX.theatre_list"
             :busy="loading"
             :editMode="'row'"
             :fields="fields"
@@ -57,64 +58,147 @@
 
     <Transition>
       <KeepAlive>
-        <div v-if="displaymode===1" class="">
-          <MovieCard2 v-for="m in rows" :key="m.id" :m="m"/>
+        <div v-if="displaymode===1" class="accordion" data-bs-theme="dark" role="tablist">
+          <b-card v-for="(t,index) in storeX.theatre_list" :key="t.id" class="mb-1" no-body>
+            <b-card-header v-b-toggle="'acc'+index" class="p-1" header-tag="header" role="tab">
+              <div class="d-flex  flex-row px-3">
+                <h1 class="align-items-start my-3 " style="min-width: fit-content">
+                  {{ t.name }}
+                </h1>
+                <br class="d-md-none">
+                <b-row class="">
+                  <span class="d-none d-md-block disabled my-1"> {{ t.place }}</span>
+                  <b-form-rating v-model="t.rating" class="d-none d-md-block bg-black border-0  flex-row"
+                                 data-bs-theme="dark"
+                                 readonly style="max-width: 125px"></b-form-rating>
+                </b-row>
+              </div>
+            </b-card-header>
+            <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel" visible>
+              <div class="d-flex flex-column align-items-center">
+                <RunningEditor ref="running_editor" :t_id="t.id"/>
+                <b-button v-b-modal:modal-run pill>
+                  <b-icon icon="plus-lg"/>
+                </b-button>
+
+              </div>
+            </b-collapse>
+          </b-card>
+
+
         </div>
       </KeepAlive>
     </Transition>
 
-    <Transition>
-      <KeepAlive>
-        <div v-if="displaymode===2" class="d-flex flex-column flex-wrap">
-          <div v-for="r in rows" :key="r.id" class="card bg-dark-subtle border-0 text-white mx-3 my-3"
-               data-bs-theme="dark" style="min-width: 18rem; min-height: 30rem">
-            <b-overlay bg-color="dark" data-bs-theme="dark" no-center opacity="1" rounded="sm" show>
-              <template #overlay>
+    <b-modal id="modal-run" body-bg-variant="dark"
+             body-text-variant="light"
+             data-bs-theme="dark"
+             footer-bg-variant="dark"
+             footer-text-variant="light"
+             header-bg-variant="dark"
+             header-text-variant="light"
+             size="xl" title="Create">
 
-                <b-icon
+      <b-row class="my-1">
+        <b-col sm="3">
+          <label for="input-namet">Show</label>
+        </b-col>
+        <b-col>
+          <b-form-select v-model="selected_show" class="mb-3 input-field bg-dark" size="lg" @change="update_variables">
+            <b-form-select-option :value="null">Please select a Show</b-form-select-option>
+            <b-form-select-option v-for="s in storeX.show_list" :key="s.id" :value="s">{{ s.name }}
+            </b-form-select-option>
+          </b-form-select>
+        </b-col>
+      </b-row>
+      <b-row class="my-1">
+        <b-col sm="3">
+          <label for="input-namet">Theatre Name</label>
+        </b-col>
+        <b-col>
+          <b-form-select v-model="temp_run.theatre_id" class="mb-3 input-field bg-dark" size="lg">
+            <b-form-select-option :value="null">Please select a Show</b-form-select-option>
+            <b-form-select-option v-for="t in storeX.theatre_list" :key="t.id" :value="t.id">{{ t.name }}
+            </b-form-select-option>
+          </b-form-select>
+        </b-col>
+      </b-row>
 
-                    class="position-absolute"
-                    scale="2"
-                    shift-h="8"
-                    shift-v="8"
-                    style="top: 0; right: 0"
-                ></b-icon>
-              </template>
-              <b-img :src="r.image_url" alt="Card image" class="card-image-top" fluid
-                     style="max-width: 23rem;    background:rgba(0,0,0,0.6);"/>
-            </b-overlay>
-            <div class="card-img-overlay border-0" style="z-index: 11;">
-              <h1 class="card-title">{{ r.name }}</h1>
-              <span v-for="t in r.tags.split()" :key="t" class="badge bg-secondary-subtle">{{ t }}</span>
-              <div class="input-group mb-3">
-                <b-input :value="r.format" prepend="" type="text"/>
-                <b-input :value="r.language" prepend="" type="text"/>
-              </div>
-              <b-textarea v-model="r.image_sqr" class="card-text mb-3"/>
+      <b-row class="my-1">
+        <b-col sm="3">
+          <label for="input-capacity">Starting time</label>
+        </b-col>
+        <b-col sm="9">
+          <b-form-timepicker v-model="temp_run.start" class="input-field bg-dark" locale="en"></b-form-timepicker>
+        </b-col>
+      </b-row>
+      <b-row class="my-1">
+        <b-col>
+          <label for="input-capacity">Ending time</label>
+        </b-col>
+        <b-col sm="9">
+          <b-form-timepicker v-model="temp_run.end" class="input-field bg-dark" locale="en"></b-form-timepicker>
 
-              <div class="input-group mb-3 d-inline-flex">
-                <div class="input-group-prepend d-inline-flex">
-                  <span class="input-group-text">Ticket Price</span>
-                  <span class="input-group-text">₹</span>
-                </div>
-                <b-input :value="r.ticket_price" prepend="Ticket Price" type="text"/>
-              </div>
+        </b-col>
+      </b-row>
+      <b-row class="my-1">
+        <b-col sm="3">
+          <label for="input-capacity">Language</label>
+        </b-col>
+        <b-col sm="9">
 
+          <b-form-select v-model="temp_run.language" class="mb-3 input-field bg-dark">
+            <b-form-select-option :value="null">Please select the Language</b-form-select-option>
 
-            </div>
-          </div>
-        </div>
-      </KeepAlive>
-    </Transition>
-    <b-button-toolbar key-nav class="mt-3">
+            <b-form-select-option v-for="s in language_list" :key="s" :value="s">{{ s }}</b-form-select-option>
+          </b-form-select>
+
+        </b-col>
+      </b-row>
+      <b-row class="my-1">
+        <b-col sm="3">
+          <label for="input-capacity">Ticket Price</label>
+        </b-col>
+        <b-col sm="9">
+          <b-form-input id="input-capacity" v-model="temp_run.ticket_price" :value="selected_show.ticket_price"
+                        class="input-field bg-dark"
+                        type="number"></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row class="my-1">
+        <b-col sm="3">
+          <label for="input-capacity">Format</label>
+        </b-col>
+        <b-col sm="9">
+          <b-form-select v-model="temp_run.format" class="mb-3 input-field bg-dark text-light">
+            <b-form-select-option :value="null" default disabled>Please select the Format</b-form-select-option>
+
+            <b-form-select-option v-for="s in format_list" :key="s" :value="s">{{ s }}</b-form-select-option>
+          </b-form-select>
+        </b-col>
+      </b-row>
+      <template #modal-footer="{cancel}">
+        <b-button size="md" variant="success" @click="createRunning()">
+          Add this show
+        </b-button>
+        <b-button size="md" variant="danger" @click="cancel()">
+          Cancel
+        </b-button>
+
+      </template>
+    </b-modal>
+
+    <b-button-toolbar class="mt-3" key-nav>
       <b-button-group class="mx-1">
-        <b-button class="me-2" @click="handleAdd()" pill variant="outline-secondary">Add Row</b-button>
-        <b-button class="me-2" @click="update_records()" pill variant="outline-danger">Reset</b-button>
-        <b-button class="me-2" @click="handleSave()" pill variant="outline-success">Save</b-button>
+        <b-button v-if="displaymode===0" class="me-2" pill variant="outline-secondary" @click="handleAdd()">Add Row
+        </b-button>
+        <b-button class="me-2" pill variant="outline-danger" @click="update_records">Reload</b-button>
+        <b-button v-if="displaymode===0" class="me-2" pill variant="outline-success" @click="handleSave()">Save
+        </b-button>
       </b-button-group>
-      <b-button-group class="mx-1">
-        <b-button @click="csvToJson()">Upload CSV</b-button>
-        <b-button @click="jsonToCSV()">Download CSV</b-button>
+      <b-button-group v-if="displaymode===0" class="mx-1 mt-3">
+        <b-button @click="storeX.csvToJson(1)">Upload CSV</b-button>
+        <b-button @click="storeX.jsonToCSV(1)">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
   </div>
@@ -123,90 +207,74 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
-import MovieCard2 from "@/components/MovieCard2.vue";
 import {useAppStore} from "@/store";
+import {useEditorStore} from "@/store/useEditorStore";
+import RunningEditor from "@/components/TableEditor/RunningEditor.vue";
+// import {useTableEditorStore} from "@/store/useTableEditorStore";
 
 export default {
   name: 'TheatresTableEditor',
   components: {
-    MovieCard2,
+    RunningEditor,
     BEditableTable,
     BSpinner,
   },
-  methods: {
-    csvToJson() {
-      var input = document.createElement('input');
-      input.type = 'file';
 
-      input.onchange = e => {
-
-        // getting a hold of the file reference
-        let file = e.target.files[0];
-
-        // setting up the reader
-        let reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-
-        // here we tell the reader what to do when it's done reading...
-        reader.onload = readerEvent => {
-          let csv = readerEvent.target.result; // this is the content!
-          let data = require('jquery-csv').toObjects(csv);
-          console.log(data)
-          this.rows = data
-        }
-
-      }
-
-      input.click();
+  props: {
+    displaymode: null,
+  },
+  data() {
+    return {
+      selected_show: {
+        language: '',
+        format: '',
+        duration: 0
+      },
+      storeX: useEditorStore(),
+      temp_run: {},
+      appstore: useAppStore(),
+      rowUpdate: {},
+      fields: [
+        {key: "edit", label: ''},
+        {key: "edit", label: ''},
+        {key: "delete", label: ""},
+        {key: 'index', class: 'id-col'},
+        {key: "name", label: "Name", type: "text", editable: true,},
+        {key: "place", label: "Place", editable: true},
+        {key: "city", label: "City", editable: true},
+      ],
+      loading: false,
+    };
+  },
+  computed: {
+    language_list() {
+      return this.selected_show.language.split(',').map(x => x.trim())
     },
-    jsonToCSV(fileTitle = 'export') {
+    format_list() {
+      return this.selected_show.format.split(',').map(x => x.trim())
+    },
 
-      const items = this.rows
-      const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
-      const header = Object.keys(items[0])
-      let csv = [
-        header.join(','), // header row first
-        ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer).replace(/"/g, '')).join(','))
-      ].join('\n')
-      console.log(csv)
-      let exportedFilename = fileTitle + '.csv' || 'export.csv';
-
-      let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-      if (navigator.msSaveBlob) { // IE 10+
-        navigator.msSaveBlob(blob, exportedFilename);
-      } else {
-        let link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          let url = URL.createObjectURL(blob);
-          link.setAttribute("href", url);
-          link.setAttribute("download", exportedFilename);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }
+  },
+  async created() {
+    await this.update_records()
+  },
+  methods: {
+    async createRunning() {
+      console.log(this.temp_run)
+      const rawResponse = await fetch(this.appstore.api + '/running', {
+        method: 'POST',
+        headers: this.appstore.getheader(),
+        body: JSON.stringify(this.temp_run)
+      });
+      const content = await rawResponse.status;
+      await this.$refs['running_editor'].update_records()
+      console.log(content);
     },
     async update_records() {
-      try {
-        this.loading = true;
-        const response = await fetch(this.appstore.api + "/bulk/theatre", {
-          method: 'GET',
-          headers: this.appstore.getheader()
-        });
-        console.log(response.status)
-        if (response.status === 200) {
-          this.rows = await response.json();
-          this.loading = false;
-        } else {
-          console.log(response.status, "Failed to load bulk shows")
-          throw new TypeError("Token expired"); // will check for token and push to log in
-        }
-      } catch (e) {
-        console.log("Failed to load bulk shows", e)
-      }
-
+      this.loading = true;
+      await this.storeX.getData(1)
+      await this.storeX.getData(2)
+      this.loading = false;
 
     },
     handleAdd() {
@@ -221,7 +289,7 @@ export default {
           id: newId,
           name: "",
           place: "",
-          capacity: "",
+          city: "",
 
         },
       };
@@ -240,7 +308,7 @@ export default {
             }), {
               method: 'PUT',
           headers: this.appstore.getheader(),
-              body: JSON.stringify(this.rows[data.index])
+          body: JSON.stringify(this.storeX.theatre_list[data.index])
             }
         );
         const content = await rawResponse.json();
@@ -261,7 +329,7 @@ export default {
           }), {
             method: 'DELETE',
         headers: this.appstore.getheader(),
-            body: JSON.stringify(this.rows)
+        body: JSON.stringify(this.storeX.theatre_list)
           }
       );
       const content = await rawResponse.status;
@@ -273,44 +341,35 @@ export default {
       const rawResponse = await fetch(this.appstore.api + '/bulk/theater', {
         method: 'POST',
         headers: this.appstore.getheader(),
-        body: JSON.stringify(this.rows)
+        body: JSON.stringify(this.storeX.theatre_list)
       });
       const content = await rawResponse.status;
 
       console.log(content);
+    },
+    update_variables() {
+      this.temp_run.show_name = this.selected_show.name;
+      this.temp_run.show_id = this.selected_show.id;
     }
-  },
-  props: {
-    displaymode: null,
-  },
-
-  data() {
-    return {
-      appstore: useAppStore(),
-      rowUpdate: {},
-      fields: [
-        {key: "edit", label: ''},
-        {key: "edit", label: ''},
-        {key: "delete", label: ""},
-        {key: 'index', class: 'id-col'},
-        {key: "name", label: "Name", type: "text", editable: true,},
-        {key: "place", label: "Place", editable: true},
-        {key: "capacity", label: "Capacity", editable: true},
-
-
-      ],
-      rows: [],
-      loading: false,
-    };
-  },
-  async mounted() {
-    await this.update_records()
   },
 };
 </script>
 
 
 <style lang="less">
+
+table.b-table {
+  width: 100% !important;
+}
+
+.input-field {
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
 /* -- import Roboto Font ---------------------------- */
 //@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
 
@@ -378,12 +437,11 @@ export default {
 // Baseline styles
 .table {
   width: 100%;
-  max-width: 100%;
   margin-bottom: 2rem;
-  background-color: @table-bg;
-  display: block;
-  max-width: -moz-fit-content;
-  max-width: fit-content;
+  background-color: @table-bg;;
+  //noinspection CssInvalidPropertyValue
+  //max-width: -moz-fit-content;
+  //max-width: fit-content;
   overflow-x: auto;
   white-space: nowrap;
 
@@ -476,5 +534,8 @@ export default {
   }
 }
 
+.b-form-timepicker {
+  display: inline-flex;
+}
 
 </style>

@@ -34,7 +34,7 @@
           <label for="input-capacity">Capacity</label>
         </b-col>
         <b-col sm="9">
-          <b-form-input id="input-capacity" v-model="theatre.capacity" 
+          <b-form-input id="input-capacity" v-model="theatre.capacity"
                         type="number"></b-form-input>
         </b-col>
       </b-row>
@@ -142,15 +142,6 @@
       <b-img thumbnail fluid-grow class="ml-2 imgr" style="max-width: 30%" :src="show.image_sqr"/>
       <b-img thumbnail fluid-grow class="imgr" style="min-height: 400px !important;" :src="show.image_url"/>
     </div>
-    <template #modal-footer="{cancel}">
-      <b-button size="md" variant="success" @click="displaymode===0 ? postTheatre() : postShow()">
-        {{ displaymode===0 ? 'Create new Theatre': 'Create new Show' }}
-      </b-button>
-      <b-button size="md" variant="danger" @click="cancel()">
-        Cancel
-      </b-button>
-
-    </template>
   </b-modal>
 </template>
 <style>

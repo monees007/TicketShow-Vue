@@ -1,15 +1,22 @@
 <template>
   <div class="NavBar">
-    <b-navbar class="text-primary fixed-top bg-dark " style="justify-content: space-between !important;">
+    <b-navbar class="text-primary fixed-top bg-dark-subtle " style="justify-content: space-between !important;">
       <b-navbar-nav>
-        <b-avatar :href="App.data.logged ? '#/user': '#/login' " v-show="search_not_toggled" class="d-flex justify-content-center align-items-center mx-3 bg-secondary" style="height: 50px;width: 50px"/>
-        <b-navbar-brand v-show="search_not_toggled" class="hide text-light" href="#">
-          <img alt="Kitten"
-               class="d-inline-block align-top"
+        <b-navbar-brand class=" text-light" href="#">
+          <img
+              class="d-inline-block mx-3"
                src="https://cdn4.iconfinder.com/data/icons/flat-design-development-set-3/24/color-wheel-512.png"
                style="height: 37px">
-          TicketShow
+
+          <span v-show="search_not_toggled" class="font-monospace" style="font-size: large">TicketShow</span>
+
         </b-navbar-brand>
+        <b-col>
+          <span v-show="search_not_toggled" class="font-monospace d-none d-md-block"
+                style="font-size: smaller">{{ appstore.user.email }} <b-icon v-id="appstore.user.role==='admin'"
+                                                                             icon="shield-fill-check"/></span>
+
+        </b-col>
       </b-navbar-nav>
       <div class="d-inline-flex align-items-center">
 
@@ -25,10 +32,17 @@
       </b-input-group>
 
         <b-icon @click="search_not_toggled=!search_not_toggled" class="mx-3 d-sm-inline-block d-md-none" :icon="search_not_toggled ? 'search': 'x-lg' "></b-icon>
-        <b-button v-show="search_not_toggled" data-bs-theme pill variant="outline-secondary">
+        <b-button v-show="false && search_not_toggled" data-bs-theme pill variant="outline-secondary">
           <b-icon aria-hidden="true" icon="sun-fill"></b-icon>
         </b-button>
-        <b-button v-b-toggle.sidebar-1 v-show="search_not_toggled" pill variant="outline-secondary">SB</b-button>
+        <b-button v-show="search_not_toggled" v-b-toggle.sidebar-1 class="mx-2 d-md-none" pill
+                  variant="outline-primary">
+          <b-icon icon="card-list"/>
+        </b-button>
+        <b-button v-if="appstore.is_logged_in===true" class="my-3 d-none mx-3 bg-dark-subtle d-md-block"
+                  @click="appstore.logout()"> Logout
+        </b-button>
+
 
       </div>
 
@@ -42,6 +56,7 @@
 <script>
 
 import App from "@/App.vue";
+import {useAppStore} from "@/store";
 
 export default {
   name: 'NavBar',
@@ -52,6 +67,7 @@ export default {
   },
   data: () => {
     return {
+      appstore: useAppStore(),
       search_not_toggled: true
     }
   }

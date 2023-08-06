@@ -1,8 +1,7 @@
 <script>
 import {defineComponent} from 'vue'
-import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
-import BookingModal from "@/BookingModal.vue";
+import BookingModal from "@/components/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
 
@@ -68,7 +67,7 @@ export default defineComponent({
         this.loading = true;
         const response = await fetch(this.app_store.api + "/homepage", {
           method: 'GET',
-          headers: App.$header('GET')
+          // headers: this.app_store.getheader()
         });
         if (response.status === 200) {
           let res = await response.json();
@@ -95,6 +94,7 @@ export default defineComponent({
 
 <template>
   <div class="">
+
     <div class="d-none">
       <div class="d-flex align-items-center mb-3">
         <b-progress :max="maxLoadingTime" class="w-100" height="1.5rem">
@@ -105,15 +105,15 @@ export default defineComponent({
         <b-button class="ml-3" @click="startLoading()">Reload</b-button>
       </div>
     </div>
-    <!--    <b-skeleton-wrapper :loading="loading">-->
-    <!--      <template #loading>-->
-    <!--        <b-card>-->
-    <!--          <b-skeleton data-bs-theme="dark" height="20%" variant="secondary" width="85%"></b-skeleton>-->
-    <!--          <b-skeleton animation="fade" height="150px" type="input" width="55%"></b-skeleton>-->
-    <!--          <b-skeleton width="70%"></b-skeleton>-->
-    <!--        </b-card>-->
-    <!--      </template>-->
-    <!--    </b-skeleton-wrapper>-->
+    <!--        <b-skeleton-wrapper :loading="loading">-->
+    <!--          <template #loading>-->
+    <!--            <b-card>-->
+    <!--              <b-skeleton data-bs-theme="dark" height="20%" variant="secondary" width="85%"></b-skeleton>-->
+    <!--              <b-skeleton animation="fade" height="150px" type="input" width="55%"></b-skeleton>-->
+    <!--              <b-skeleton width="70%"></b-skeleton>-->
+    <!--            </b-card>-->
+    <!--          </template>-->
+    <!--        </b-skeleton-wrapper>-->
     <b-alert v-show="failed" variant="danger">Danger Alert</b-alert>
 
     <div v-for="n in order" :key="n">
@@ -123,9 +123,11 @@ export default defineComponent({
           {{ theatre[n][0].name }}
         </h1>
         <b-row>
-          <span  class="disabled w-50 "> {{ theatre[n][0].place }}</span>
-          <b-form-rating v-model="theatre[n][0].rating" class="bg-black border-0 w-25 flex-row" color="" data-bs-theme="dark"
-                         readonly style="max-width: 125px"></b-form-rating>
+          <span class="disabled w-75 "> {{ theatre[n][0].place }}</span>
+
+          <b-form-rating v-model="theatre[n][0].rating" class="d-none d-md-block bg-black border-0 w-75 flex-row"
+                         color="" data-bs-theme="dark"
+                         readonly></b-form-rating>
         </b-row>
       </div>
       <hr>

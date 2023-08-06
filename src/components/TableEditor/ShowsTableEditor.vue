@@ -4,7 +4,7 @@
       <KeepAlive>
         <b-editable-table
             v-if="displaymode===0"
-            v-model="rows"
+            v-model="storeX.show_list"
             :busy="loading"
             :editMode="'row'"
             :fields="fields"
@@ -58,63 +58,21 @@
     <Transition>
       <KeepAlive>
         <div v-if="displaymode===1" class="">
-          <MovieCard2 v-for="m in rows" :key="m.id" :m="m"/>
+          <MovieCard2 v-for="m in storeX.show_list" :key="m.id" :m="m"/>
         </div>
       </KeepAlive>
     </Transition>
 
-    <Transition>
-      <KeepAlive>
-        <div v-if="displaymode===2" class="d-flex flex-wrap">
-          <div v-for="r in rows" :key="r.id" class="card bg-dark-subtle border-0 text-white mx-3 my-3"
-               data-bs-theme="dark" style="min-width: 18rem; min-height: 30rem">
-            <b-overlay bg-color="dark" data-bs-theme="dark" no-center opacity="1" rounded="sm" show>
-              <template #overlay>
 
-                <b-icon
-
-                    class="position-absolute"
-                    scale="2"
-                    shift-h="8"
-                    shift-v="8"
-                    style="top: 0; right: 0"
-                ></b-icon>
-              </template>
-              <b-img :src="r.image_url" alt="Card image" class="card-image-top" fluid
-                     style="max-width: 23rem;    background:rgba(0,0,0,0.6);"/>
-            </b-overlay>
-            <div class="card-img-overlay border-0" style="z-index: 11;">
-              <h1 class="card-title">{{ r.name }}</h1>
-              <span v-for="t in r.tags.split()" :key="t" class="badge bg-secondary-subtle">{{ t }}</span>
-              <div class="input-group mb-3">
-                <b-input :value="r.format" prepend="" type="text"/>
-                <b-input :value="r.language" prepend="" type="text"/>
-              </div>
-              <b-textarea v-model="r.image_sqr" class="card-text mb-3"/>
-
-              <div class="input-group mb-3 d-inline-flex">
-                <div class="input-group-prepend d-inline-flex">
-                  <span class="input-group-text">Ticket Price</span>
-                  <span class="input-group-text">₹</span>
-                </div>
-                <b-input :value="r.ticket_price" prepend="Ticket Price" type="text"/>
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-      </KeepAlive>
-    </Transition>
-    <b-button-toolbar key-nav class="mt-3">
+    <b-button-toolbar v-if="displaymode===0" class="mt-3" key-nav>
       <b-button-group class="mx-1">
-        <b-button class="me-2" @click="handleAdd()" pill variant="outline-secondary">Add Row</b-button>
-        <b-button class="me-2" @click="update_records()" pill variant="outline-danger">Reset</b-button>
-        <b-button class="me-2" @click="handleSave()" pill variant="outline-success">Save</b-button>
+        <b-button class="me-2" pill variant="outline-secondary" @click="handleAdd()">Add Row</b-button>
+        <b-button class="me-2" pill variant="outline-danger" @click="update_records()">Reset</b-button>
+        <b-button class="me-2" pill variant="outline-success" @click="handleSave()">Save</b-button>
       </b-button-group>
-      <b-button-group class="mx-1">
-        <b-button @click="csvToJson()">Upload CSV</b-button>
-        <b-button @click="jsonToCSV()">Download CSV</b-button>
+      <b-button-group class="mx-1 mt-3">
+        <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
+        <b-button @click="storeX.jsonToCSV(0)">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
   </div>
@@ -123,9 +81,9 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
-import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
 import {useAppStore} from "@/store";
+import {useEditorStore} from "@/store/useEditorStore";
 
 export default {
   name: 'ShowsTableEditor',
@@ -137,6 +95,7 @@ export default {
 
   data() {
     return {
+      storeX: useEditorStore(),
       appstore: useAppStore(),
       rowUpdate: {},
       fields: [
@@ -156,84 +115,15 @@ export default {
         {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
         {key: "description", label: "Description", editable: true},
       ],
-      rows: [],
       loading: false,
     };
   },
   methods: {
-    csvToJson() {
-      var input = document.createElement('input');
-      input.type = 'file';
 
-      input.onchange = e => {
-
-        // getting a hold of the file reference
-        let file = e.target.files[0];
-
-        // setting up the reader
-        let reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-
-        // here we tell the reader what to do when it's done reading...
-        reader.onload = readerEvent => {
-          let csv = readerEvent.target.result; // this is the content!
-          let data = require('jquery-csv').toObjects(csv);
-          console.log(data)
-          this.rows = data
-        }
-
-      }
-
-      input.click();
-    },
-    jsonToCSV(fileTitle = 'export') {
-
-      const items = this.rows
-      const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
-      const header = Object.keys(items[0])
-      let csv = [
-        header.join(','), // header row first
-        ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer).replace(/"/g, '')).join(','))
-      ].join('\n')
-      console.log(csv)
-      let exportedFilename = fileTitle + '.csv' || 'export.csv';
-
-      let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-      if (navigator.msSaveBlob) { // IE 10+
-        navigator.msSaveBlob(blob, exportedFilename);
-      } else {
-        let link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          let url = URL.createObjectURL(blob);
-          link.setAttribute("href", url);
-          link.setAttribute("download", exportedFilename);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }
-    },
     async update_records() {
-      const appstoreX = this.appstore
-      try {
-        this.loading = true;
-        const response = await fetch(appstoreX.server + "/api/bulk/shows", {
-          method: 'GET',
-          headers: appstoreX.getheader()
-        });
-        console.log(response.status, "ShowList Updated")
-        if (response.status === 200) {
-          this.rows = await response.json();
-          this.loading = false;
-        } else {
-          console.log(response.status, "Failed to load bulk shows")
-          throw new TypeError("Token expired"); // will check for token and push to log in
-        }
-      } catch (e) {
-        console.log("Failed to load bulk shows", e)
-      }
+      this.loading = true;
+      await this.storeX.getData(0)
+      this.loading = false;
 
 
     },
@@ -254,10 +144,10 @@ export default {
           ticket_price: "",
           format: "",
           language: "",
-          year:'',
-          director:'',
-          description:'',
-          duration:'',
+          year: '',
+          director: '',
+          description: '',
+          duration: '',
         },
       };
     },
@@ -269,13 +159,11 @@ export default {
         action: update ? "update" : "cancel",
       };
       if (update) {
-        const rawResponse = await fetch('http://127.0.0.1:4433/api/shows?' +
-            new URLSearchParams({
-
-            }), {
+        const rawResponse = await fetch(this.appstore.api + '/shows?' +
+            new URLSearchParams({}), {
           method: 'POST',
-              headers: App.$header(),
-              body: JSON.stringify(this.rows[data.index])
+          headers: this.appstore.getheader(),
+          body: JSON.stringify(this.storeX.show_list[data.index])
             }
         );
         const content = await rawResponse.json();
@@ -290,13 +178,13 @@ export default {
       this.rowUpdate = {edit: true, id: data.id};
     },
     async handleDelete(data) {
-      const rawResponse = await fetch('http://127.0.0.1:4433/api/shows?' +
+      const rawResponse = await fetch(this.appstore.api + '/shows?' +
           new URLSearchParams({
             id: data.id
           }), {
             method: 'DELETE',
-            headers: App.$header(),
-            body: JSON.stringify(this.rows)
+        headers: this.appstore.getheader(),
+
           }
       );
       const content = await rawResponse.json();
@@ -305,10 +193,10 @@ export default {
     },
     async handleSave() {
 
-      const rawResponse = await fetch('http://127.0.0.1:4433/api/bulk/shows', {
+      const rawResponse = await fetch(this.appstore.api + '/bulk/shows', {
         method: 'POST',
-        headers: App.$header(),
-        body: JSON.stringify(this.rows)
+        headers: this.appstore.getheader(),
+        body: JSON.stringify(this.storeX.show_list)
       });
       const content = await rawResponse.json();
 
@@ -326,8 +214,6 @@ export default {
 
 
 <style lang="less">
-/* -- import Roboto Font ---------------------------- */
-//@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
 
 .link-col {
   max-width: 150px !important;
@@ -397,6 +283,7 @@ export default {
   margin-bottom: 2rem;
   background-color: @table-bg;
   display: block;
+  //noinspection CssInvalidPropertyValue
   max-width: -moz-fit-content;
   max-width: fit-content;
   overflow-x: auto;

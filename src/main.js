@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import {BootstrapVue, IconsPlugin} from "bootstrap-vue";
-
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import 'bootstrap/dist/css/bootstrap.css'
 // import '@/style/bootstrap-vue.css'
@@ -10,6 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import router from './router'
 import './registerServiceWorker'
 import {createPinia, PiniaVuePlugin} from 'pinia'
+
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
 // import '@/style/custom.scss'

@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia'
 import axios from "axios";
+import router from "@/router";
 
 export const useAppStore = defineStore('AppStore', {
     state: () => (
@@ -9,6 +10,11 @@ export const useAppStore = defineStore('AppStore', {
             api: 'http://127.0.0.1:4433/api',
             next_page: '/',
             auth_token: '',
+            user: {
+                role: '',
+                email: '',
+                username: '',
+            },
             csrf: '',
             is_logged_in: false,
 
@@ -19,6 +25,18 @@ export const useAppStore = defineStore('AppStore', {
 
     },
     actions: {
+        check_for_token() {
+            try {
+                this.auth_token = window.localStorage.getItem('Authentication-Token');
+                this.csrf = window.localStorage.getItem('csrf_token');
+                this.is_logged_in = true
+                console.log('Token Found')
+                this.get_user()
+            } catch (e) {
+                console.log(e)
+                router.push({path: 'login'})
+            }
+        },
         setValue(t, m) {
             console.log(t, m)
             this.theatre = t
@@ -45,16 +63,36 @@ export const useAppStore = defineStore('AppStore', {
                 self.csrf = response.data.response['csrf_token']
                 window.localStorage.setItem("Authentication-Token", self.auth_token);
                 window.localStorage.setItem("csrf_token", self.csrf);
+                self.get_user()
                 self.is_logged_in = true
                 console.log('Logged in Successfully')
+                router.push({path: self.next_page})
             }).catch(function (error) {
                 console.log(error);
             });
         },
+        async get_user() {
+            const rawResponse = await fetch(this.api + '/user',
+                {
+                    method: 'GET',
+                    headers: this.getheader(),
+                }
+            );
+            const content = await rawResponse.json();
+            this.user.email = content.email
+            this.user.role = content.name
+            this.user.username = content.username
+        },
         async logout() {
+            const self = this
             await axios.post(this.server + '/logout'
             ).then((response) => {
                 if (response.status === 200) {
+                    window.localStorage.removeItem("Authentication-Token");
+                    window.localStorage.removeItem("csrf_token");
+                    self.auth_token = ''
+                    self.csrf = ''
+                    self.is_logged_in = false
                     console.log("logout Successful")
                 }
             })
@@ -62,13 +100,13 @@ export const useAppStore = defineStore('AppStore', {
 
         },
         getheader() {
-            if (!this.auth_token) {
-                this.auth_token = window.localStorage.getItem('Authentication-Token');
-                this.csrf = window.localStorage.getItem('csrf_token');
+            if (this.is_logged_in && this.auth_token) {
+                return {
+                    "Content-Type": "application/json", "Authentication-Token": this.auth_token,
+                }
             }
-            return {
-                "Content-Type": "application/json", "Authentication-Token": this.auth_token,
-            }
+            this.next_page = router.currentRoute.path
+            router.push({path: 'login'})
         }
 
     },

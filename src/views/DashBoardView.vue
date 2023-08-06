@@ -1,11 +1,14 @@
 <template>
-  <div class="DashBoardView">
+  <div class="DashBoardView" style="min-width: 46vh">
+    <b-alert v-if="!appstore.is_logged_in" class="d-flex justify-content-between" show variant="warning">You are not
+      logged in.
+      <b-button href="#/login" variant="warning">Click here to login</b-button>
+    </b-alert>
     <b-alert ref="flag" v-show="flag_error" show variant="danger">CSV is incorrectly formatted</b-alert>
-    <b-button-toolbar key-nav class="mb-3">
+    <b-button-toolbar class="mb-3 " key-nav>
       <b-button-group class="col" cols="3" >
         <b-button :pressed="activeTab===0" @click="activeTab=0">Shows</b-button>
-        <b-button :pressed="activeTab===1" @click="activeTab=1">Theatres</b-button>
-        <b-button :pressed="activeTab===2" @click="activeTab=2">Running</b-button>
+        <b-button :pressed1="activeTab===1" @click="activeTab=1">Theatres</b-button>
       </b-button-group>
       <b-button-group class="col" cols="2">
         <b-button v-show="activeTab===2" :pressed.sync="separateTheatresToggle" class="sm"
@@ -14,17 +17,19 @@
         </b-button>
 
       </b-button-group>
-      <b-button-group class="col" cols="3" >
-        <b-button :pressed="displaymode===0" @click="displaymode=0">Table</b-button>
-        <b-button :pressed="displaymode===1" @click="displaymode=1">Grid</b-button>
-        <b-button :pressed="displaymode===2" @click="displaymode=2">CSV</b-button>
+      <b-button-group class="col">
+        <b-button :pressed="displaymode===0" @click="displaymode=0">
+          <b-icon icon="table"/>
+        </b-button>
+        <b-button :pressed="displaymode===1" @click="displaymode=1">
+          <b-icon icon="card-image"/>
+        </b-button>
       </b-button-group>
 
     </b-button-toolbar>
 
-    <ShowsTableEditor v-if="activeTab===0" :displaymode="displaymode" class="rounded-5 d-flex" />
-    <TheatresTableEditor v-if="activeTab===1" :displaymode="displaymode" class="rounded-5 d-flex" />
-    <RunningTableEditor v-if="activeTab===2" :displaymode="displaymode" class="rounded-5 d-flex" />
+    <ShowsTableEditor v-if="activeTab===0" :displaymode="displaymode" class=" d-flex "/>
+    <TheatresTableEditor v-if="activeTab===1" :displaymode="displaymode" class=" d-flex"/>
 
 
 
@@ -36,12 +41,14 @@
 
 import ShowsTableEditor from "@/components/TableEditor/ShowsTableEditor.vue";
 import TheatresTableEditor from "@/components/TableEditor/TheatresTableEditor.vue";
-import RunningTableEditor from "@/components/TableEditor/RunningTableEditor.vue";
+import {useAppStore} from "@/store";
+
 export default {
   name: 'DashboardView',
-  components: {RunningTableEditor, TheatresTableEditor, ShowsTableEditor},
+  components: {TheatresTableEditor, ShowsTableEditor},
   data: () => {
     return {
+      appstore: useAppStore(),
       displaymode:0,
       flag_error: false,
       separateTheatresToggle: false,

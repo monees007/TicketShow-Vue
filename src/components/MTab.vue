@@ -2,16 +2,24 @@
   <div id="parent1" class="d-flex position-fixed  align-items-center justify-content-evenly" style="flex-direction:column; height: 100vh; left: 0;width: 50px"  >
     <router-link class="rotate" to="/">HOME</router-link>
     <router-link class="rotate" to="/bookings">BOOKINGS</router-link>
-    <router-link class="rotate" to="/dashboard">DASHBOARD</router-link>
-    <router-link class="rotate" to="/stats">STATS</router-link>
+    <router-link v-if="appstore.user.role==='admin'" class="rotate" to="/dashboard">DASHBOARD</router-link>
+    <router-link v-if="appstore.user.role==='admin'" class="rotate" to="/stats">STATS</router-link>
 
 
   </div>
 
 </template>
 <script>
+import {useAppStore} from "@/store";
+
 export default {
-  name: 'MTab'
+  name: 'MTab',
+  data: () => {
+    return {
+      appstore: useAppStore(),
+    }
+  },
+
 }
 </script>
 <style>
