@@ -67,17 +67,15 @@
                 </h1>
                 <br class="d-md-none">
                 <b-row class="">
-                  <span class="d-none d-md-block disabled my-1"> {{ t.place }}</span>
-                  <b-form-rating v-model="t.rating" class="d-none d-md-block bg-black border-0  flex-row"
-                                 data-bs-theme="dark"
-                                 readonly style="max-width: 125px"></b-form-rating>
+                  <span class="d-none align-bottom mx-3 d-md-block disabled my-1"> {{ t.place }}</span>
+
                 </b-row>
               </div>
             </b-card-header>
             <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel" visible>
               <div class="d-flex flex-column align-items-center">
                 <RunningEditor ref="running_editor" :t_id="t.id"/>
-                <b-button v-b-modal:modal-run pill>
+                <b-button v-b-modal:modal-run class="mb-3" pill>
                   <b-icon icon="plus-lg"/>
                 </b-button>
 
@@ -267,7 +265,8 @@ export default {
         body: JSON.stringify(this.temp_run)
       });
       const content = await rawResponse.status;
-      await this.$refs['running_editor'].update_records()
+      await this.$refs.running_editor[0].update_records()
+
       console.log(content);
     },
     async update_records() {

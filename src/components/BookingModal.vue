@@ -1,23 +1,24 @@
 <template>
   <div>
     <b-modal id="modal-booking" v-model="storeX.showModal1" body-bg-variant="dark" body-text-variant="light"
-             class="d-flex flex-column" title="Book Tickets"
+             class="d-flex flex-column" data-bs-theme="dark"
              footer-bg-variant="dark"
              footer-text-variant="light"
              header-bg-variant="dark"
              header-text-variant="light"
              no-stacking
              size="lg"
+             title="Book Tickets"
              visible>
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ show.name }}</h3>
-          <span class="pillx" >{{ show.format }}</span>
-          <span class="pillx" >{{ lang || 'ENG' }}</span>
+          <span class="pillx">{{ show.format }}</span>
+          <span class="pillx">{{ lang || 'ENG' }}</span>
         </b-col>
       </b-row>
       <b-row class="mt-3">
-        <span class="left" >Theatre</span>
+        <span class="left">Theatre</span>
         <b-col class="right">
           <h4 style="max-width: fit-content">{{ theatre.name }} </h4>
           <h5 style="max-width: fit-content">{{ theatre.place }} </h5>
@@ -27,14 +28,37 @@
         <span class="left">Date</span>
         <b-col class="right d-inline">
 
-          <b-datepicker id="datepicker" v-model="value" class=""></b-datepicker>
+          <b-datepicker id="datepicker" v-model="booking.date" class="my-2" required></b-datepicker>
         </b-col>
 
       </b-row>
       <b-row cols="mt-3">
-        <span class="left">Time</span>
+        <span class="left">Slot</span>
         <b-col class="right">
-          <b-form-select class="w-100" v-model="time" :options="times" size="sm" variant="dark"></b-form-select>
+          <b-form-select v-model="selected_run" class="my-2 input-field bg-dark text-light" required
+                         @change="booking.rid = selected_run.id" @input="booking.total_price = total_p">
+            <b-form-select-option :value="null" default disabled>Please select the show</b-form-select-option>
+
+            <b-form-select-option v-for="r in this.storeX.running" :key="r.id" :value="r">{{
+                'Starting at ' + r.start
+              }}
+            </b-form-select-option>
+          </b-form-select>
+        </b-col>
+      </b-row>
+      <b-row>
+        <span class="left">Person</span>
+        <b-col class="right my-3">
+          <b-form-input v-model="booking.person" min="1" required type="number"
+                        @input="booking.total_price = total_p"></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row>
+        <span class="left">Price</span>
+        <b-col class="right my-3">
+          <b-input-group prepend="₹">
+            <b-form-input v-model="booking.total_price" disabled type="number"></b-form-input>
+          </b-input-group>
         </b-col>
       </b-row>
       <b-row class="mt-3">
@@ -45,6 +69,15 @@
         </b-col>
 
       </b-row>
+      <template #modal-footer="{cancel}">
+
+        <b-button v-b-modal.modal-booking size="md" variant="danger" @click="cancel()">
+          {{ 'Cancel' }}
+        </b-button>
+        <b-button v-b-modal.modal-booking size="md" variant="success" @click="bookticket()">
+          {{ 'Confirm Booking' }}
+        </b-button>
+      </template>
     </b-modal>
 
     <b-modal id="modal-multi-2" v-model="storeX.showModal2"
@@ -79,7 +112,7 @@
 
           <div v-for="j in alphas" :key="j" class="row">
             <div v-for="i in 8" :id="j+i" :key="i"
-                 :class="['seat', (occupiedSeat.includes(''+j+i))? 'occupied': '',(storeX.selectedSeats.includes(''+j+i))? 'selected': ''  ]"
+                 :class="['seat', (selected_run.occupied_seats.includes(''+j+i))? 'occupied': '',(storeX.selectedSeats.includes(''+j+i))? 'selected': ''  ]"
                  @click="seatclick">{{ j + i }}
             </div>
 
@@ -105,25 +138,43 @@
 </template>
 <script>
 import {useBookingStore} from "@/store/useBookingStore";
+import {useAppStore} from "@/store";
+import {storeToRefs} from 'pinia'
 
 export default {
   name: 'BookingModal',
   props: ['show', 'theatre'],
+  setup() {
+    const storeX = useBookingStore()
+    const {showX} = storeToRefs(storeX).show
+    return {showX}
+  },
   data: () => {
     return {
+      selected_run: {
+        ticket_price: 0,
+        occupied_seats: '',
+      },
+      booking: {
+        total_price: 0,
+        person: 1,
+      },
       storeX: useBookingStore(),
-
+      appstore: useAppStore(),
       lang: "",
-      occupiedSeat: ['D6', 'E5', 'C5', 'C3',],
-
       value: null
     }
   },
+
   computed: {
     alphas: () => {
       return ["A", "B", "C", "D", "E", "F", "G", "H", "I",
         "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
         "T", "U", "V", "W", "X", "Y", "Z"].slice(0, 8)
+    },
+    total_p() {
+      return (this.booking.person * this.selected_run.ticket_price)
+
     }
 
   },
@@ -138,20 +189,71 @@ export default {
           this.storeX.updateSeats(this.storeX.selectedSeats + "," + e.target.id)
         e.target.classList.toggle('selected');
       }
+    },
+    async bookticket() {
+      const rawResponse = await fetch(this.appstore.api + '/booking', {
+        method: 'POST',
+        headers: this.appstore.getheader(),
+        body: JSON.stringify({
+          running_id: this.selected_run.id,
+          theatre_name: this.storeX.theatre.name,
+          theatre_place: this.storeX.theatre.place,
+          show_name: this.selected_run.show_name,
+          language: this.selected_run.language,
+          format: this.selected_run.format,
+          date: this.booking.date,
+          start: this.selected_run.start,
+          end: this.selected_run.end,
+          seats: this.storeX.selectedSeats,
+          total_price: this.booking.total_price,
+        })
+      });
+      const content = await rawResponse.json();
+      console.log('booking', content);
+      const rawResponse2 = await fetch(this.appstore.api + '/running',
+          {
+            method: 'PATCH',
+            headers: this.appstore.getheader(),
+            body: JSON.stringify({
+              id: this.selected_run.id,
+              occupied_seats: this.selected_run.occupied_seats + this.storeX.selectedSeats
+            })
+
+          });
+      const content2 = await rawResponse2.json();
+      console.log('running', content2);
     }
-  }
+
+
+  },
+
 }
 
 </script>
 <style>
 
+.btn-outline-light {
+  color: #a3cfbb !important;
+  outline-color: #0a3622;
+}
+
+.b-calendar-grid-help {
+  background: #121212 !important;
+}
+
 .b-calendar-grid {
-  width: 100% !important;
+  width: fit-content !important;
+}
+
+#datepicker__dialog_ {
+  width: 50%;
 }
 
 #datepicker__outer_ {
+
   display: inline-flex;
 }
+
 .left {
   width: 100px;
   margin-right: 10px;
@@ -162,10 +264,11 @@ export default {
   padding-left: 20px;
   border-left: darkcyan dashed 2px;
 }
-.pillx{
+
+.pillx {
   padding: 3px 5px;
   border-radius: 90px;
-  margin:5px;
+  margin: 5px;
   font-weight: bold;
   background: #121212;
 }
