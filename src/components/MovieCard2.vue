@@ -42,16 +42,17 @@ export default {
       </div>
 
       <div class="d-flex flex-row mb-3 mx-3">
-        <b-rating class="w-25 rating-el bg-black"  data-bs-theme="dark" inline no-border size="lg" variant=""></b-rating>
+        <b-rating class="rating-el bg-black pa-0" data-bs-theme="dark" inline no-border size="lg"
+                  style="width: fit-content" variant=""></b-rating>
 
         <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light">Reviews</b-button>
         <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
                   @click="storeX.setValue(t,m)">Book
         </b-button>
-        <b-button v-if="appstore.user.role==='admin'" class="me-2" pill size="sm">
+        <b-button v-if="false && appstore.user.role==='admin'" class="me-2" pill size="sm">
           <b-icon icon="pen"/>
         </b-button>
-        <b-button v-if="appstore.user.role==='admin'" class="me-2" pill size="sm">
+        <b-button v-if="false && appstore.user.role==='admin'" class="me-2" pill size="sm">
           <b-icon icon="trash"/>
         </b-button>
 

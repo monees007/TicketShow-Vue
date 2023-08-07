@@ -1,31 +1,33 @@
 <script>
 import {useBookingStore} from "@/store/useBookingStore";
+import {useAppStore} from "@/store";
 
 export default {
   name: 'BookingView',
-  date: () => {
+  async mounted() {
+
+    const rawResponse = await fetch(this.appstore.api + '/booking?id=-1', {
+      method: 'GET',
+      headers: this.appstore.getheader(),
+
+    });
+    this.bookings = await rawResponse.json();
+
+  },
+
+
+  data() {
     return {
       storeX: useBookingStore(),
+      appstore: useAppStore(),
       bookings: []
     }
-  },
-  beforeMount: {
-    async getBookings() {
-      const rawResponse = await fetch(this.appstore.api + '/bookings?id=-1', {
-        method: 'GET',
-        headers: this.appstore.getheader(),
-
-      });
-      this.bookings = await rawResponse.json();
-    }
   }
-
-
 }
 </script>
 <template>
   <div class="d-grid">
-    <div v-for="b in this.bookings" :key="b.id">
+    <div v-for="b in this.bookings" :key="b.id" class="card bg-dark-subtle py-4 px-4" data-bs-theme="dark">
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ b.show_name }}</h3>
@@ -51,13 +53,13 @@ export default {
       <b-row cols="mt-3">
         <span class="left">Slot</span>
         <b-col class="right">
-          {{ b.start - b.end }}
+          {{ b.start + '-' + b.end }}
         </b-col>
       </b-row>
-      <b-row>
+      <b-row cols="mt-3">
         <span class="left">Total Price</span>
-        <b-col class="right my-3">
-          {{ b.total_price }}
+        <b-col class="right ">
+          {{ '₹ ' + b.total_price }}
         </b-col>
       </b-row>
       <b-row class="mt-3">

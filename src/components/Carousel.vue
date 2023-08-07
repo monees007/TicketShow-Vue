@@ -5,6 +5,7 @@ export default defineComponent({
   name: "CarouselM",
   data() {
     return {
+      controller_show: false
     }
   }
   ,
@@ -16,6 +17,9 @@ export default defineComponent({
     next() {
       this.$refs.myCarousel.next()
     }
+  },
+  mounted() {
+    this.controller_show = true
   }
 })
 
@@ -49,7 +53,7 @@ export default defineComponent({
 
     </b-carousel>
 
-    <b-button-toolbar id="controller" class="d-none d-md-block">
+    <b-button-toolbar v-show="controller_show" id="controller" class="d-none d-md-block">
       <b-button-group class="mr-1">
         <b-button title="Save file" @click="prev">
           <b-icon aria-hidden="true" icon="arrow-left" ></b-icon>
