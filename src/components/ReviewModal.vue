@@ -1,0 +1,80 @@
+<template>
+  <div>
+    <b-modal v-model="appstore.review_modal.show" :data-bs-theme="appstore.app_theme" class="text-light"
+             title="Create Review">
+      <template #modal-header>
+        <span class="text-light h4">Create Review</span>
+        <b-icon class="text-light" icon="x-lg" @click="appstore.review_modal.show=false"/>
+      </template>
+      <b-alert v-if="this.error" show variant="danger">Something went wrong. Please try again.</b-alert>
+
+      <b-rating v-model="rating" :variant="check? 'warning': 'danger'" class="ml-5 my-2 bg-dark border-0" inline
+                size="lg"></b-rating>
+      <b-form-invalid-feedback :state="check">
+        Please select at least 1 star and give a review to continue.
+      </b-form-invalid-feedback>
+      <b-form-textarea
+          id="textarea"
+          v-model="review"
+          :state="check"
+          max-rows="6"
+          placeholder="Enter something..."
+          rows="3"
+      ></b-form-textarea>
+      <template #modal-footer>
+        <b-button @click="post">Save Review</b-button>
+      </template>
+    </b-modal>
+  </div>
+</template>
+<script>
+import {useAppStore} from "@/store";
+import axios from "axios";
+
+export default {
+  name: 'ReviewModal',
+  data() {
+    return {
+      check: true,
+      text: "",
+      appstore: useAppStore(),
+      rating: 0,
+      review: '',
+      error: false,
+    }
+  },
+  methods: {
+    async post() {
+      if (this.rating === 0 || this.review.length === 0) {
+        this.check = this.review.length > 0 && this.rating > 0
+      } else {
+        await axios.post(this.appstore.api + '/review', {
+              show_id: this.appstore.review_modal.show_id,
+              theatre_id: this.appstore.review_modal.theatre_id,
+              rating: this.rating,
+              review: this.review,
+            },
+            {
+              headers: this.appstore.getheader()
+            }).then(function (response) {
+          if (response.status === 200) {
+            console.log(response)
+            this.appstore.hide_review_modal()
+          }
+
+
+          // router.push({path: '/'})
+        }).catch(function (error) {
+          console.log(error);
+          this.error = true;
+        });
+      }
+    }
+  }
+}
+</script>
+<style>
+
+@media (min-width: 768px) {
+}
+</style>

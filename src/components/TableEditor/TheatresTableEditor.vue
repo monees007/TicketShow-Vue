@@ -58,21 +58,20 @@
 
     <Transition>
       <KeepAlive>
-        <div v-if="displaymode===1" class="accordion" data-bs-theme="dark" role="tablist">
+        <div v-if="displaymode===1" class="accordion w-100" data-bs-theme="dark" role="tablist">
           <b-card v-for="(t,index) in storeX.theatre_list" :key="t.id" class="mb-1" no-body>
             <b-card-header v-b-toggle="'acc'+index" class="p-1" header-tag="header" role="tab">
               <div class="d-flex  flex-row px-3">
                 <h1 class="align-items-start my-3 " style="min-width: fit-content">
                   {{ t.name }}
                 </h1>
-                <br class="d-md-none">
                 <b-row class="">
-                  <span class="d-none align-bottom mx-3 d-md-block disabled my-1"> {{ t.place }}</span>
+                  <span class="d-none mx-3 d-md-block my-4"> {{ t.place }}</span>
 
                 </b-row>
               </div>
             </b-card-header>
-            <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel" visible>
+            <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel">
               <div class="d-flex flex-column align-items-center">
                 <RunningEditor ref="running_editor" :t_id="t.id"/>
                 <b-button v-b-modal:modal-run class="mb-3" pill>

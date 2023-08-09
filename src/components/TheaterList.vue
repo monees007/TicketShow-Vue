@@ -17,8 +17,7 @@ export default defineComponent({
       loading: false,
       theatre: {},
       order: [],
-      loadingTime: 0,
-      maxLoadingTime: 3,
+
     }
   },
   computed: {
@@ -27,41 +26,15 @@ export default defineComponent({
     //   return this.theatre[x].slice(1)
     // }
   },
-  watch: {
-    loading(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        this.clearLoadingTimeInterval()
 
-        if (newValue) {
-          this.$_loadingTimeInterval = setInterval(() => {
-            this.loadingTime++
-          }, 1000)
-        }
-      }
-    },
-    loadingTime(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        if (newValue === this.maxLoadingTime) {
-          this.loading = false
-        }
-      }
-    }
-  },
   created() {
-    this.$_loadingTimeInterval = null
+
   },
   mounted() {
-    this.startLoading()
+
   },
   methods: {
-    clearLoadingTimeInterval() {
-      clearInterval(this.$_loadingTimeInterval)
-      this.$_loadingTimeInterval = null
-    },
-    startLoading() {
-      this.loading = true
-      this.loadingTime = 0
-    },
+
     async loadx() {
       try { // get theatres
         this.loading = true;
@@ -80,6 +53,7 @@ export default defineComponent({
           throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
+        this.failed = true;
         console.log("Failed at TheatreList", e)
       }
     },
@@ -94,27 +68,7 @@ export default defineComponent({
 
 <template>
   <div class="">
-
-    <div class="d-none">
-      <div class="d-flex align-items-center mb-3">
-        <b-progress :max="maxLoadingTime" class="w-100" height="1.5rem">
-          <b-progress-bar :label="`${((loadingTime / maxLoadingTime) * 100).toFixed(2)}%`"
-                          :value="loadingTime"></b-progress-bar>
-        </b-progress>
-
-        <b-button class="ml-3" @click="startLoading()">Reload</b-button>
-      </div>
-    </div>
-    <!--        <b-skeleton-wrapper :loading="loading">-->
-    <!--          <template #loading>-->
-    <!--            <b-card>-->
-    <!--              <b-skeleton data-bs-theme="dark" height="20%" variant="secondary" width="85%"></b-skeleton>-->
-    <!--              <b-skeleton animation="fade" height="150px" type="input" width="55%"></b-skeleton>-->
-    <!--              <b-skeleton width="70%"></b-skeleton>-->
-    <!--            </b-card>-->
-    <!--          </template>-->
-    <!--        </b-skeleton-wrapper>-->
-    <b-alert v-show="failed" variant="danger">Danger Alert</b-alert>
+    <b-alert v-show="failed" variant="danger">Server not found</b-alert>
 
     <div v-for="n in order" :key="n">
       <hr>
@@ -136,13 +90,6 @@ export default defineComponent({
     <BookingModal :show="storeX.show" :theatre="storeX.theatre"/>
 
   </div>
-  <!--d
-   // get all theatres of current user,
-   // get running shows of current user,
-   render lazily
-  -->
-
-
 </template>
 
 

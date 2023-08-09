@@ -5,7 +5,8 @@ export default defineComponent({
   name: "CarouselM",
   data() {
     return {
-      controller_show: false
+      controller_show: false,
+      slide: 0,
     }
   }
   ,
@@ -29,16 +30,17 @@ export default defineComponent({
 <template>
 
   <div class="mx-3 my-3 rounded-5">
+
     <b-carousel
         id="carousel-fade"
         ref="myCarousel"
         fade
         img-height="280"
-
         img-width="1024"
         style="text-shadow: 0 0 2px #000; border-radius: 60px !important; overflow: hidden"
     >
-      <b-carousel-slide
+
+    <b-carousel-slide
           caption="First Slide"
           img-src="https://picsum.photos/1024/480/?image=10"
       ></b-carousel-slide>
@@ -59,7 +61,7 @@ export default defineComponent({
           <b-icon aria-hidden="true" icon="arrow-left" ></b-icon>
         </b-button>
         <b-button id="pause-button" title="Load file">
-          <span>2/3</span>
+          <span>2/3 {{ this.slide }} </span>
         </b-button>
         <b-button title="New document"  @click="next">
           <b-icon aria-hidden="true" icon="arrow-right"></b-icon>

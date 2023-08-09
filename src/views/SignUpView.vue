@@ -54,7 +54,7 @@ export default defineComponent({
       <div class="offset-md-2 col-lg-11 col-md-7 offset-lg-4 offset-md-3">
         <b-card class="panel border  ">
           <b-card-header class="panel-heading">
-            <h4 class="py-2 font-weight-bold">Login</h4>
+            <h4 class="py-2 font-weight-bold">SignUp</h4>
           </b-card-header>
           <b-card-body class="panel-body p-3">
             <b-form action="" method="POST">
@@ -95,7 +95,7 @@ export default defineComponent({
               <div class="text-center pt-4 text-muted">Already have an account? <a href="#/login">Login</a></div>
             </b-form>
           </b-card-body>
-          <b-card-footer class="mx-3 my-2 py-2 bordert">
+          <b-card-footer class="d-none mx-3 my-2 py-2 bordert">
             <div class="text-center py-3"><a class="px-2" href="https://wwww.facebook.com" target="_blank"> <img
                 alt="" src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg"> </a> <a
                 class="px-2" href="https://www.google.com" target="_blank"> <img

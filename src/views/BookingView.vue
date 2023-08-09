@@ -26,8 +26,8 @@ export default {
 }
 </script>
 <template>
-  <div class="d-grid">
-    <div v-for="b in this.bookings" :key="b.id" class="card bg-dark-subtle py-4 px-4" data-bs-theme="dark">
+  <div class="d-grid mb-5">
+    <div v-for="b in this.bookings" :key="b.id" class="card bg-dark-subtle py-4 px-4 my-4" data-bs-theme="dark">
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ b.show_name }}</h3>
@@ -90,6 +90,14 @@ export default {
   margin: 5px;
   font-weight: bold;
   background: #121212;
+}
+
+@media screen and (max-width: 768px) {
+  .left {
+    width: 100px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
 }
 
 </style>

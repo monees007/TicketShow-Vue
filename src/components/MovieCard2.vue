@@ -4,9 +4,15 @@
 
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
+import router from "@/router";
 
 export default {
   name: "MovieCard2",
+  methods: {
+    router() {
+      return router
+    }
+  },
   data: () => {
     return {
       appstore: useAppStore(),
@@ -35,17 +41,18 @@ export default {
       </div>
       <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5">
         <p class="text">
-          Set in a world where fantasy creatures live side by side with humans. A human cop is forced to work with an
-          Orc to find a weapon everyone is prepared to kill for.
+          {{ m.description }}
         </p>
 
       </div>
 
-      <div class="d-flex flex-row mb-3 mx-3">
+      <div v-if="t != null" class="d-flex flex-row mb-3 mx-3">
         <b-rating class="rating-el bg-black pa-0" data-bs-theme="dark" inline no-border size="lg"
                   style="width: fit-content" variant=""></b-rating>
 
-        <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light">Reviews</b-button>
+        <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
+                  @click="$router.push({path:'/show/'+m.id})">Reviews
+        </b-button>
         <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
                   @click="storeX.setValue(t,m)">Book
         </b-button>
@@ -222,9 +229,6 @@ html, body {
   }
 }
 
-.bright_back {
-  background: url("https://occ-0-2433-448.1.nflxso.net/art/cd5c9/3e192edf2027c536e25bb5d3b6ac93ced77cd5c9.jpg");
-}
 
 #tomb {
   box-shadow: 0px 0px 150px -45px rgba(19, 160, 134, 0.6);
