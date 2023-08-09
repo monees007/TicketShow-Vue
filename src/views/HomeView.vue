@@ -1,8 +1,11 @@
 <template>
   <div class="home">
-    <b-alert v-if="!appstore.is_logged_in" class="d-flex justify-content-between" show variant="warning">You are not
+    <b-alert v-if="!appstore.is_logged_in" class="fixed-bottom d-flex justify-content-between shadow" show
+             variant="warning">You are not
       logged in.
       <b-button href="#/login" variant="warning">Click here to login</b-button>
+    </b-alert>
+    <b-alert v-if="appstore.server_error" class="d-flex justify-content-between" show variant="danger">Server not found
     </b-alert>
     <CarouselM class=""/>
     <TheatreListAsync/>

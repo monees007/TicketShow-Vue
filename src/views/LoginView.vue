@@ -73,7 +73,7 @@ export default defineComponent({
               <b-form  class="form-inline" inline>
                 <input v-model="remember" id="remember" name="remember" type="checkbox">
                 <label class="text-muted me-2" for="remember">Remember me</label>
-                <a id="forgot" class="font-weight-bold" href="#">Forgot password?</a></b-form>
+                <a id="forgot" class="d-none font-weight-bold" href="#">Forgot password?</a></b-form>
 
               <b-button :disabled="disable_button" class=" btn btn-primary btn-block px-3 py-1 mt-3" pill
                         @click="login">Login
@@ -82,7 +82,7 @@ export default defineComponent({
               <div class="text-center pt-4 text-muted">Don't have an account? <a href="#/signup">Sign up</a></div>
             </b-form>
           </b-card-body>
-          <b-card-footer class="mx-3 my-2 py-2 bordert">
+          <b-card-footer class=" d-none  mx-3 my-2 py-2 bordert">
             <div class="text-center py-3"><a class="px-2" href="https://wwww.facebook.com" target="_blank"> <img
                 alt="" src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg"> </a> <a
                 class="px-2" :href="App.$server+'/login/oauthstart/google'" target="_blank"> <img

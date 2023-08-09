@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="modal-xl" body-bg-variant="dark"
+  <b-modal id="modal-xl" body-bg-variant="dark" class="modal-fullscreen-sm-down" l
            body-text-variant="light"
            data-bs-theme="dark"
            footer-bg-variant="dark"
@@ -10,6 +10,9 @@
     <b-button-group class="col mb-3 " cols="3">
       <b-button :pressed="displaymode===0" class="bg-dark-subtle" @click="displaymode=0">New Theatre</b-button>
       <b-button :pressed="displaymode===1" class="bg-dark-subtle" @click="displaymode=1">New Show</b-button>
+    </b-button-group>
+    <b-button-group class="col mb-3 " cols="3">
+      <b-button :pressed.sync="show_preview">Show Image Preview</b-button>
     </b-button-group>
     <div v-if="displaymode===0">
 
@@ -39,7 +42,7 @@
         </b-col>
       </b-row>
     </div>
-    <div class="d-flex flex-row align-items-start" v-if="displaymode===1">
+    <div v-if="displaymode===1" class="d-md-flex flex-row align-items-start">
       <b-col>
         <b-row class="my-1">
           <b-col sm="4">
@@ -139,8 +142,9 @@
         </b-row>
 
       </b-col>
-      <b-img thumbnail fluid-grow class="ml-2 imgr" style="max-width: 30%" :src="show.image_sqr"/>
-      <b-img thumbnail fluid-grow class="imgr" style="min-height: 400px !important;" :src="show.image_url"/>
+      <b-img v-show="show_preview" :src="show.image_sqr" class="ml-2 imgr" fluid-grow style="max-width: 30%" thumbnail/>
+      <b-img v-show="show_preview" :src="show.image_url" class="imgr" fluid-grow style="min-height: 400px !important;"
+             thumbnail/>
     </div>
   </b-modal>
 </template>
@@ -161,6 +165,7 @@ export default {
   name: 'NewShowModal',
   data: () => {
     return {
+      show_preview: false,
       displaymode: 1,
       theatre: {
         name: '',

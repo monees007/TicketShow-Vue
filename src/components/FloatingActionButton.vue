@@ -3,7 +3,7 @@
       variant="outline"
       v-b-modal.modal-xl
       id="fab1"
-      class="d-flex align-items-center justify-content-center position-fixed ">
+      class="d-flex z-3 align-items-center justify-content-center position-fixed ">
     <b-icon icon="plus-lg"></b-icon>
   </b-button>
 <!--  <div class="fab-wrapper">-->

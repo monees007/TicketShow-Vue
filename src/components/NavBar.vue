@@ -8,41 +8,54 @@
               src="https://cdn4.iconfinder.com/data/icons/flat-design-development-set-3/24/color-wheel-512.png"
               style="height: 37px">
 
-          <span v-show="search_not_toggled" class="font-monospace" style="font-size: large">TicketShow</span>
+          <span class="font-monospace" style="font-size: large">TicketShow</span>
 
         </b-navbar-brand>
         <b-col>
-          <span v-show="search_not_toggled" class="font-monospace d-none d-md-block"
-                style="font-size: smaller">{{ appstore.user.email }} <b-icon v-id="appstore.user.role==='admin'"
+          <span class="font-monospace d-none align-bottom d-md-block"
+                style="font-size: smaller">{{ appstore.user.email }} <b-icon v-if="appstore.user.role==='admin'"
                                                                              icon="shield-fill-check"/></span>
 
         </b-col>
       </b-navbar-nav>
       <div class="d-inline-flex align-items-center">
 
-        <b-input-group v-show="!search_not_toggled" id="search" class="mx-lg-5 bg-secondary text-light d-md-flex"
-                       style="max-width: 730px">
-          <b-icon class="mx-3" icon="search"></b-icon>
-          <b-form-input id="searchx" v-model="search_string" class="text-right bg-secondary text-light border-0"
-                        data-bs-theme="dark" placeholder="search"
-                        @keyup="do_search"></b-form-input>
-          <b-dropdown class="mx-3 border-0 text-light" data-bs-theme="dark" right text="City" variant="outline">
-            <b-dropdown-item>Item 1</b-dropdown-item>
-            <b-dropdown-item>Item 2</b-dropdown-item>
-            <b-dropdown-item>Item 3</b-dropdown-item>
-          </b-dropdown>
-        </b-input-group>
+        <b-modal id="modal-lg" v-model="search_not_toggled" cancel-only size="md" static title="Search">
+          <template #modal-header>
+            <div class="col">
+              <h3> Search </h3>
+            </div>
+            <b-icon icon="x-lg" @click="search_not_toggled=!search_not_toggled"/>
+          </template>
+          <b-form-input id="searchy" v-model="search_string" class="text-right bg-secondary text-light border-0"
+                        data-bs-theme="dark" placeholder="supports regex"
+                        @keyup="do_search">
+          </b-form-input>
+          <b-row v-for="x in result" :key="x.id"
+                 class="mt-3 py-2 bg-black rounded-4" @click="appstore.router.push((x.director ? '/show/': '/theatre/')+x.id )">
+            <b-col class="align-items-start">
+              <h3 class="">{{ x.name }}</h3>
+              <span class="disabled">{{ x.place || x.director }}</span>
+            </b-col>
+          </b-row>
+          <template #modal-footer>
+            <div class="">
 
-        <b-icon :icon="search_not_toggled ? 'search': 'x-lg' " class="mx-3 d-sm-inline-block d-md-none"
+
+            </div>
+          </template>
+        </b-modal>
+
+        <b-icon :icon="search_not_toggled ?  'x-lg':'search' " class="mx-3 d-sm-inline-block"
                 @click="search_not_toggled=!search_not_toggled"></b-icon>
         <b-button v-show="false && search_not_toggled" data-bs-theme pill variant="outline-secondary">
           <b-icon aria-hidden="true" icon="sun-fill"></b-icon>
         </b-button>
-        <b-button v-show="search_not_toggled" v-b-toggle.sidebar-1 class="mx-2 d-md-none" pill
+        <b-button v-b-toggle.sidebar-1 class="mx-2 d-md-none" pill
                   variant="outline-primary">
           <b-icon icon="card-list"/>
         </b-button>
-        <b-button v-if="appstore.is_logged_in===true" class="my-3 d-none mx-3 bg-dark-subtle d-md-block"
+        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 bg-dark-subtle d-md-block"
                   @click="appstore.logout()"> Logout
         </b-button>
 
@@ -71,19 +84,24 @@ export default {
   data: () => {
     return {
       appstore: useAppStore(),
-      search_not_toggled: true,
+      search_not_toggled: false,
       search_string: "",
+      result: [],
     }
   },
   methods: {
+    toggle_search() {
+      this.search_not_toggled = !this.search_not_toggled
+    },
     async do_search() {
       try { // get theatres
         const response = await fetch(this.appstore.api + "/search?search_type=0&search_string=" + this.search_string, {
           method: 'GET',
-          headers: this.appstore.getheader()
+          // headers: this.appstore.getheader()
         });
         if (response.status === 200) {
           let res = await response.json();
+          this.result = res;
           console.log(res)
         } else {
           console.log(response.status, "Failed at TheatreList")
@@ -93,7 +111,8 @@ export default {
       } catch (e) {
         console.log("Failed at TheatreList", e)
       }
-    }
+    },
+
   }
 };
 </script>
