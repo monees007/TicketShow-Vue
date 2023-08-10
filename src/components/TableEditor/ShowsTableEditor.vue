@@ -73,6 +73,7 @@
       <b-button-group class="mx-1 mt-3">
         <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
         <b-button @click="storeX.jsonToCSV(0)">Download CSV</b-button>
+        <b-button @click="export_csv">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
   </div>
@@ -119,6 +120,69 @@ export default {
     };
   },
   methods: {
+    download(blob, filename) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      // the filename you want
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    },
+    async export_csv() {
+      // const rawResponse = await fetch(this.appstore.api + '/export?' +
+      //     new URLSearchParams({
+      //       api: 'shows'
+      //     }), {
+      //       method: 'GET',
+      //       headers: {
+      //         "Content-Type": "application/json", "Authentication-Token": this.auth_token,
+      //         Accept : "text/csv; charset=utf-8",
+      //       }
+      //
+      //     }
+      //
+      // );
+      try {
+        const target = this.appstore.api + '/export?' +
+            new URLSearchParams({
+              api: 'shows'
+            }) //file
+        //const target = `https://SOME_DOMAIN.com/api/data/log_csv?$"queryString"`; //target can also be api with req.query
+
+        fetch(target, {
+          method: 'get',
+          headers: {
+            'Accept': 'text/plain',
+            'Content-Type': 'text/plain',
+            "Authentication-Token": this.appstore.auth_token,
+          }
+        }).then(res => res.blob())
+            .then(blob => {
+              var file = window.URL.createObjectURL(blob);
+              window.location.assign(file);
+            });
+
+
+        //   ;
+        //
+        //   if (res.status === 200) {
+        //     // res.blob().then(blob => this.download(blob))
+        //     const data = await res.text();
+        //     console.log(data);
+        //
+        //   } else {
+        //     console.log(`Error code ${res.status}`);
+        //   }
+      } catch (err) {
+        console.log(err)
+      }
+      // console.log(99, rawResponse);
+
+    },
 
     async update_records() {
       this.loading = true;
@@ -209,6 +273,7 @@ export default {
   async mounted() {
     await this.update_records()
   },
+
 };
 </script>
 
