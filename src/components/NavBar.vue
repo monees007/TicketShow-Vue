@@ -1,6 +1,7 @@
 <template>
   <div class="NavBar">
-    <b-navbar class="text-primary fixed-top bg-dark-subtle " style="justify-content: space-between !important;">
+    <b-navbar :class="appstore.app_theme==='dark'? 'bg-dark-subtle': 'bg-info-subtle' " class="text-primary fixed-top"
+              style="justify-content: space-between !important;">
       <b-navbar-nav>
         <b-navbar-brand class="" href="/">
           <img
@@ -59,7 +60,7 @@
         </b-button>
         <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 d-md-block"
                   @click="appstore.logout()">
-          <b-icon icon="leave"/>
+          <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']"/>
         </b-button>
 
 

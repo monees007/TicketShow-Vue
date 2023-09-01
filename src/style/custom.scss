@@ -21,6 +21,14 @@ $enable-responsive-font-sizes: true;
 .text-light {
   color: #0a58ca !important;
 }
+
 @import "bootstrap";
-//@import "bootstrap-vue";
+@import "bootstrap-vue";
 //@import "theme.dark.css";
+
+//import 'bootstrap-vue/dist/bootstrap-vue.css';
+////
+//// import 'bootstrap/dist/css/bootstrap.css'
+//// // import '@/style/bootstrap-vue.css'
+//import '@/style/bootstrap.css';
+//// import 'bootstrap/dist/css/bootstrap.min.css'
