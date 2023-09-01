@@ -6,7 +6,7 @@ export const useAppStore = defineStore('AppStore', {
     state: () => (
         {
             app_name: 'TicketShow',
-            app_theme: 'dark',
+            app_theme: 'light',
             server: 'http://127.0.0.1:4433',
             api: 'http://127.0.0.1:4433/api',
             next_page: '/',
@@ -19,7 +19,9 @@ export const useAppStore = defineStore('AppStore', {
             csrf: '',
             is_logged_in: false,
             server_error: false,
+
             router: router,
+            review_id: false,
             review_modal: {
                 show: false,
                 show_id: -1,
@@ -35,6 +37,17 @@ export const useAppStore = defineStore('AppStore', {
 
     },
     actions: {
+        toggle_theme() {
+            if (this.app_theme === 'dark') {
+                this.app_theme = 'light'
+            } else {
+                this.app_theme = 'dark'
+            }
+        },
+
+        reload_reviews() {
+            this.review_id = !this.review_id;
+        },
         open_review_modal(rid, show_or_theatre) {
 
             this.review_modal.show = true;

@@ -8,11 +8,29 @@ export const useEditorStore = defineStore('EditorStore', {
             theatre_list: [],
             running_list: [],
             appstore: useAppStore(),
+            shows_for_theatre: {}
         }
     ),
     getters: {},
     actions: {
+        async get_shows_of_theatre(tid) {
+            const asd = this.appstore
+            try {
+                this.loading = true;
+                const response = await fetch(asd.api + "/running?id=" + tid, {
+                    method: 'GET',
+                    headers: asd.getheader()
+                });
+                if (response.status === 200) {
+                    this.shows_for_theatre[tid] = await response.json()
 
+                } else {
+                    console.log(response.status, "Failed to load bulk running")
+                }
+            } catch (e) {
+                console.log("Failed to load bulk running ", e)
+            }
+        },
         async getData(show_or_theatre) {
             const asd = this.appstore
             const steam = (show_or_theatre === 1 ? 'theatre' : show_or_theatre === 2 ? 'running' : 'shows')

@@ -49,7 +49,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="container" data-bs-theme="dark">
+  <div :data-bs-theme="appstore.app_theme" class="container">
     <div class="row">
       <div class="offset-md-2 col-lg-11 col-md-7 offset-lg-4 offset-md-3">
         <b-card class="panel border  ">

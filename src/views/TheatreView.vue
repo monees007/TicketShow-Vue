@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100vh">
+  <div :key="appstore.review_id" style="width: 100vh">
 
     <div class="d-flex align-items-center w-100 flex-row px-3">
 
@@ -21,7 +21,8 @@
       review
     </b-button>
     <div v-if="compo">
-      <div v-for="r in reviews" :key="r.id" class="card w-100 bg-dark text-light text-warning rounded-5 border-1 py-5"
+      <div v-for="r in reviews" :key="r.id"
+           class="card w-100 bg-dark text-light text-warning rounded-5 border-1 py-5 my-4"
            style="min-height: 80px; font-style: oblique; font-size: small">
         <span>"{{ r.review }}" </span>
         <b-row class="d-inline">

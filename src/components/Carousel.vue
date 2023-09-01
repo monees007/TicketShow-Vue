@@ -35,6 +35,7 @@ export default defineComponent({
         id="carousel-fade"
         ref="myCarousel"
         fade
+        controls
         img-height="280"
         img-width="1024"
         style="text-shadow: 0 0 2px #000; border-radius: 60px !important; overflow: hidden"
@@ -55,19 +56,19 @@ export default defineComponent({
 
     </b-carousel>
 
-    <b-button-toolbar v-show="controller_show" id="controller" class="d-none d-md-block">
-      <b-button-group class="mr-1">
-        <b-button title="Save file" @click="prev">
-          <b-icon aria-hidden="true" icon="arrow-left" ></b-icon>
-        </b-button>
-        <b-button id="pause-button" title="Load file">
-          <span>2/3 {{ this.slide }} </span>
-        </b-button>
-        <b-button title="New document"  @click="next">
-          <b-icon aria-hidden="true" icon="arrow-right"></b-icon>
-        </b-button>
-      </b-button-group>
-    </b-button-toolbar>
+    <!--    <b-button-toolbar v-show="controller_show" id="controller" class="d-none d-md-block">-->
+    <!--      <b-button-group class="mr-1">-->
+    <!--        <b-button title="Save file" @click="prev">-->
+    <!--          <b-icon aria-hidden="true" icon="arrow-left" ></b-icon>-->
+    <!--        </b-button>-->
+    <!--        <b-button id="pause-button" title="Load file">-->
+    <!--          <span>2/3 {{ this.slide }} </span>-->
+    <!--        </b-button>-->
+    <!--        <b-button title="New document"  @click="next">-->
+    <!--          <b-icon aria-hidden="true" icon="arrow-right"></b-icon>-->
+    <!--        </b-button>-->
+    <!--      </b-button-group>-->
+    <!--    </b-button-toolbar>-->
   </div>
 </template>
 
@@ -83,5 +84,9 @@ b-carousel-slide {
   left: 40%;
   z-index: 33;
 //top: 40%; bottom: 80px;
+}
+
+.carousel-control-prev > .sr-only {
+  display: none;
 }
 </style>

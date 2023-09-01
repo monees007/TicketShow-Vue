@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="modal-booking" v-model="storeX.showModal1" body-bg-variant="dark" body-text-variant="light"
-             class="d-flex flex-column" data-bs-theme="dark"
+             :data-bs-theme="appstore.app_theme" class="d-flex flex-column"
              footer-bg-variant="dark"
              footer-text-variant="light"
              header-bg-variant="dark"
@@ -10,6 +10,7 @@
              size="lg"
              title="Book Tickets"
              visible>
+      <b-alert v-show="booking_successful" show variant="success">Booking Successful</b-alert>
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ show.name }}</h3>
@@ -35,7 +36,7 @@
       <b-row cols="mt-3">
         <span class="left">Slot</span>
         <b-col class="right">
-          <b-form-select v-model="selected_run" class="my-2 input-field bg-dark text-light" required
+          <b-form-select v-model="selected_run" :state="is_valid" class="my-2 input-field bg-dark text-light" required
                          @change="booking.rid = selected_run.id" @input="booking.total_price = total_p">
             <b-form-select-option :value="null" default disabled>Please select the show</b-form-select-option>
 
@@ -46,21 +47,6 @@
           </b-form-select>
         </b-col>
       </b-row>
-      <b-row>
-        <span class="left">Person</span>
-        <b-col class="right my-3">
-          <b-form-input v-model="booking.person" min="1" required type="number"
-                        @input="booking.total_price = total_p"></b-form-input>
-        </b-col>
-      </b-row>
-      <b-row>
-        <span class="left">Price</span>
-        <b-col class="right my-3">
-          <b-input-group prepend="₹">
-            <b-form-input v-model="booking.total_price" disabled type="number"></b-form-input>
-          </b-input-group>
-        </b-col>
-      </b-row>
       <b-row class="mt-3">
         <span class="left">Seats</span>
         <b-col class="right">
@@ -69,13 +55,28 @@
         </b-col>
 
       </b-row>
-      <template #modal-footer="{cancel}">
+      <b-row>
+        <span class="left">Person</span>
+        <b-col class="right my-3">
+          <b-form-input v-model="person" min="1" required type="number"
+          ></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row>
+        <span class="left">Price</span>
+        <b-col class="right my-3">
+          <b-input-group prepend="₹">
+            <b-form-input v-model="total_p" disabled type="number"></b-form-input>
+          </b-input-group>
+        </b-col>
+      </b-row>
+      <template #modal-footer>
 
-        <b-button v-b-modal.modal-booking size="md" variant="danger" @click="cancel()">
+        <b-button size="md" variant="danger" @click="storeX.showModal1=false">
           {{ 'Cancel' }}
         </b-button>
-        <b-button v-b-modal.modal-booking size="md" variant="success" @click="bookticket()">
-          {{ 'Confirm Booking' }}
+        <b-button size="md" variant="success" @click="booking_successful? storeX.showModal1=false : bookticket()">
+          {{ booking_successful ? 'Done' : 'Confirm Booking' }}
         </b-button>
       </template>
     </b-modal>
@@ -83,7 +84,7 @@
     <b-modal id="modal-multi-2" v-model="storeX.showModal2"
              body-bg-variant="dark"
              body-text-variant="light"
-             data-bs-theme="dark"
+             :data-bs-theme="appstore.app_theme"
              footer-bg-variant="dark"
              footer-text-variant="light"
              header-bg-variant="dark"
@@ -151,6 +152,7 @@ export default {
   },
   data: () => {
     return {
+      is_valid: true,
       selected_run: {
         ticket_price: 0,
         occupied_seats: '',
@@ -162,7 +164,9 @@ export default {
       storeX: useBookingStore(),
       appstore: useAppStore(),
       lang: "",
-      value: null
+      value: null,
+
+      booking_successful: false,
     }
   },
 
@@ -173,8 +177,11 @@ export default {
         "T", "U", "V", "W", "X", "Y", "Z"].slice(0, 8)
     },
     total_p() {
-      return (this.booking.person * this.selected_run.ticket_price)
+      return (this.person * this.selected_run.ticket_price)
 
+    },
+    person() {
+      return (this.storeX.selectedSeats.split(',').splice(1).length)
     }
 
   },
@@ -201,14 +208,15 @@ export default {
           show_name: this.selected_run.show_name,
           language: this.selected_run.language,
           format: this.selected_run.format,
+          person: this.person,
           date: this.booking.date,
           start: this.selected_run.start,
           end: this.selected_run.end,
           seats: this.storeX.selectedSeats,
-          total_price: this.booking.total_price,
+          total_price: this.total_p,
         })
       });
-      const content = await rawResponse.json();
+      const content = await rawResponse.status;
       console.log('booking', content);
       const rawResponse2 = await fetch(this.appstore.api + '/running',
           {
@@ -219,10 +227,20 @@ export default {
               occupied_seats: this.selected_run.occupied_seats + this.storeX.selectedSeats
             })
 
+
           });
-      const content2 = await rawResponse2.json();
+      const content2 = await rawResponse2.status;
       console.log('running', content2);
-    }
+      this.booking_successful = true;
+      setTimeout(() => {
+            this.storeX.$reset()
+          },
+          3000
+      )
+
+
+    },
+
 
 
   },

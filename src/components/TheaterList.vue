@@ -4,6 +4,7 @@ import MovieCard2 from "@/components/MovieCard2.vue";
 import BookingModal from "@/components/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
+import router from "@/router";
 
 
 export default defineComponent({
@@ -34,6 +35,9 @@ export default defineComponent({
 
   },
   methods: {
+    router() {
+      return router
+    },
 
     async loadx() {
       try { // get theatres
@@ -72,7 +76,7 @@ export default defineComponent({
 
     <div v-for="n in order" :key="n">
       <hr>
-      <div class="d-flex flex-row">
+      <div class="d-flex flex-row" @click="app_store.router.push('/theatre/'+theatre[n][0].id)">
         <h1 class="align-items-start">
           {{ theatre[n][0].name }}
         </h1>
@@ -80,7 +84,7 @@ export default defineComponent({
           <span class="disabled w-75 "> {{ theatre[n][0].place }}</span>
 
           <b-form-rating v-model="theatre[n][0].rating" class="d-none d-md-block bg-black border-0 w-75 flex-row"
-                         color="" data-bs-theme="dark"
+                         :data-bs-theme="app_store.app_theme" color=""
                          readonly></b-form-rating>
         </b-row>
       </div>
