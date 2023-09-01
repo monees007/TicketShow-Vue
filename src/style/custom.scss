@@ -18,6 +18,9 @@ $enable-rounded: true;
 $enable-transitions: true;
 $enable-responsive-font-sizes: true;
 
+.text-light {
+  color: #0a58ca !important;
+}
 @import "bootstrap";
 //@import "bootstrap-vue";
 //@import "theme.dark.css";

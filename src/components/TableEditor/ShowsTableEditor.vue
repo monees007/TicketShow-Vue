@@ -133,19 +133,7 @@ export default {
       window.URL.revokeObjectURL(url);
     },
     async export_csv() {
-      // const rawResponse = await fetch(this.appstore.api + '/export?' +
-      //     new URLSearchParams({
-      //       api: 'shows'
-      //     }), {
-      //       method: 'GET',
-      //       headers: {
-      //         "Content-Type": "application/json", "Authentication-Token": this.auth_token,
-      //         Accept : "text/csv; charset=utf-8",
-      //       }
-      //
-      //     }
-      //
-      // );
+
       try {
         const target = this.appstore.api + '/export?' +
             new URLSearchParams({
@@ -162,21 +150,16 @@ export default {
           }
         }).then(res => res.blob())
             .then(blob => {
-              var file = window.URL.createObjectURL(blob);
-              window.location.assign(file);
+              const link = document.createElement('a');
+              let url = URL.createObjectURL(blob);
+              link.setAttribute("href", url);
+              link.setAttribute("download", 'export.csv');
+              link.style.visibility = 'hidden';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
             });
 
-
-        //   ;
-        //
-        //   if (res.status === 200) {
-        //     // res.blob().then(blob => this.download(blob))
-        //     const data = await res.text();
-        //     console.log(data);
-        //
-        //   } else {
-        //     console.log(`Error code ${res.status}`);
-        //   }
       } catch (err) {
         console.log(err)
       }
@@ -215,7 +198,7 @@ export default {
         },
       };
     },
-    async handleSubmit(data, update, repeat = true) {
+    async handleSubmit(data, update, repeat = false) {
       this.rowUpdate = {
         edit: false,
         id: data.id,
@@ -225,7 +208,7 @@ export default {
       if (update) {
         const rawResponse = await fetch(this.appstore.api + '/shows?' +
             new URLSearchParams({}), {
-          method: 'POST',
+          method: 'PUT',
           headers: this.appstore.getheader(),
           body: JSON.stringify(this.storeX.show_list[data.index])
             }
@@ -242,18 +225,43 @@ export default {
       this.rowUpdate = {edit: true, id: data.id};
     },
     async handleDelete(data) {
-      const rawResponse = await fetch(this.appstore.api + '/shows?' +
-          new URLSearchParams({
-            id: data.id
-          }), {
-            method: 'DELETE',
-        headers: this.appstore.getheader(),
+      this.$bvModal.msgBoxConfirm('Please confirm that you want to delete this entry.', {
+        title: 'Please Confirm',
+        bodyBgVariant: 'dark',
 
-          }
-      );
-      const content = await rawResponse.json();
-      console.log(content);
-      this.rowUpdate = {id: data.id, action: "delete"};
+        footerBgVariant: 'dark',
+        headerBgVariant: 'dark',
+        bodyTextVariant: 'light',
+        size: 'sm',
+        titleTag: 'Confirm',
+        buttonSize: 'sm',
+        okVariant: 'danger',
+        okTitle: 'YES',
+        cancelTitle: 'NO',
+        footerClass: 'p-2',
+        hideHeaderClose: true,
+        centered: true
+      })
+          .then(async value => {
+            if (value) {
+              const rawResponse = await fetch(this.appstore.api + '/shows?' +
+                  new URLSearchParams({
+                    id: data.id
+                  }), {
+                    method: 'DELETE',
+                    headers: this.appstore.getheader(),
+
+                  }
+              );
+              const content = await rawResponse.json();
+              console.log(content);
+              this.rowUpdate = {id: data.id, action: "delete"};
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+
     },
     async handleSave() {
 

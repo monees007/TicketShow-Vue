@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <NavBar data-bs-theme="dark"/>
+    <NavBar :data-bs-theme="appstore.app_theme"/>
 
     <Sidebar :appstore="appstore"/>
     <ReviewModal/>
@@ -58,7 +58,7 @@ export default {
 
   margin-top: 80px;
 
-  background: #000;
+//background: #000;
 }
 
 @media (min-width: 768px) {

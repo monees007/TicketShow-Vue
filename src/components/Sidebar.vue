@@ -1,5 +1,5 @@
 <template>
-  <b-sidebar id="sidebar-1" bg-variant="black" data-bs-theme="dark" right shadow text-variant="light"
+  <b-sidebar id="sidebar-1" :data-bs-theme="appstore.app_theme" bg-variant="black" right shadow text-variant="light"
              title="TicketShow">
     <div class="px-3 py-2 ">
       <b-row>

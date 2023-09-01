@@ -2,13 +2,13 @@
   <div class="NavBar">
     <b-navbar class="text-primary fixed-top bg-dark-subtle " style="justify-content: space-between !important;">
       <b-navbar-nav>
-        <b-navbar-brand class=" text-light" href="#">
+        <b-navbar-brand class="" href="/">
           <img
               class="d-inline-block mx-3"
               src="https://cdn4.iconfinder.com/data/icons/flat-design-development-set-3/24/color-wheel-512.png"
               style="height: 37px">
 
-          <span class="font-monospace" style="font-size: large">TicketShow</span>
+          <span class="font-monospace" style="font-size: large; font-weight: bold">TicketShow</span>
 
         </b-navbar-brand>
         <b-col>
@@ -27,15 +27,17 @@
             </div>
             <b-icon icon="x-lg" @click="search_not_toggled=!search_not_toggled"/>
           </template>
-          <b-form-input id="searchy" v-model="search_string" class="text-right bg-secondary text-light border-0"
-                        data-bs-theme="dark" placeholder="supports regex"
+          <b-form-input id="searchy" v-model="search_string" :data-bs-theme="appstore.app_theme"
+                        class="text-right bg-secondary border-0" placeholder="supports regex"
                         @keyup="do_search">
           </b-form-input>
+          <hr class="">
           <b-row v-for="x in result" :key="x.id"
-                 class="mt-3 py-2 bg-black rounded-4" @click="appstore.router.push((x.director ? '/show/': '/theatre/')+x.id )">
+                 class=" py-2 " @click="appstore.router.push((x.director ? '/show/': '/theatre/')+x.id )">
             <b-col class="align-items-start">
               <h3 class="">{{ x.name }}</h3>
               <span class="disabled">{{ x.place || x.director }}</span>
+              <hr>
             </b-col>
           </b-row>
           <template #modal-footer>
@@ -48,15 +50,16 @@
 
         <b-icon :icon="search_not_toggled ?  'x-lg':'search' " class="mx-3 d-sm-inline-block"
                 @click="search_not_toggled=!search_not_toggled"></b-icon>
-        <b-button v-show="false && search_not_toggled" data-bs-theme pill variant="outline-secondary">
-          <b-icon aria-hidden="true" icon="sun-fill"></b-icon>
+        <b-button :variant="appstore.app_theme==='dark' ? 'dark' : 'warning' " pill @click="appstore.toggle_theme">
+          <b-icon :icon="appstore.app_theme==='dark' ? 'moon-stars-fill' :'sun-fill'" aria-hidden="true"></b-icon>
         </b-button>
         <b-button v-b-toggle.sidebar-1 class="mx-2 d-md-none" pill
                   variant="outline-primary">
           <b-icon icon="card-list"/>
         </b-button>
-        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 bg-dark-subtle d-md-block"
-                  @click="appstore.logout()"> Logout
+        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 d-md-block"
+                  @click="appstore.logout()">
+          <b-icon icon="leave"/>
         </b-button>
 
 

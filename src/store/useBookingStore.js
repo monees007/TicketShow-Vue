@@ -32,6 +32,7 @@ export const useBookingStore = defineStore('BookingStore', {
                 }
             );
             this.running = await rawResponse.json();
+            this.showModal1 = true
 
         },
         updateSeats(seats) {

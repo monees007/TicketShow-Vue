@@ -45,6 +45,7 @@ export default {
   },
   methods: {
     async post() {
+      const this2 = this
       if (this.rating === 0 || this.review.length === 0) {
         this.check = this.review.length > 0 && this.rating > 0
       } else {
@@ -59,14 +60,15 @@ export default {
             }).then(function (response) {
           if (response.status === 200) {
             console.log(response)
-            this.appstore.hide_review_modal()
+            this2.appstore.reload_reviews()
+            this2.appstore.hide_review_modal()
           }
 
 
           // router.push({path: '/'})
         }).catch(function (error) {
           console.log(error);
-          this.error = true;
+          this2.error = true;
         });
       }
     }

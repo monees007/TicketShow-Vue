@@ -28,32 +28,33 @@ export default {
   <div id="bright" class="movie_card">
     <div class="info_section d-flex flex-column">
       <div class="movie_header">
-        <img class="locandina"
-             :src="m.image_url"/>
+        <img :src="m.image_url" class="locandina"/>
         <div class="d-flex flex-column align-items-start" style="text-align: left">
           <h1 style="overflow: hidden">{{ m.name }}</h1>
           <h4>{{m.year}}, {{ m.director}}</h4>
           <div><span class="minutes">{{ m.format}}</span>
-            <p class="type">{{ m.tags }}</p></div>
+            <p class="type mb-2">{{ m.tags }}</p></div>
 
         </div>
 
       </div>
-      <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5">
-        <p class="text">
+      <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5 mx-4">
+        <p class="text ">
           {{ m.description }}
         </p>
 
       </div>
 
       <div v-if="t != null" class="d-flex flex-row mb-3 mx-3">
-        <b-rating class="rating-el bg-black pa-0" data-bs-theme="dark" inline no-border size="lg"
-                  style="width: fit-content" variant=""></b-rating>
+        <b-rating :value="m.rating" class="ml-5  bg-dark border-0" inline size="lg"
+                  variant="warning"></b-rating>
 
-        <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
+
+        <b-button :data-bs-theme="appstore.app_theme" class="mx-2 btn-outline-secondary btn-dark" pill
                   @click="$router.push({path:'/show/'+m.id})">Reviews
         </b-button>
-        <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
+        <b-button v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
+                  class="mx-2 btn-outline-secondary btn-dark" pill
                   @click="storeX.setValue(t,m)">Book
         </b-button>
         <b-button v-if="false && appstore.user.role==='admin'" class="me-2" pill size="sm">
@@ -66,7 +67,7 @@ export default {
       </div>
     </div>
     <div class="blur_back bright_back " style="max-width: fit-content;">
-      <img style="    max-height: -webkit-fill-available;"
+      <img style="    /*noinspection CssInvalidPropertyValue*/max-height: -webkit-fill-available;"
           :src="m.image_sqr">
     </div>
   </div>

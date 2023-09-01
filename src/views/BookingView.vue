@@ -27,7 +27,8 @@ export default {
 </script>
 <template>
   <div class="d-grid mb-5">
-    <div v-for="b in this.bookings" :key="b.id" class="card bg-dark-subtle py-4 px-4 my-4" data-bs-theme="dark">
+    <div v-for="b in this.bookings" :key="b.id" :data-bs-theme="appstore.app_theme"
+         class="card bg-dark-subtle py-4 px-4 my-4">
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ b.show_name }}</h3>
@@ -82,6 +83,7 @@ export default {
 .right {
   padding-left: 20px;
   border-left: darkcyan dashed 2px;
+  left: 2px;
 }
 
 .pillx {
