@@ -20,7 +20,7 @@ import MTab from "@/components/MTab.vue";
 import {useAppStore} from "@/store";
 import Sidebar from "@/components/Sidebar.vue";
 import ReviewModal from "@/components/ReviewModal.vue";
-
+// const bg = useAppStore().app_theme==='dark' ? '#000' : '#fff';
 
 export default {
   name: 'App',
@@ -37,6 +37,7 @@ export default {
     return {
       show: true,
       appstore: useAppStore(),
+      background: '#fff',
     }
   },
   created() {
@@ -58,7 +59,10 @@ export default {
 
   margin-top: 80px;
 
-//background: #000;
+}
+
+body {
+  background: v-bind(background) !important;
 }
 
 @media (min-width: 768px) {
