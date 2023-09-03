@@ -7,14 +7,16 @@
             v-if="displaymode===0"
             v-model="storeX.theatre_list"
             :busy="loading"
+            :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'"
+            :data-bs-theme="appstore.app_theme"
             :editMode="'row'"
             :fields="fields"
+
             :rowUpdate="rowUpdate"
             bordered
 
-            class=" editable-table table-hover shadow-z-1 "
-            data-bs-theme="dark"
 
+            class=" editable-table table-hover shadow-z-1 "
         >
           <template #cell-isActive="data">
             <span v-if="data.value">Yes</span>
@@ -58,7 +60,7 @@
 
     <Transition>
       <KeepAlive>
-        <div v-if="displaymode===1" class="accordion w-100" data-bs-theme="dark" role="tablist">
+        <div v-if="displaymode===1" :data-bs-theme="appstore.app_theme" class="accordion w-100" role="tablist">
           <b-card v-for="(t,index) in storeX.theatre_list" :key="t.id" class="mb-1" no-body>
             <b-card-header v-b-toggle="'acc'+index" class="p-1" header-tag="header" role="tab">
               <div class="d-flex  flex-row px-3">
@@ -187,15 +189,26 @@
 
     <b-button-toolbar class="mt-3" key-nav>
       <b-button-group class="mx-1">
-        <b-button v-if="displaymode===0" class="me-2" pill variant="outline-secondary" @click="handleAdd()">Add Row
+        <b-button v-if="displaymode===0" class="me-2" pill variant="secondary" @click="handleAdd()">
+          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation=180/>
         </b-button>
-        <b-button class="me-2" pill variant="outline-danger" @click="update_records">Reload</b-button>
-        <b-button v-if="displaymode===0" class="me-2" pill variant="outline-success" @click="handleSave()">Save
+        <b-button class="me-2" pill variant="danger" @click="update_records">
+          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+        </b-button>
+        <b-button v-if="displaymode===0" class="me-2" pill variant="success" @click="handleSave()">
+          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
         </b-button>
       </b-button-group>
       <b-button-group v-if="displaymode===0" class="mx-1 mt-3">
-        <b-button @click="storeX.csvToJson(1)">Upload CSV</b-button>
-        <b-button @click="storeX.jsonToCSV(1)">Download CSV</b-button>
+        <b-button @click="storeX.csvToJson(1)">
+          <font-awesome-icon :icon="['fas', 'up-long']"/>
+          CSV
+          <font-awesome-icon :icon="['fas', 'file-csv']"/>
+        </b-button>
+        <b-button @click="storeX.jsonToCSV(1)">
+          <font-awesome-icon :icon="['fas', 'down-long']"/>
+          <font-awesome-icon :icon="['fas', 'file-csv']"/>
+        </b-button>
       </b-button-group>
     </b-button-toolbar>
   </div>

@@ -51,12 +51,7 @@ const routes = [
     meta: {requiresAuth: true},
     component: () => import('../views/TheatreView.vue')
   },
-  {
-    path: '/stats',
-    name: 'stats',
-    meta: {requiresAuth: true},
-    component: () => import('../views/StatsView.vue')
-  }
+
 ]
 
 const router = new VueRouter({

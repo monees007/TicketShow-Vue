@@ -4,6 +4,7 @@ import App from "@/App.vue";
 import MovieCard2 from "@/components/MovieCard2.vue";
 import BookingModal from "@/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
+import {useAppStore} from "@/store";
 
 
 export default defineComponent({
@@ -11,6 +12,7 @@ export default defineComponent({
   components: {BookingModal, MovieCard2},
   data: () => {
     return {
+      appstore: useAppStore(),
       storeX: useBookingStore(),
       loading: false,
       theatre: {},
@@ -118,7 +120,8 @@ export default defineComponent({
         </h1>
         <b-row>
           <span  class="disabled w-50 "> {{ theatre[n][0].place }}</span>
-          <b-form-rating v-model="theatre[n][0].rating" class="bg-black border-0 w-25 flex-row" color="" data-bs-theme="dark"
+          <b-form-rating v-model="theatre[n][0].rating" :data-bs-theme="appstore.app_theme" class="bg-black border-0 w-25 flex-row"
+                         color=""
                          readonly style="max-width: 125px"></b-form-rating>
         </b-row>
       </div>

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <b-modal id="modal-booking" v-model="storeX.showModal1" body-bg-variant="dark" body-text-variant="light"
-             :data-bs-theme="appstore.app_theme" class="d-flex flex-column"
+    <b-modal id="modal-booking" v-model="storeX.showModal1" :data-bs-theme="appstore.app_theme" body-bg-variant="dark"
+             body-text-variant="light" class="d-flex flex-column"
              footer-bg-variant="dark"
              footer-text-variant="light"
              header-bg-variant="dark"
@@ -82,9 +82,9 @@
     </b-modal>
 
     <b-modal id="modal-multi-2" v-model="storeX.showModal2"
+             :data-bs-theme="appstore.app_theme"
              body-bg-variant="dark"
              body-text-variant="light"
-             :data-bs-theme="appstore.app_theme"
              footer-bg-variant="dark"
              footer-text-variant="light"
              header-bg-variant="dark"
@@ -140,16 +140,11 @@
 <script>
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
-import {storeToRefs} from 'pinia'
 
 export default {
   name: 'BookingModal',
   props: ['show', 'theatre'],
-  setup() {
-    const storeX = useBookingStore()
-    const {showX} = storeToRefs(storeX).show
-    return {showX}
-  },
+
   data: () => {
     return {
       is_valid: true,
@@ -160,11 +155,12 @@ export default {
       booking: {
         total_price: 0,
         person: 1,
+        date: null,
       },
       storeX: useBookingStore(),
       appstore: useAppStore(),
       lang: "",
-      value: null,
+
 
       booking_successful: false,
     }
@@ -240,7 +236,6 @@ export default {
 
 
     },
-
 
 
   },

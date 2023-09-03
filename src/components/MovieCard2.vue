@@ -3,12 +3,15 @@
 <script>
 
 import {useBookingStore} from "@/store/useBookingStore";
+import {useAppStore} from "@/store";
 
 export default {
   name: "MovieCard2",
   data: () => {
     return {
       storeX: useBookingStore()
+      ,
+      appstore: useAppStore()
     }
   },
   props: ['m', 't'],
@@ -17,7 +20,8 @@ export default {
 </script>
 
 <template>
-  <div id="bright" class="movie_card">
+  <div id="bright" :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'" :data-bs-theme="appstore.app_theme"
+       class="movie_card ">
     <div class="info_section d-flex flex-column">
       <div class="movie_header">
         <img class="locandina"
@@ -40,10 +44,12 @@ export default {
       </div>
 
       <div class="d-flex flex-row mb-3 mx-3">
-        <b-rating class="w-25 rating-el bg-black"  data-bs-theme="dark" inline no-border size="lg" variant=""></b-rating>
+        <b-rating :class="appstore.app_theme==='dark'? 'bg-black' : ''" :data-bs-theme="appstore.app_theme"
+                  class="w-25 rating-el" inline no-border size="lg" variant=""></b-rating>
 
-        <b-button class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light">Reviews</b-button>
-        <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark" data-bs-theme="light"
+        <b-button :data-bs-theme="appstore.app_theme" class="mx-2 btn-outline-secondary btn-dark">Reviews</b-button>
+        <b-button v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
+                  class="mx-2 btn-outline-secondary btn-dark"
                   @click="storeX.setValue(t,m)">Book
         </b-button>
         <b-button class="me-2" pill size="sm">
@@ -72,7 +78,7 @@ export default {
 
 html, body {
   margin: 0;
-  background: black;
+  //background: black;
   font-family: 'Montserrat', helvetica, arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -107,19 +113,19 @@ html, body {
       height: 40%;
 
       h1 {
-        color: #fff;
+        //color: #fff;
         font-weight: 400;
       }
 
       h4 {
-        color: #9ac7fa;
+        //color: #9ac7fa;
         font-weight: 400;
       }
 
       .minutes {
         display: inline-block;
         margin-top: 10px;
-        color: #fff;
+        //color: #fff;
         padding: 5px;
         border-radius: 5px;
         border: 1px solid rgba(255, 255, 255, 0.13);
@@ -127,7 +133,7 @@ html, body {
 
       .type {
         display: inline-block;
-        color: #cee4fd;
+        //color: #cee4fd;
         margin-left: 10px;
       }
 
@@ -166,7 +172,7 @@ html, body {
   }
 
   .info_section {
-    background: linear-gradient(to right, #0d0d0c 50%, transparent 100%);
+    //background: linear-gradient(to right, #0d0d0c 50%, transparent 100%);
   }
 
   .blur_back {

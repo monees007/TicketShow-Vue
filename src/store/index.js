@@ -43,6 +43,9 @@ export const useAppStore = defineStore('AppStore', {
             } else {
                 this.app_theme = 'dark'
             }
+            document.body.style.background = this.app_theme === 'dark' ? '#000' : '#fff';
+            document.body.style.color = this.app_theme === 'dark' ? '#fff' : '#000';
+
         },
 
         reload_reviews() {
