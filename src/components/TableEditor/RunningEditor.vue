@@ -9,7 +9,9 @@
       bordered
 
       class="overflow-x-scroll editable-table table-hover shadow-z-1 "
-      data-bs-theme="dark"
+      :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'"
+
+      :data-bs-theme="appstore.app_theme"
 
   >
     <template #cell-isActive="data">
