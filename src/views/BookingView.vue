@@ -28,7 +28,7 @@ export default {
 <template>
   <div class="d-grid mb-5">
     <div v-for="b in this.bookings" :key="b.id" :data-bs-theme="appstore.app_theme"
-         class="card bg-dark-subtle py-4 px-4 my-4">
+         class="card bg-secondary py-4 px-4 my-4">
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ b.show_name }}</h3>

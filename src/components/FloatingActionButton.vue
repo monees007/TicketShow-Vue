@@ -2,8 +2,9 @@
   <b-button
       variant="outline"
       v-b-modal.modal-xl
+      :data-bs-theme="appstore.app_theme"
       id="fab1"
-      class="d-flex z-3 align-items-center justify-content-center position-fixed ">
+      class="d-flex z-3 btn-secondary align-items-center justify-content-center position-fixed ">
     <b-icon icon="plus-lg"></b-icon>
   </b-button>
 <!--  <div class="fab-wrapper">-->
@@ -30,8 +31,15 @@
 <!--  </div>-->
 </template>
 <script>
+import {useAppStore} from "@/store";
+
 export default {
-  name: 'FloatingActionButton'
+  name: 'FloatingActionButton',
+  data() {
+    return {
+      appstore: useAppStore(),
+    }
+  }
 }
 </script>
 <style>
@@ -39,10 +47,16 @@ export default {
   width: 7vh;
   height: 7vh;
   border-radius: 90px;
-  background: #0c5460;
+  border: 0;
+  background: #7d5260;
   color: #f8f9fa;
   bottom: 20px;
   right: 20px
+}
+
+#fab1:hover {
+  background: #6d4250;
+//box-shadow: 0px 0px 30px 10px #ffd9e3;
 }
 </style>
 <style>
@@ -64,9 +78,7 @@ export default {
   right: -1rem;
   width: 4rem;
   height: 4rem;
-  background: blue;
   border-radius: 50%;
-  background: #126ee2;
   box-shadow: 0px 5px 20px #81a4f1;
   transition: all 0.3s ease;
   z-index: 1;

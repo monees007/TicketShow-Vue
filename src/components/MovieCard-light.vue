@@ -1,12 +1,10 @@
-
-
 <script>
 
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
 
 export default {
-  name: "MovieCard2",
+  name: "MovieCardLight",
   data: () => {
     return {
       storeX: useBookingStore()
@@ -20,16 +18,17 @@ export default {
 </script>
 
 <template>
-  <div id="bright" :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'" :data-bs-theme="appstore.app_theme"
+  <div id="bright" :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'"
+       :data-bs-theme="appstore.app_theme"
        class="movie_card ">
     <div class="info_section d-flex flex-column">
       <div class="movie_header">
-        <img class="locandina"
-             :src="m.image_url"/>
+        <img :src="m.image_url"
+             class="locandina"/>
         <div class="d-flex flex-column align-items-start">
           <h1 style="text-wrap: nowrap; overflow: hidden">{{ m.name }}</h1>
-          <h4>{{m.year}}, {{ m.director}}</h4>
-          <div><span class="minutes">{{ m.format}}</span>
+          <h4>{{ m.year }}, {{ m.director }}</h4>
+          <div><span class="minutes">{{ m.format }}</span>
             <p class="type">{{ m.tags }}</p></div>
 
         </div>
@@ -62,13 +61,13 @@ export default {
       </div>
     </div>
     <div class="blur_back bright_back " style="max-width: fit-content;">
-      <img style="    max-height: -webkit-fill-available;"
-          :src="m.image_sqr">
+      <img :src="m.image_sqr"
+           style="    max-height: -webkit-fill-available;">
     </div>
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,700,800');
 
 * {
@@ -78,10 +77,18 @@ export default {
 
 html, body {
   margin: 0;
-  //background: black;
+  background: white;
   font-family: 'Montserrat', helvetica, arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
+}
+
+.link {
+  display: block;
+  text-align: center;
+  color: #777;
+  text-decoration: none;
+  padding: 10px;
 }
 
 .movie_card {
@@ -89,13 +96,15 @@ html, body {
   display: block;
   width: 800px;
   height: 350px;
-  margin: 100px auto;
+  margin: 80px auto;
   overflow: hidden;
   border-radius: 10px;
   transition: all 0.4s;
+  box-shadow: 0px 0px 120px -25px rgba(0, 0, 0, 0.5);
 
   &:hover {
     transform: scale(1.02);
+    box-shadow: 0px 0px 80px -25px rgba(0, 0, 0, 0.5);
     transition: all 0.4s;
   }
 
@@ -113,27 +122,27 @@ html, body {
       height: 40%;
 
       h1 {
-        //color: #fff;
+        color: black;
         font-weight: 400;
       }
 
       h4 {
-        //color: #9ac7fa;
+        color: #555;
         font-weight: 400;
       }
 
       .minutes {
         display: inline-block;
-        margin-top: 10px;
-        //color: #fff;
+        margin-top: 15px;
+        color: #555;
         padding: 5px;
         border-radius: 5px;
-        border: 1px solid rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(0, 0, 0, 0.05);
       }
 
       .type {
         display: inline-block;
-        //color: #cee4fd;
+        color: #959595;
         margin-left: 10px;
       }
 
@@ -141,14 +150,48 @@ html, body {
         position: relative;
         float: left;
         margin-right: 20px;
-        height: 150px;
+        height: 120px;
         box-shadow: 0 0 20px -10px rgba(0, 0, 0, 0.5);
       }
     }
 
+    .movie_desc {
+      padding: 25px;
+      height: 50%;
 
+      .text {
+        color: #545454;
+      }
+    }
 
+    .movie_social {
+      height: 10%;
+      padding-left: 15px;
+      padding-bottom: 20px;
 
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+          display: inline-block;
+          color: rgba(0, 0, 0, 0.3);
+          transition: color 0.3s;
+          transition-delay: 0.15s;
+          margin: 0 10px;
+
+          &:hover {
+            transition: color 0.3s;
+            color: rgba(0, 0, 0, 0.7);
+          }
+
+          i {
+            font-size: 19px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
   }
 
   .blur_back {
@@ -164,7 +207,7 @@ html, body {
 
 @media screen and (min-width: 768px) {
   .movie_header {
-    width: 60%;
+    width: 65%;
   }
 
   .movie_desc {
@@ -172,7 +215,7 @@ html, body {
   }
 
   .info_section {
-    //background: linear-gradient(to right, #0d0d0c 50%, transparent 100%);
+    background: linear-gradient(to right, #e5e6e6 50%, transparent 100%);
   }
 
   .blur_back {
@@ -183,8 +226,8 @@ html, body {
 
 @media screen and (max-width: 768px) {
   .movie_card {
-    width: 97%;
-    //margin: 70px auto;
+    width: 95%;
+    margin: 70px auto;
     min-height: 350px;
     height: auto;
   }
@@ -196,61 +239,19 @@ html, body {
 
   .movie_header {
     width: 100%;
-    //margin-top: 85px;
+    margin-top: 85px;
   }
 
   .movie_desc {
     width: 100%;
   }
-  .rating-el{
-    min-width: 120px;
-    padding: 7px;
-    max-height: 4px;
-  }
-  .text_el{
-    min-width: 90%;
-  }
+
   .info_section {
-    background: linear-gradient(to top, rgb(20, 20, 19) 50%, transparent 100%);
+    background: linear-gradient(to top, #e5e6e6 50%, transparent 100%);
     display: inline-grid;
   }
 }
 
 
-#bright {
-  box-shadow: 0px 0px 150px -45px rgba(255, 51, 0, 0.5);
-
-  &:hover {
-    box-shadow: 0px 0px 120px -55px rgba(255, 51, 0, 0.5);
-  }
-}
-
-.bright_back {
-  background: url("https://occ-0-2433-448.1.nflxso.net/art/cd5c9/3e192edf2027c536e25bb5d3b6ac93ced77cd5c9.jpg");
-}
-
-#tomb {
-  box-shadow: 0px 0px 150px -45px rgba(19, 160, 134, 0.6);
-
-  &:hover {
-    box-shadow: 0px 0px 120px -55px rgba(19, 160, 134, 0.6);
-  }
-}
-
-.tomb_back {
-  background: url("https://fsmedia.imgix.net/cd/c9/5e/ba/4817/4d9a/93f0/c776ec32ecbc/lara-crofts-neck-looks-unnatural-in-the-new-poster-for-tomb-raider.png");
-}
-
-#ave {
-  box-shadow: 0px 0px 150px -45px rgba(199, 147, 75, 0.7);
-  margin-bottom: 200px;
-
-  &:hover {
-    box-shadow: 0px 0px 120px -55px rgba(199, 147, 75, 0.7);
-  }
-}
-
-.ave_back {
-  background: url("https://www.gannett-cdn.com/-mm-/c03fd140debe8ad4c05cf81a5cad7ad61a12ce52/c=0-1580-2985-3266&r=x803&c=1600x800/local/-/media/2017/06/09/USATODAY/USATODAY/636326272873599176-Black-Panther-Teaser.jpg");
-}
 </style>
+

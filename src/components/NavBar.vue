@@ -1,6 +1,6 @@
 <template>
   <div class="NavBar">
-    <b-navbar :class="appstore.app_theme==='dark'? 'bg-dark-subtle': 'bg-info-subtle' " class="text-primary fixed-top"
+    <b-navbar class="text-primary bg-primary fixed-top"
               style="justify-content: space-between !important;">
       <b-navbar-nav>
         <b-navbar-brand class="" href="/">
@@ -9,7 +9,7 @@
               src="https://cdn4.iconfinder.com/data/icons/flat-design-development-set-3/24/color-wheel-512.png"
               style="height: 37px">
 
-          <span class="font-monospace" style="font-size: large; font-weight: bold">TicketShow</span>
+          <span class="font-monospace text-light" style="font-size: large; font-weight: bold">TicketShow</span>
 
         </b-navbar-brand>
         <b-col>
@@ -51,7 +51,7 @@
 
         <b-icon :icon="search_not_toggled ?  'x-lg':'search' " class="mx-3 d-sm-inline-block"
                 @click="search_not_toggled=!search_not_toggled"></b-icon>
-        <b-button :variant="appstore.app_theme==='dark' ? 'dark' : 'warning' " pill @click="appstore.toggle_theme">
+        <b-button pill @click="appstore.toggle_theme">
           <b-icon :icon="appstore.app_theme==='dark' ? 'moon-stars-fill' :'sun-fill'" aria-hidden="true"></b-icon>
         </b-button>
         <b-button v-b-toggle.sidebar-1 class="mx-2 d-md-none" pill

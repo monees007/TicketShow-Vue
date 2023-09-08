@@ -1,5 +1,6 @@
+
 /* change the colors */
-$primary: #ffb783;
+$primary: #6750A4;
 $secondary: #303235;
 $card-border-radius: 25px;
 $text-secondary: #FFFFFF;
@@ -17,18 +18,76 @@ $dark: #171819;
 $enable-rounded: true;
 $enable-transitions: true;
 $enable-responsive-font-sizes: true;
+$enable-shadows: true;
+$enable-gradients: true;
 
-.text-light {
-  color: #0a58ca !important;
+
+[data-bs-theme='dark'] {
+  --bs-primary: #6750A4;
+  --bs-primary-rgb: 49, 16, 29;
+  --bs-bg-opacity: 0.4;
+  --bs-secondary: #633b48;
+  --bs-secondary-rgb: 99, 59, 72;
+  --bs-body-bg: #2b0013;
+  --bs-body-bg-rgb: 255, 217, 227;
+
+  .btn-secondary {
+    border: 0;
+    --bs-btn-bg: #{mix(#7D5260, #7D5260, .5)};
+    --bs-btn-color: #FFFBFE;
+    --bs-btn-border-color: #{rgba(#FFFBFE, .25)};
+    --bs-btn-hover-bg: #{darken(mix(#7D5260, #7D5260, .5), 5%)};
+    --bs-btn-hover-border-color: #{rgba(#FFFBFE, .25)};
+    --bs-btn-active-bg: #{darken(mix(#7D5260, #7D5260, .5), 10%)};
+    --bs-btn-active-border-color: #{rgba(#FFFBFE, .5)};
+    --bs-btn-focus-border-color: #{rgba(#FFFBFE, .5)};
+    --bs-btn-focus-box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .2);
+  }
 }
 
-@import "bootstrap";
-@import "bootstrap-vue";
+[data-bs-theme="light"] {
+  --bs-body-color: #31101d;
+  --bs-body-color-rgb: 26, 82, 96;
+  --bs-body-bg: #ffd9e3;
+  --bs-body-bg-rgb: 255, 217, 227;
+  --bs-secondary-bg: #FFD8E4;
+  --bs-secondary-bg-rgb: 255, 217, 227;
+  --bs-tertiary-color: #7D5260;
+  --bs-primary: #6750A4;
+  --bs-primary-rgb: 126, 82, 96;
+  --bs-secondary: #ffdad6;
+  --bs-secondary-rgb: 255, 218, 214;
+  --bs-bg-opacity: 0.6;
+  --bs-border-color: #3e001f;
+
+
+  .dropdown-menu {
+    --bs-dropdown-bg: #{mix(#EADDFF, #d9bbdd)};
+    --bs-dropdown-link-active-bg: #{#FFD8E4};
+  }
+
+  .btn-secondary {
+    --bs-btn-bg: #{mix(#7D5260, #7D5260, .5)};
+    --bs-btn-color: #FFFBFE;
+    --bs-btn-border-color: #{rgba(#FFFBFE, .25)};
+    --bs-btn-hover-bg: #{darken(mix(#7D5260, #7D5260, .5), 5%)};
+    --bs-btn-hover-border-color: #{rgba(#FFFBFE, .25)};
+    --bs-btn-active-bg: #{darken(mix(#7D5260, #7D5260, .5), 10%)};
+    --bs-btn-active-border-color: #{rgba(#FFFBFE, .5)};
+    --bs-btn-focus-border-color: #{rgba(#FFFBFE, .5)};
+    --bs-btn-focus-box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .2);
+  }
+}
+
+
+
 //@import "theme.dark.css";
 
 //import 'bootstrap-vue/dist/bootstrap-vue.css';
-////
-//// import 'bootstrap/dist/css/bootstrap.css'
+//import 'bootstrap/dist/css/bootstrap.css'
 //// // import '@/style/bootstrap-vue.css'
 //import '@/style/bootstrap.css';
 //// import 'bootstrap/dist/css/bootstrap.min.css'
+
+//@import '~bootstrap/scss/bootstrap.scss';
+//@import '~bootstrap-vue/src/index.scss';

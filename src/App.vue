@@ -53,19 +53,16 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #f8f9fa;
-
-
   overflow-x: hidden;
-
+  min-height: 100vh;
   margin-top: 80px;
-
 }
-
-
 @media (min-width: 768px) {
   #app {
     margin-left: 40px;
   }
 }
+</style>
+
+<style lang="scss">
 </style>
