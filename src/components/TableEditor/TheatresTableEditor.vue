@@ -199,7 +199,7 @@
           <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
         </b-button>
       </b-button-group>
-      <b-button-group v-if="displaymode===0" class="mx-1 mt-3">
+      <b-button-group v-if="displaymode===0" class="mx-1">
         <b-button @click="storeX.csvToJson(1)">
           <font-awesome-icon :icon="['fas', 'up-long']"/>
           CSV

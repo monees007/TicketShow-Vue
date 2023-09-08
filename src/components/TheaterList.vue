@@ -1,15 +1,16 @@
 <script>
 import {defineComponent} from 'vue'
 import App from "@/App.vue";
-import MovieCard2 from "@/components/MovieCard2.vue";
+import MovieCardDark from "@/components/MovieCard-dark.vue";
 import BookingModal from "@/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
+import MovieCardLight from "@/components/MovieCard-light.vue";
 
 
 export default defineComponent({
   name: "TheaterList",
-  components: {BookingModal, MovieCard2},
+  components: {MovieCardLight, BookingModal, MovieCardDark},
   data: () => {
     return {
       appstore: useAppStore(),
@@ -112,21 +113,27 @@ export default defineComponent({
     <!--        </b-card>-->
     <!--      </template>-->
     <!--    </b-skeleton-wrapper>-->
-    <div v-for="n in order" :key="n">
-      <hr>
-      <div class="d-flex flex-row">
-        <h1 class="align-items-start">
+    <div v-for="n in order" :key="n" :data-bs-theme="appstore.app_theme" class="bg-secondary rounded-5 py-3 px-1 mb-5">
+      <div class="d-flex flex-column align-items-start px-5 pt-4">
+        <h1 class="align-items-start " style="font-size: xx-large;">
           {{ theatre[n][0].name }}
         </h1>
-        <b-row>
-          <span  class="disabled w-50 "> {{ theatre[n][0].place }}</span>
-          <b-form-rating v-model="theatre[n][0].rating" :data-bs-theme="appstore.app_theme" class="bg-black border-0 w-25 flex-row"
-                         color=""
+        <div class="d-flex justify-content-start w-auto">
+          <span class="disabled w-auto ">{{ theatre[n][0].place }}</span>
+          <b-form-rating v-model="theatre[n][0].rating" :data-bs-theme="appstore.app_theme"
+                         class="bg-black border-0 mx-3 flex-row"
+                         color="golden"
                          readonly style="max-width: 125px"></b-form-rating>
-        </b-row>
+        </div>
       </div>
-      <hr>
-      <MovieCard2 v-for="m in theatre[n][1]" :key="m.id" :m="m" :t="theatre[n][0]"/>
+      <div v-if="appstore.app_theme==='dark'">
+        <MovieCardDark v-for="m in theatre[n][1]" :key="m.id" :m="m" :t="theatre[n][0]"/>
+
+      </div>
+      <div v-if="appstore.app_theme==='light'">
+        <MovieCardLight v-for="m in theatre[n][1]" :key="m.id" :m="m" :t="theatre[n][0]"/>
+      </div>
+
     </div>
     <BookingModal :show="storeX.show" :theatre="storeX.theatre"/>
 

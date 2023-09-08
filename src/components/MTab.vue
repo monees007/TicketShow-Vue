@@ -26,10 +26,10 @@ export default {
 <style>
 
 .router-link-exact-active{
-  background: #0f1941;
+  background: #31101d;
   padding: 10px 30px;
   border-radius: 30px;
-  width: 190px;
+  width: 180px;
   font-weight: bolder;
   color: #f8f9fa !important;
   text-shadow: #f8f9fa;
@@ -40,15 +40,17 @@ export default {
   min-height: fit-content;
 }
 .rotate:hover{
-  background: #0b5ed7;
+  background: #7e5260;
   padding: 10px 30px;
   border-radius: 30px;
-  width: 190px;
+  width: 180px;
   font-weight: bold;
   color: #f8f9fa;
 //text-shadow:1px 1px 4px #fff;}
 .rotate{
   font-size: medium;
+  width: 180px;
+  padding: 10px 30px;
   text-decoration: none;
   color: grey;
   vertical-align:top;

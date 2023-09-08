@@ -1,5 +1,5 @@
 <template>
-  <div class="DashBoardView" style="min-width: 46vh">
+  <div :data-bs-theme="appstore.app_theme" class="DashBoardView" style="min-width: 46vh">
     <b-alert v-if="!appstore.is_logged_in" class="fixed-top d-flex justify-content-between" show variant="warning">You
       are not
       logged in.
@@ -9,26 +9,25 @@
       Server not found
     </b-alert>
     <b-alert v-show="flag_error" ref="flag" show variant="danger">CSV is incorrectly formatted</b-alert>
-    <b-row class="mb-3 d-inline-flex w-100 justify-content-between" key-nav>
-      <b-button-group class="col">
-        <b-button :pressed="activeTab===0" @click="activeTab=0">Shows</b-button>
-        <b-button :pressed="activeTab===1" @click="activeTab=1">Theatres</b-button>
-      </b-button-group>
+    <b-button-group class="col mb-3" style="width: 100vh; max-width: 988px">
+      <b-button :pressed="activeTab===0" class="py-3" @click="activeTab=0">Shows</b-button>
+      <b-button :pressed="activeTab===1" class="py-3" @click="activeTab=1">Theatres</b-button>
+    </b-button-group>
+    <div class="d-flex">
 
-      <b-button-group class="col">
-        <b-button :pressed="displaymode===0" @click="displaymode=0">
+      <b-button-group class="col mb-3">
+        <b-button :pressed="displaymode===0" style="max-width: max-content" @click="displaymode=0">
           <b-icon v-if="activeTab===0" icon="table"/>
           <span v-if="activeTab===1" class="">
           Edit Theatre Details
           </span>
         </b-button>
-        <b-button :pressed="displaymode===1" @click="displaymode=1">
+        <b-button :pressed="displaymode===1" style="max-width: max-content" @click="displaymode=1">
           <b-icon v-if="activeTab===0" icon="card-image"/>
           <span v-if="activeTab===1">Edit Show Details</span>
         </b-button>
       </b-button-group>
-
-    </b-row>
+    </div>
 
     <ShowsTableEditor v-if="activeTab===0" :displaymode="displaymode" class=" d-flex "/>
     <TheatresTableEditor v-if="activeTab===1" id="tte" :displaymode="displaymode" class=" d-flex "/>

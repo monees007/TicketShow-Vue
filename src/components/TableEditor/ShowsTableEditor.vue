@@ -27,7 +27,7 @@
             </div>
           </template>
           <template #cell(edit)="data">
-            <div v-if="data.isEdit">
+            <div v-if="data.isEdit" :data-bs-theme="appstore.app_theme">
 
               <b-button class="edit-icon bg-danger me-2" @click="handleSubmit(data, false)">
                 <b-icon icon="x-lg"></b-icon>
@@ -64,13 +64,19 @@
     </Transition>
 
 
-    <b-button-toolbar v-if="displaymode===0" class="mt-3" key-nav>
+    <b-button-toolbar v-if="displaymode===0" :data-bs-theme="appstore.app_theme" class="mt-3" key-nav>
       <b-button-group class="mx-1">
-        <b-button class="me-2" pill variant="outline-secondary" @click="handleAdd()">Add Row</b-button>
-        <b-button class="me-2" pill variant="outline-danger" @click="update_records()">Reset</b-button>
-        <b-button class="me-2" pill variant="outline-success" @click="handleSave()">Save</b-button>
+        <b-button v-if="displaymode===0" class="me-2" pill variant="secondary" @click="handleAdd()">
+          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation=180/>
+        </b-button>
+        <b-button class="me-2" pill variant="danger" @click="update_records">
+          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+        </b-button>
+        <b-button v-if="displaymode===0" class="me-2" pill variant="success" @click="handleSave()">
+          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+        </b-button>
       </b-button-group>
-      <b-button-group class="mx-1 mt-3">
+      <b-button-group class="mx-1">
         <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
         <b-button @click="storeX.jsonToCSV(0)">Download CSV</b-button>
         <b-button @click="export_csv">Download CSV</b-button>
@@ -82,7 +88,7 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
-import MovieCard2 from "@/components/MovieCard2.vue";
+import MovieCard2 from "@/components/MovieCard-dark.vue";
 import {useAppStore} from "@/store";
 import {useEditorStore} from "@/store/useEditorStore";
 
@@ -198,7 +204,7 @@ export default {
         },
       };
     },
-    async handleSubmit(data, update, repeat = false) {
+    async handleSubmit(data, update) {
       this.rowUpdate = {
         edit: false,
         id: data.id,
@@ -206,18 +212,7 @@ export default {
         action: update ? "update" : "cancel",
       };
       if (update) {
-        const rawResponse = await fetch(this.appstore.api + '/shows?' +
-            new URLSearchParams({}), {
-          method: 'PUT',
-          headers: this.appstore.getheader(),
-          body: JSON.stringify(this.storeX.show_list[data.index])
-            }
-        );
-        const content = await rawResponse.json();
-        if (repeat) {
-          await this.handleSubmit(data, update, repeat = false)
-        }
-        console.log(content);
+        await this.storeX.put('shows', data.item)
 
       }
     },
@@ -360,6 +355,8 @@ export default {
   max-width: -moz-fit-content;
   max-width: fit-content;
   overflow-x: auto;
+  scrollbar-color: red orange;
+  scrollbar-width: thin;
   white-space: nowrap;
 
   > thead,

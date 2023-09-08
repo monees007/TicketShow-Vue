@@ -1,6 +1,6 @@
 <script>
 import {useAppStore} from "@/store";
-import MovieCard2 from "@/components/MovieCard2.vue";
+import MovieCard2 from "@/components/MovieCard-dark.vue";
 
 export default {
   name: 'ShowView',
