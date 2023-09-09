@@ -212,7 +212,7 @@ export default {
         action: update ? "update" : "cancel",
       };
       if (update) {
-        await this.storeX.put('shows', data.item)
+        await this.storeX.put('/shows', data.item)
 
       }
     },

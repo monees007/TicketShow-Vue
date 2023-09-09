@@ -37,6 +37,14 @@ export const useAppStore = defineStore('AppStore', {
 
     },
     actions: {
+        async login_with_token(token) {
+            window.localStorage.setItem("Authentication-Token", token);
+            this.auth_token = token
+            this.is_logged_in = true
+            await this.get_user()
+            console.log('Logged in Successfully')
+
+        },
         toggle_theme() {
             if (this.app_theme === 'dark') {
                 this.app_theme = 'light'

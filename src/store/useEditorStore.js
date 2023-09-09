@@ -13,6 +13,26 @@ export const useEditorStore = defineStore('EditorStore', {
     ),
     getters: {},
     actions: {
+        async put(endpoint, data) {
+            console.log('put-data', data)
+            const asd = this.appstore
+            try {
+                this.loading = true;
+                const response = await fetch(asd.api + endpoint, {
+                    method: 'PUT',
+                    headers: asd.getheader(),
+                    body: JSON.stringify(data)
+                });
+                if (response.status === 200) {
+                    console.log("Pushed changes to server")
+                    return await response.json()
+                } else {
+                    console.log(response.status, "Failed to push update")
+                }
+            } catch (e) {
+                console.log("Failed to push update ", e)
+            }
+        },
         async get_shows_of_theatre(tid) {
             const asd = this.appstore
             try {

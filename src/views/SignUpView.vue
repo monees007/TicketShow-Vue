@@ -2,9 +2,17 @@
 import {defineComponent} from 'vue'
 import App from "@/App.vue";
 import axios from "axios";
+import {useAppStore} from "@/store";
 
 export default defineComponent({
   name: "SignUpPage",
+  mounted() {
+    if (document.getElementById('my-gsi-client')) return; // was already loaded
+    let scriptTag = document.createElement("script");
+    scriptTag.src = "https://accounts.google.com/gsi/client";
+    scriptTag.id = "my-gsi-client";
+    document.getElementsByTagName('head')[0].appendChild(scriptTag);
+  },
   methods:{
     async signup() {
       this.disable_button = true
@@ -39,6 +47,7 @@ export default defineComponent({
   data : ()=>{
     return{
       eye: false,
+      appstore: useAppStore(),
       disable_button:false,
       email: '',
       password: '',
@@ -50,6 +59,7 @@ export default defineComponent({
 
 <template>
   <div :data-bs-theme="appstore.app_theme" class="container">
+
     <div class="row">
       <div class="offset-md-2 col-lg-11 col-md-7 offset-lg-4 offset-md-3">
         <b-card class="panel border  ">
@@ -95,7 +105,22 @@ export default defineComponent({
               <div class="text-center pt-4 text-muted">Already have an account? <a href="#/login">Login</a></div>
             </b-form>
           </b-card-body>
-          <b-card-footer class="d-none mx-3 my-2 py-2 bordert">
+          <b-card-footer class="mx-3 my-2 py-2 bordert">
+            <div id="g_id_onload"
+                 data-auto_prompt="false"
+                 data-callback="handleCredentialResponse"
+                 data-client_id="519706053397-1739mh8juqvrs4tv89mer3dvdjoshl01.apps.googleusercontent.com"
+                 style="color-scheme: light">
+            </div>
+            <div :data-theme="appstore.app_theme==='light' ? 'filled_black' :''"
+                 class="g_id_signin w-100 d-flex justify-content-center my-3"
+                 data-logo_alignment="left"
+                 data-shape="rectangular"
+                 data-size="large"
+                 data-text="sign_in_with"
+                 data-type="standard"
+                 style="color-scheme: light">
+            </div>
             <div class="text-center py-3"><a class="px-2" href="https://wwww.facebook.com" target="_blank"> <img
                 alt="" src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg"> </a> <a
                 class="px-2" href="https://www.google.com" target="_blank"> <img
