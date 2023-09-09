@@ -77,7 +77,7 @@ export const useAppStore = defineStore('AppStore', {
             try {
                 this.auth_token = window.localStorage.getItem('Authentication-Token');
                 this.csrf = window.localStorage.getItem('csrf_token');
-                if (this.auth_token && this.csrf) {
+                if (this.auth_token) {
                     this.is_logged_in = true
                     console.log('Token Found')
                     this.get_user()
