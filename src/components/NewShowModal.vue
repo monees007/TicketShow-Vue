@@ -1,7 +1,7 @@
 <template>
   <b-modal id="modal-xl" :data-bs-theme="appstore.app_theme" class="modal-fullscreen-sm-down"
            size="xl"
-           visible>
+  >
     <template v-slot:modal-header="{ hide }">
       <b class="h3 mx-3">Create</b>
       <div class="pa-2 mx-4" @click="hide">

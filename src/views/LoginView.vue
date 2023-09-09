@@ -20,6 +20,13 @@ export default defineComponent({
       remember:true,
     }
   },
+  beforeMount() {
+    if (document.getElementById('my-gsi-client')) return; // was already loaded
+    let scriptTag = document.createElement("script");
+    scriptTag.src = "https://accounts.google.com/gsi/client";
+    scriptTag.id = "my-gsi-client";
+    document.getElementsByTagName('head')[0].appendChild(scriptTag);
+  },
   methods: {
     async login() {
       this.disable_button = true
@@ -27,8 +34,7 @@ export default defineComponent({
       this.disable_button = false
 
 
-
-    }
+    },
   }
 })
 </script>
@@ -42,6 +48,7 @@ export default defineComponent({
             <h4 class="py-2 font-weight-bold">Login</h4>
           </b-card-header>
           <b-card-body class="panel-body p-3">
+
             <b-form action="" method="POST">
               <b-form-group class=" py-2">
                 <b-input-group class="input-field row py-2">
@@ -67,6 +74,7 @@ export default defineComponent({
                     </b-button>
                   </b-col>
                 </b-input-group>
+
               </b-form-group>
 
 
@@ -81,8 +89,24 @@ export default defineComponent({
 
               <div class="text-center pt-4 text-muted">Don't have an account? <a href="#/signup">Sign up</a></div>
             </b-form>
+
           </b-card-body>
-          <b-card-footer class=" d-none  mx-3 my-2 py-2 bordert">
+          <b-card-footer class=" mx-3 my-2 py-2 bordert">
+            <div id="g_id_onload"
+                 data-auto_prompt="false"
+                 data-callback="handleCredentialResponse"
+                 data-client_id="519706053397-1739mh8juqvrs4tv89mer3dvdjoshl01.apps.googleusercontent.com"
+                 style="color-scheme: light">
+            </div>
+            <div :data-theme="appstore.app_theme==='light' ? 'filled_black' :''"
+                 class="g_id_signin w-100 d-flex justify-content-center my-3"
+                 data-logo_alignment="left"
+                 data-shape="rectangular"
+                 data-size="large"
+                 data-text="sign_in_with"
+                 data-type="standard"
+                 style="color-scheme: light">
+            </div>
             <div class="text-center py-3"><a class="px-2" href="https://wwww.facebook.com" target="_blank"> <img
                 alt="" src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg"> </a> <a
                 class="px-2" :href="App.$server+'/login/oauthstart/google'" target="_blank"> <img
@@ -91,12 +115,13 @@ export default defineComponent({
             </a> <a class="px-2" href="https://www.github.com" target="_blank"> <img
                 alt="" src="https://www.freepnglogos.com/uploads/512x512-logo-png/512x512-logo-github-icon-35.png"> </a>
             </div>
+
           </b-card-footer>
         </b-card>
       </div>
     </div>
-
   </div>
+
 </template>
 
 <style scoped>

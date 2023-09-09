@@ -190,10 +190,10 @@
     <b-button-toolbar class="mt-3" key-nav>
       <b-button-group class="mx-1">
         <b-button v-if="displaymode===0" class="me-2" pill variant="secondary" @click="handleAdd()">
-          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation=180/>
+          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation=180></font-awesome-icon>
         </b-button>
         <b-button class="me-2" pill variant="danger" @click="update_records">
-          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+          <font-awesome-icon :icon="['fas', 'rotate-right']"></font-awesome-icon>
         </b-button>
         <b-button v-if="displaymode===0" class="me-2" pill variant="success" @click="handleSave()">
           <font-awesome-icon :icon="['fas', 'floppy-disk']"/>

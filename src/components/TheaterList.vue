@@ -2,7 +2,6 @@
 import {defineComponent} from 'vue'
 import App from "@/App.vue";
 import MovieCardDark from "@/components/MovieCard-dark.vue";
-import BookingModal from "@/BookingModal.vue";
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
 import MovieCardLight from "@/components/MovieCard-light.vue";
@@ -10,7 +9,7 @@ import MovieCardLight from "@/components/MovieCard-light.vue";
 
 export default defineComponent({
   name: "TheaterList",
-  components: {MovieCardLight, BookingModal, MovieCardDark},
+  components: {MovieCardLight, MovieCardDark},
   data: () => {
     return {
       appstore: useAppStore(),
@@ -135,7 +134,7 @@ export default defineComponent({
       </div>
 
     </div>
-    <BookingModal :show="storeX.show" :theatre="storeX.theatre"/>
+    <!--    <BookingModal :show="storeX.show" :theatre="storeX.theatre"/>-->
 
   </div>
   <!--d

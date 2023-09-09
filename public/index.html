@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="">
-<head data-bs-theme="dark">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans" rel="stylesheet">
+<head>
     <meta charset=1"utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
     <meta content="width=device-width,initial-scale=1.0" name="viewport">
+    <meta content="strict-origin-when-cross-origin" name="referrer"/>
+    <meta content="same-origin-allow-popups" http-equiv="Cross-Origin-Opener-Policy">
+    <meta content="script-src https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/; connect-src https://accounts.google.com/gsi/;"
+          name="Content-Security-Policy-Report-Only"/>
+
+
     <link href="<%= BASE_URL %>favicon.ico" rel="icon">
+    <script async src="https://accounts.google.com/gsi/client"></script>
     <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 <body style="display:flex; justify-content:space-evenly;"
