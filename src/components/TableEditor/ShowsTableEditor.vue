@@ -67,7 +67,7 @@
     <b-button-toolbar v-if="displaymode===0" :data-bs-theme="appstore.app_theme" class="mt-3" key-nav>
       <b-button-group class="mx-1">
         <b-button v-if="displaymode===0" class="me-2" pill variant="secondary" @click="handleAdd()">
-          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation=180/>
+          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
         </b-button>
         <b-button class="me-2" pill variant="danger" @click="update_records">
           <font-awesome-icon :icon="['fas', 'rotate-right']"/>
