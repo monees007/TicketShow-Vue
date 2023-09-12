@@ -1,6 +1,5 @@
 <script>
 import {defineComponent} from 'vue'
-import App from "@/App.vue";
 import MovieCardDark from "@/components/MovieCard-dark.vue";
 import {useBookingStore} from "@/store/useBookingStore";
 import {useAppStore} from "@/store";
@@ -65,9 +64,9 @@ export default defineComponent({
     async loadx() {
       try { // get theatres
         this.loading = true;
-        const response = await fetch("http://127.0.0.1:4433/api/homepage", {
+        const response = await fetch(this.appstore.api + "/homepage", {
           method: 'GET',
-          headers: App.$header('GET')
+          headers: this.appstore.getheader()
         });
         if (response.status === 200) {
           let res = await response.json();
@@ -75,11 +74,12 @@ export default defineComponent({
           this.order = res[1]
           this.loading = false;
         } else {
-          throw new TypeError("Token expired"); // will check for token and push to log in
+          this.loading = false;
+          this.appstore.server_error = true
         }
       } catch (e) {
-        App.$next = App.$router.currentRoute.path
-        App.$router.push({path: 'login'})
+        this.loading = false;
+        this.appstore.server_error = true
       }
     },
   },

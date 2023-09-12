@@ -7,12 +7,19 @@ export const useEditorStore = defineStore('EditorStore', {
             show_list: [],
             theatre_list: [],
             running_list: [],
+            selected_show: {},
+            selected_theatre: {},
+            editorMode: 0,
             appstore: useAppStore(),
             shows_for_theatre: {}
         }
     ),
     getters: {},
     actions: {
+        update_show(data) {
+            // this.show_list[data.index]= data.item
+            this.put('/shows', this.show_list[data.index])
+        },
         async put(endpoint, data) {
             console.log('put-data', data)
             const asd = this.appstore

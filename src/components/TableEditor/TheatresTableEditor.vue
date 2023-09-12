@@ -2,27 +2,24 @@
 <template>
   <div class="d-flex flex-column">
     <Transition>
-      <KeepAlive>
+      <b-card v-if="displaymode===0">
         <b-editable-table
-            v-if="displaymode===0"
             v-model="storeX.theatre_list"
             :busy="loading"
             :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'"
             :data-bs-theme="appstore.app_theme"
             :editMode="'row'"
             :fields="fields"
-
             :rowUpdate="rowUpdate"
-            bordered
-
-
-            class=" editable-table table-hover shadow-z-1 "
-        >
-          <template #cell-isActive="data">
-            <span v-if="data.value">Yes</span>
-            <span v-else>No</span>
-          </template>
-
+            :filter="filter"
+            :head-variant="appstore.app_theme==='dark'? 'dark' : 'secondary'"
+            borderless
+            class=" editable-table table-hover "
+            disableDefaultEdit
+            hover
+            responsive
+            sort-icon-left
+            stacked="sm">
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -30,32 +27,26 @@
             </div>
           </template>
           <template #cell(edit)="data">
-            <div v-if="data.isEdit">
+            <div v-if="data.isEdit" :data-bs-theme="appstore.app_theme">
 
-              <b-button class="edit-icon bg-danger me-2" @click="handleSubmit(data, false)">
+              <b-button class="edit-icon bg-danger" @click="handleSubmit(data, false)">
                 <b-icon icon="x-lg"></b-icon>
               </b-button>
               <b-button ref="row_btn" class="edit-icon bg-success" @click="handleSubmit(data, true)">
                 <b-icon icon="save2"></b-icon>
               </b-button>
             </div>
-            <BIconPencil
-                v-else
-                class="edit-icon"
-                @click="handleEdit(data, true)"
-            ></BIconPencil>
+            <b-button v-if="!data.isEdit" v-b-tooltip.hover class="mx-2" pill title="Edit Row"
+                      @click="handleEdit(data)">
+              <font-awesome-icon :icon="['fas', 'pen-to-square']"/>
+            </b-button>
+            <b-button v-if="!data.isEdit" v-b-tooltip.hover pill title="Delete Row" @click="handleDelete(data)">
+              <font-awesome-icon :icon="['fas', 'trash']"/>
+            </b-button>
           </template>
-          <template #cell(delete)="data">
-            <BIconTrash
-                class="remove-icon"
-                @click="handleDelete(data)"
-            ></BIconTrash>
-          </template>
-          <template #cell(index)="data">
-            {{ data.index + 1 }}
-          </template>
+
         </b-editable-table>
-      </KeepAlive>
+      </b-card>
     </Transition>
 
     <Transition>
@@ -74,13 +65,9 @@
               </div>
             </b-card-header>
             <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel">
-              <div class="d-flex flex-column align-items-center">
-                <RunningEditor ref="running_editor" :t_id="t.id"/>
-                <b-button v-b-modal:modal-run class="mb-3" pill>
-                  <b-icon icon="plus-lg"/>
-                </b-button>
+              <RunningEditor ref="running_editor" :filter="filter" :t_id="t.id"/>
 
-              </div>
+
             </b-collapse>
           </b-card>
 
@@ -189,13 +176,17 @@
 
     <b-button-toolbar class="mt-3" key-nav>
       <b-button-group class="mx-1">
-        <b-button v-if="displaymode===0" class="me-2" pill variant="secondary" @click="handleAdd()">
-          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation=180></font-awesome-icon>
+        <b-button v-if="displaymode===0" v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary"
+                  @click="handleAdd()">
+          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
         </b-button>
-        <b-button class="me-2" pill variant="danger" @click="update_records">
-          <font-awesome-icon :icon="['fas', 'rotate-right']"></font-awesome-icon>
+        <b-button v-if="displaymode===0" v-b-tooltip.hover class="me-2" pill title="Reload" variant="danger"
+                  @click="update_records">
+          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
         </b-button>
-        <b-button v-if="displaymode===0" class="me-2" pill variant="success" @click="handleSave()">
+        <b-button v-if="displaymode===0" v-b-tooltip.hover
+                  :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' " :variant="synced? 'success' :'warning' " class="me-2" pill
+                  @click="handleSave()">
           <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
         </b-button>
       </b-button-group>
@@ -230,9 +221,7 @@ export default {
     BSpinner,
   },
 
-  props: {
-    displaymode: null,
-  },
+  props: ['displaymode', 'filter'],
   data() {
     return {
       selected_show: {
@@ -242,16 +231,14 @@ export default {
       },
       storeX: useEditorStore(),
       temp_run: {},
+      synced: true,
       appstore: useAppStore(),
       rowUpdate: {},
       fields: [
         {key: "edit", label: ''},
-        {key: "edit", label: ''},
-        {key: "delete", label: ""},
-        {key: 'index', class: 'id-col'},
-        {key: "name", label: "Name", type: "text", editable: true,},
-        {key: "place", label: "Place", editable: true},
-        {key: "city", label: "City", editable: true},
+        {key: "name", sortable: true, label: "Name", type: "text", editable: true,},
+        {key: "place", sortable: true, label: "Place", editable: true},
+        {key: "city", sortable: true, label: "City", editable: true},
       ],
       loading: false,
     };
@@ -286,6 +273,7 @@ export default {
       await this.storeX.getData(1)
       await this.storeX.getData(2)
       this.loading = false;
+      this.synced = true;
 
     },
     handleAdd() {
@@ -304,48 +292,58 @@ export default {
 
         },
       };
+      this.synced = false
     },
-    async handleSubmit(data, update, repeat = true) {
+    async handleSubmit(data, update) {
       this.rowUpdate = {
         edit: false,
         id: data.id,
 
         action: update ? "update" : "cancel",
       };
-      if (update) {
-        const rawResponse = await fetch(this.appstore.api + '/theater?' +
-            new URLSearchParams({
-              id: data.id
-            }), {
-              method: 'PUT',
-          headers: this.appstore.getheader(),
-          body: JSON.stringify(this.storeX.theatre_list[data.index])
-            }
-        );
-        const content = await rawResponse.json();
-        if (repeat) {
-          await this.handleSubmit(data, update, repeat = false)
-        }
-        console.log(content);
+      this.synced = false
 
-      }
     },
     handleEdit(data) {
       this.rowUpdate = {edit: true, id: data.id};
     },
     async handleDelete(data) {
-      const rawResponse = await fetch(this.appstore.api + '/theater?' +
-          new URLSearchParams({
-            id: data.id
-          }), {
-            method: 'DELETE',
-        headers: this.appstore.getheader(),
-        body: JSON.stringify(this.storeX.theatre_list)
-          }
-      );
-      const content = await rawResponse.status;
-      console.log(content);
-      this.rowUpdate = {id: data.id, action: "delete"};
+      this.$bvModal.msgBoxConfirm('Please confirm that you want to delete this entry.', {
+        title: 'Please Confirm',
+        bodyBgVariant: 'dark',
+
+        footerBgVariant: 'dark',
+        headerBgVariant: 'dark',
+        bodyTextVariant: 'light',
+        size: 'sm',
+        titleTag: 'div',
+        buttonSize: 'sm',
+        okVariant: 'danger',
+        okTitle: 'YES',
+        cancelTitle: 'NO',
+        footerClass: 'p-2',
+        hideHeaderClose: true,
+        centered: true
+      })
+          .then(async value => {
+            if (value) {
+              const rawResponse = await fetch(this.appstore.api + '/theater?' +
+                  new URLSearchParams({
+                    id: data.id
+                  }), {
+                    method: 'DELETE',
+                    headers: this.appstore.getheader(),
+                  }
+              );
+              const content = await rawResponse.status;
+              console.log(content);
+              this.rowUpdate = {id: data.id, action: "delete"};
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+
     },
     async handleSave() {
 
@@ -361,6 +359,8 @@ export default {
     update_variables() {
       this.temp_run.show_name = this.selected_show.name;
       this.temp_run.show_id = this.selected_show.id;
+      this.synced = true
+
     }
   },
 };
@@ -370,7 +370,7 @@ export default {
 <style lang="less">
 
 table.b-table {
-  width: 100% !important;
+  min-width: 100% !important;
 }
 
 .input-field {
@@ -384,15 +384,6 @@ table.b-table {
 /* -- import Roboto Font ---------------------------- */
 //@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
 
-.link-col {
-  max-width: 150px !important;
-  overflow: hidden;
-}
-
-.id-col {
-  max-width: 0;
-  display: none;
-}
 
 //*,
 //*:after,
@@ -428,7 +419,7 @@ table.b-table {
 
 @table-bg: #171819;
 @table-bg-accent: #983423;
-@table-bg-hover: rgba(0, 0, 0, .12);
+@table-bg-hover: #7D5260;
 @table-bg-active: @table-bg-hover;
 @table-border-color: #e0e0e0;
 
@@ -447,7 +438,6 @@ table.b-table {
 
 // Baseline styles
 .table {
-  width: 100%;
   margin-bottom: 2rem;
   background-color: @table-bg;;
   //noinspection CssInvalidPropertyValue
@@ -492,6 +482,7 @@ table.b-table {
   }
 
   > tbody + tbody {
+
     border-top: 1px solid rgba(0, 0, 0, .12);
   }
 
