@@ -9,28 +9,32 @@
       Server not found
     </b-alert>
     <b-alert v-show="flag_error" ref="flag" show variant="danger">CSV is incorrectly formatted</b-alert>
-    <b-button-group class="col mb-3" style="width: 100vh; max-width: 988px">
+    <b-button-group class="col mb-3 w-100" style=" max-width: 988px">
       <b-button :pressed="activeTab===0" class="py-3" @click="activeTab=0">Shows</b-button>
       <b-button :pressed="activeTab===1" class="py-3" @click="activeTab=1">Theatres</b-button>
     </b-button-group>
     <div class="d-flex">
 
       <b-button-group class="col mb-3">
-        <b-button :pressed="displaymode===0" style="max-width: max-content" @click="displaymode=0">
-          <b-icon v-if="activeTab===0" icon="table"/>
-          <span v-if="activeTab===1" class="">
+        <b-button v-if="activeTab===1" :pressed="displaymode===1" style="max-width: max-content" @click="displaymode=1">
+          <font-awesome-icon :icon="['fas', 'film']" class="me-2"/>
+          Edit Shows Here
+        </b-button>
+        <b-button v-if="activeTab===1" :pressed="displaymode===0" style="max-width: max-content" @click="displaymode=0">
+          <font-awesome-icon :icon="['fas', 'tent']" class="me-1"/>
           Edit Theatre Details
-          </span>
         </b-button>
-        <b-button :pressed="displaymode===1" style="max-width: max-content" @click="displaymode=1">
-          <b-icon v-if="activeTab===0" icon="card-image"/>
-          <span v-if="activeTab===1">Edit Show Details</span>
-        </b-button>
+
       </b-button-group>
+      <div class="d-inline-flex align-items-center border-1 rounded-5 mb-3 bg-primary px-3">
+        <font-awesome-icon :icon="['fas', 'magnifying-glass']"/>
+        <b-input id="search-filter" v-model="filter" class="border-0 bg-transparent" placeholder="Search"/>
+      </div>
+
     </div>
 
-    <ShowsTableEditor v-if="activeTab===0" :displaymode="displaymode" class=" d-flex "/>
-    <TheatresTableEditor v-if="activeTab===1" id="tte" :displaymode="displaymode" class=" d-flex "/>
+    <ShowsTableEditor v-if="activeTab===0" :displaymode="displaymode" :filter="filter" class=" d-flex "/>
+    <TheatresTableEditor v-if="activeTab===1" id="tte" :displaymode="displaymode" :filter="filter" class=" d-flex "/>
 
 
   </div>
@@ -48,7 +52,8 @@ export default {
   data: () => {
     return {
       appstore: useAppStore(),
-      displaymode: 0,
+      displaymode: 1,
+      filter: '',
       flag_error: false,
       separateTheatresToggle: false,
       activeTab: 0,
@@ -77,6 +82,12 @@ export default {
 <style scoped>
 thead, tbody, tfoot, tr, td, th {
 //color: #f8f9fa !important; text-align: left;
+}
+
+#search-filter:focus {
+  border-width: 0;
+  box-shadow: none;
+  outline: 0 none;
 }
 
 .form-control {

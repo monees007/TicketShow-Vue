@@ -75,14 +75,6 @@ export default {
   margin: 0;
 }
 
-html, body {
-  margin: 0;
-  background: white;
-  font-family: 'Montserrat', helvetica, arial, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-}
-
 .link {
   display: block;
   text-align: center;
