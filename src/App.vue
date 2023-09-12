@@ -10,7 +10,7 @@
     <FloatingActionButton v-if="appstore.user.role==='admin'"/>
     <router-view style="padding: 30px"/>
 
-    <div id="g_id_onload"
+    <div v-if="!appstore.is_logged_in" id="g_id_onload"
          data-auto_select="true"
          data-callback="handleCredentialResponse"
          data-client_id="519706053397-1739mh8juqvrs4tv89mer3dvdjoshl01.apps.googleusercontent.com"

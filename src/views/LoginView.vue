@@ -2,7 +2,44 @@
 import {defineComponent} from 'vue'
 import App from "../App.vue";
 import {useAppStore} from "@/store";
+import axios from "axios";
+import router from "@/router";
 
+function decodeJwtResponse(token) {
+  let base64Url = token.split('.')[1]
+  let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  let jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(jsonPayload)
+}
+
+window.handleCredentialResponse = async (response) => {
+  // decodeJwtResponse() is a custom function defined by you
+  // to decode the credential response.
+  console.log(response.credential)
+  const responsePayload = decodeJwtResponse(response.credential);
+  await axios.post('http://127.0.0.1:4433' + '/login/google', {
+        token: response.credential
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': 'application/json'
+        },
+      }).then(function (response) {
+    useAppStore().login_with_token(response.data.token)
+    router.push('/')
+  }).catch(function (error) {
+    console.log(error);
+  });
+  console.log("ID: " + responsePayload.sub);
+  console.log('Full Name: ' + responsePayload.name);
+  console.log('Given Name: ' + responsePayload.given_name);
+  console.log('Family Name: ' + responsePayload.family_name);
+  console.log("Image URL: " + responsePayload.picture);
+  console.log("Email: " + responsePayload.email);
+}
 export default defineComponent({
   name: "LoginPage",
   computed: {
@@ -35,6 +72,7 @@ export default defineComponent({
 
 
     },
+
   }
 })
 </script>
