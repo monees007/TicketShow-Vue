@@ -5,40 +5,51 @@
       <b-card>
         <b-editable-table
             v-model="storeX.$state.show_list"
-            :class="appstore.app_theme==='dark'? 'bg-primary' : 'bg-light-subtle'"
             :busy="loading"
+            :class="appstore.app_theme==='dark'? 'bg-primary' : 'bg-light-subtle'"
+            :data-bs-theme="appstore.app_theme"
             :editMode="'row'"
             :fields="fields"
-            :rowUpdate="rowUpdate"
             :filter="filter"
             :head-variant="appstore.app_theme==='dark'? 'dark' : 'secondary'"
             :key-field="'id'"
+            :rowUpdate="rowUpdate"
             class=" editable-table table-hover border-0"
             disableDefaultEdit
             hover
             responsive
             sort-icon-left
             stacked="sm"
-            :data-bs-theme="appstore.app_theme"
         >
           <template #cell(edit)="data">
             <div v-if="data.isEdit" :data-bs-theme="appstore.app_theme">
-
-              <b-button class="edit-icon bg-danger" @click="handleSubmit(data, false)">
-                <b-icon icon="x-lg"></b-icon>
+              <b-button class="mx-2 edit-button" pill @click="handleSubmit(data, false)">
+                <font-awesome-icon :icon="['fas', 'xmark']"/>
               </b-button>
-              <b-button ref="row_btn" class="edit-icon bg-success" @click="handleSubmit(data, true)">
-                <b-icon icon="save2"></b-icon>
+              <b-button class="edit-button" pill @click="handleSubmit(data, true)">
+                <font-awesome-icon :icon="['fas', 'check']"/>
               </b-button>
             </div>
 
-            <b-button v-if="!data.isEdit" v-b-tooltip.hover class="mx-2" pill title="Edit Row"
-                      @click="handleEdit(data)">
-              <font-awesome-icon :icon="['fas', 'pen-to-square']"/>
-            </b-button>
-            <b-button v-if="!data.isEdit" v-b-tooltip.hover pill title="Delete Row" @click="handleDelete(data)">
-              <font-awesome-icon :icon="['fas', 'trash']"/>
-            </b-button>
+            <div v-else>
+              <b-button v-if="!data.isEdit" v-b-tooltip.hover class="mx-2" pill title="Edit Row"
+                        @click="handleEdit(data)">
+                <font-awesome-icon :icon="['fas', 'pen-to-square']"/>
+              </b-button>
+              <b-button v-if="!data.isEdit" v-b-tooltip.hover pill title="Delete Row" @click="handleDelete(data)">
+                <font-awesome-icon :icon="['fas', 'trash']"/>
+              </b-button>
+              <b-button v-b-tooltip.hover class="mx-2 d-sm-none" pill title="Reload"
+                        @click="update_records">
+                <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+              </b-button>
+              <b-button v-b-tooltip.hover
+                        :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                        :variant="synced? 'secondary' :'warning' " class="d-sm-none" pill
+                        @click="handleSave()">
+                <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+              </b-button>
+            </div>
 
           </template>
 
@@ -65,21 +76,21 @@
     </Transition>
 
     <b-button-toolbar :data-bs-theme="appstore.app_theme" class="mt-3" key-nav>
-      <b-button-group class="mx-1">
+      <b-button-group class="mx-1 mb-3">
         <b-button v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary" @click="handleAdd()">
           <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
         </b-button>
-        <b-button v-b-tooltip.hover class="me-2" pill title="Reload" variant="danger" @click="update_records">
+        <b-button v-b-tooltip.hover class="me-2" pill title="Reload" @click="update_records">
           <font-awesome-icon :icon="['fas', 'rotate-right']"/>
         </b-button>
         <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
-                  :variant="synced? 'success' :'warning' " class="me-2" pill @click="handleSave()">
+                  :variant="synced? 'secondary' :'warning' " class="me-2" pill @click="handleSave()">
           <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
         </b-button>
       </b-button-group>
       <b-button-group class="mx-1">
         <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
-        <b-button @click="storeX.jsonToCSV(0)">Download CSV</b-button>
+        <b-button v-if="false" @click="storeX.jsonToCSV(0)">Download CSV</b-button>
         <b-button @click="export_csv">Download CSV</b-button>
       </b-button-group>
     </b-button-toolbar>
@@ -108,16 +119,16 @@ export default {
       fields: [
         {key: "edit", label: ''},
         {key: "name", sortable: true, label: "Name", type: "text", editable: true,},
-        {key: "year", sortable: true, label: "Year", editable: true, class: ''},
+        {key: "year", sortable: true, label: "Year", editable: true, class: 'year-col'},
         {key: "director", sortable: true, label: "Director", editable: true},
         {key: "duration", label: "Duration", editable: true},
         {key: "tags", sortable: true, label: "Tags", type: "text", editable: true},
         {key: "ticket_price", sortable: true, label: "Ticket Price", type: "text", editable: true},
         {key: "format", sortable: true, label: "Format", type: "text", editable: true},
         {key: "language", sortable: true, label: "Language", type: "text", editable: true},
-        {key: "image_url", label: "Poster", type: "url", editable: true, class: ''},
-        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: ''},
-        {key: "description", label: "Description", editable: true, class: ''},
+        {key: "image_url", label: "Poster", type: "url", editable: true, class: 'link-col'},
+        {key: "image_sqr", label: "Thumbnail", type: "url", editable: true, class: 'link-col'},
+        {key: "description", label: "Description", editable: true, class: 'link-col'},
       ],
       loading: false,
     };
@@ -279,175 +290,20 @@ export default {
 </script>
 
 
-<style lang="less" scoped>
-
-.year-col {
-  width: 55px !important;
-}
-.link-col {
-  max-width: 150px !important;
-  overflow: hidden;
-}
-
-.id-col {
-  max-width: 0;
-  display: none;
-}
-
-//*,
-//*:after,
-//*:before {
-//  -webkit-box-sizing: border-box;
-//  -moz-box-sizing: border-box;
-//  box-sizing: border-box;
-//}
-
-
-// Material Design shadows
-//
-.shadow-z-1 {
-  -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
-  0 1px 2px 0 rgba(0, 0, 0, .24);
-  -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
-  0 1px 2px 0 rgba(0, 0, 0, .24);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
-  0 1px 2px 0 rgba(0, 0, 0, .24);
-}
-
-
-/* -- Material Design Table style -------------- */
-
-// Variables
-// ---------------------
-
-@table-header-font-color: #898989;
-
-@table-cell-padding: 1.6rem;
-@table-condensed-cell-padding: @table-cell-padding/2;
-
-
-@table-bg: #171819;
-@table-bg-accent: #983423;
-@table-bg-hover: rgba(0, 0, 0, .12);
-@table-bg-active: @table-bg-hover;
-@table-border-color: #e0e0e0;
-
-
-// Mixins
-// -----------------
-.transition(@transition) {
-  -webkit-transition: @transition;
-  -o-transition: @transition;
-  transition: @transition;
-}
-
-// Tables
-//
-// -----------------
-
-// Baseline styles
-.table {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 2rem;
-  background-color: @table-bg;
-  display: block;
-  //noinspection CssInvalidPropertyValue
-  max-width: -moz-fit-content;
-  max-width: fit-content;
-  overflow-x: auto;
-  scrollbar-color: red orange;
-  scrollbar-width: thin;
-  white-space: nowrap;
-
-  > thead,
-  > tbody,
-  > tfoot {
-    > tr {
-      .transition(all .3s ease);
-
-      > th,
-      > td {
-        text-align: left;
-        padding: @table-cell-padding;
-        vertical-align: top;
-        border-top: 0;
-        .transition(all .3s ease);
-      }
-    }
+<style>
+@media (min-width: 576px ) {
+  .year-col {
+    width: 55px !important;
   }
 
-  > thead > tr > th {
-    color: @table-header-font-color;
-    vertical-align: bottom;
-    font-weight: bolder;
-    border-bottom: 1px solid rgba(0, 0, 0, .12);
+  .link-col {
+    max-width: 150px !important;
+    overflow: hidden;
   }
 
-  > caption + thead,
-  > colgroup + thead,
-  > thead:first-child {
-    > tr:first-child {
-      > th,
-      > td {
-        border-top: 0;
-      }
-    }
-  }
-
-  > tbody + tbody {
-    border-top: 1px solid rgba(0, 0, 0, .12);
-  }
-
-  // Nesting
-  .table {
-    background-color: @table-bg;
-  }
-
-  // Remove border
-  .no-border {
-    border: 0;
+  .id-col {
+    max-width: 0;
+    display: none;
   }
 }
-
-
-// Bordered version
-//
-// Add horizontal borders between columns.
-.table-bordered {
-  border: 0;
-
-  > thead,
-  > tbody,
-  > tfoot {
-    > tr {
-      > th,
-      > td {
-        border: 0;
-        border-bottom: 1px solid @table-border-color;
-      }
-    }
-  }
-
-  > thead > tr {
-    > th,
-    > td {
-      border-bottom-width: 2px;
-    }
-  }
-}
-
-
-// Hover effect
-//
-.table-hover {
-  > tbody > tr:hover {
-    > td,
-    > th {
-      background-color: @table-bg-hover;
-    }
-  }
-}
-
-
 </style>

@@ -15,10 +15,10 @@
     </b-button-group>
     <div class="d-flex">
 
-      <b-button-group class="col mb-3">
+      <b-button-group :class="searching? 'hide':'show'" class="col mb-3">
         <b-button v-if="activeTab===1" :pressed="displaymode===1" style="max-width: max-content" @click="displaymode=1">
           <font-awesome-icon :icon="['fas', 'film']" class="me-2"/>
-          Edit Shows Here
+          Edit Shows
         </b-button>
         <b-button v-if="activeTab===1" :pressed="displaymode===0" style="max-width: max-content" @click="displaymode=0">
           <font-awesome-icon :icon="['fas', 'tent']" class="me-1"/>
@@ -26,9 +26,12 @@
         </b-button>
 
       </b-button-group>
-      <div class="d-inline-flex align-items-center border-1 rounded-5 mb-3 bg-primary px-3">
-        <font-awesome-icon :icon="['fas', 'magnifying-glass']"/>
-        <b-input id="search-filter" v-model="filter" class="border-0 bg-transparent" placeholder="Search"/>
+      <div :class="searching?'show':''"
+           class="d-inline-flex align-items-center border-1  rounded-5 mb-3 bg-primary px-3" style="height: 35px;max-width: 400px;">
+        <font-awesome-icon :icon="['fas', 'magnifying-glass']" @click="searching=true"/>
+        <b-input id="search-filter" v-model="filter" :class="searching?'': 'hide'" class="border-0 bg-transparent "
+                 placeholder="Search"/>
+        <font-awesome-icon v-show="searching" :icon="['fas', 'xmark']" @click="searching=false; filter=''"/>
       </div>
 
     </div>
@@ -51,6 +54,7 @@ export default {
   components: {TheatresTableEditor, ShowsTableEditor},
   data: () => {
     return {
+      searching: false,
       appstore: useAppStore(),
       displaymode: 1,
       filter: '',
@@ -102,7 +106,14 @@ thead, tbody, tfoot, tr, td, th {
   }
 }
 
-.active {
-  background: #4c555d;
+@media (max-width: 576px) {
+  .hide {
+    display: none !important;
+  }
+
+  .show {
+    display: flex !important;
+    width: 100vh;
+  }
 }
 </style>

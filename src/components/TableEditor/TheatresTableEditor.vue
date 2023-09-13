@@ -17,7 +17,6 @@
             class=" editable-table table-hover "
             disableDefaultEdit
             hover
-            responsive
             sort-icon-left
             stacked="sm">
           <template #table-busy>
@@ -29,13 +28,15 @@
           <template #cell(edit)="data">
             <div v-if="data.isEdit" :data-bs-theme="appstore.app_theme">
 
-              <b-button class="edit-icon bg-danger" @click="handleSubmit(data, false)">
-                <b-icon icon="x-lg"></b-icon>
+              <b-button class="mx-2" pill @click="handleSubmit(data, false)">
+                <font-awesome-icon :icon="['fas', 'xmark']"/>
               </b-button>
-              <b-button ref="row_btn" class="edit-icon bg-success" @click="handleSubmit(data, true)">
-                <b-icon icon="save2"></b-icon>
+              <b-button pill @click="handleSubmit(data, true)">
+                <font-awesome-icon :icon="['fas', 'check']"/>
               </b-button>
+
             </div>
+            <div v-else>
             <b-button v-if="!data.isEdit" v-b-tooltip.hover class="mx-2" pill title="Edit Row"
                       @click="handleEdit(data)">
               <font-awesome-icon :icon="['fas', 'pen-to-square']"/>
@@ -43,6 +44,17 @@
             <b-button v-if="!data.isEdit" v-b-tooltip.hover pill title="Delete Row" @click="handleDelete(data)">
               <font-awesome-icon :icon="['fas', 'trash']"/>
             </b-button>
+              <b-button v-b-tooltip.hover class="mx-2 d-sm-none" pill title="Reload"
+                        @click="update_records">
+                <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+              </b-button>
+              <b-button v-b-tooltip.hover
+                        :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                        :variant="synced? 'secondary' :'warning' " class="d-sm-none" pill
+                        @click="handleSave()">
+                <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+              </b-button>
+            </div>
           </template>
 
         </b-editable-table>
@@ -180,12 +192,13 @@
                   @click="handleAdd()">
           <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
         </b-button>
-        <b-button v-if="displaymode===0" v-b-tooltip.hover class="me-2" pill title="Reload" variant="danger"
+        <b-button v-if="displaymode===0" v-b-tooltip.hover class="me-2" pill title="Reload"
                   @click="update_records">
           <font-awesome-icon :icon="['fas', 'rotate-right']"/>
         </b-button>
         <b-button v-if="displaymode===0" v-b-tooltip.hover
-                  :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' " :variant="synced? 'success' :'warning' " class="me-2" pill
+                  :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                  :variant="synced? 'secondary' :'warning' " class="me-2" pill
                   @click="handleSave()">
           <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
         </b-button>
@@ -277,7 +290,7 @@ export default {
 
     },
     handleAdd() {
-      const newId = Date.now();
+      const newId = 'abc' + Date.now();
       this.rowUpdate = {
         edit: true,
         id: newId,
@@ -327,7 +340,7 @@ export default {
       })
           .then(async value => {
             if (value) {
-              const rawResponse = await fetch(this.appstore.api + '/theater?' +
+              const rawResponse = await fetch(this.appstore.api + '/theatre?' +
                   new URLSearchParams({
                     id: data.id
                   }), {
@@ -347,7 +360,7 @@ export default {
     },
     async handleSave() {
 
-      const rawResponse = await fetch(this.appstore.api + '/bulk/theater', {
+      const rawResponse = await fetch(this.appstore.api + '/bulk/theatre', {
         method: 'POST',
         headers: this.appstore.getheader(),
         body: JSON.stringify(this.storeX.theatre_list)
@@ -419,7 +432,7 @@ table.b-table {
 
 @table-bg: #171819;
 @table-bg-accent: #983423;
-@table-bg-hover: #7D5260;
+@table-bg-hover: #3f1322;
 @table-bg-active: @table-bg-hover;
 @table-border-color: #e0e0e0;
 
@@ -536,6 +549,24 @@ table.b-table {
   }
 }
 
+
+@media (max-width: 576px) {
+  .table {
+    overflow-x: hidden;
+
+    > tbody,
+    > thead,
+    > tfoot {
+      > tr {
+        background: #53F025 !important;
+        border-width: 5px;
+        border-color: #7D5260;
+        border-radius: 5px;
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
 .b-form-timepicker {
   display: inline-flex;
 }

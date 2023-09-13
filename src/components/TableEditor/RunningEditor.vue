@@ -34,20 +34,33 @@
     <template #cell(edit)="data">
       <div v-if="data.isEdit" :data-bs-theme="appstore.app_theme">
 
-        <b-button class="edit-icon bg-danger" @click="handleSubmit(data, false)">
-          <b-icon icon="x-lg"></b-icon>
+        <b-button class="mx-2" pill @click="handleSubmit(data, false)">
+          <font-awesome-icon :icon="['fas', 'xmark']"/>
         </b-button>
-        <b-button ref="row_btn" class="edit-icon bg-success" @click="handleSubmit(data, true)">
-          <b-icon icon="save2"></b-icon>
+        <b-button pill @click="handleSubmit(data, true)">
+          <font-awesome-icon :icon="['fas', 'check']"/>
         </b-button>
       </div>
 
-      <b-button v-if="!data.isEdit" v-b-tooltip.hover class="mx-2" pill title="Edit Row" @click="handleEdit(data)">
-        <font-awesome-icon :icon="['fas', 'pen-to-square']"/>
-      </b-button>
-      <b-button v-if="!data.isEdit" v-b-tooltip.hover pill title="Delete Row" @click="handleDelete(data)">
-        <font-awesome-icon :icon="['fas', 'trash']"/>
-      </b-button>
+      <div v-else>
+        <b-button v-if="!data.isEdit" v-b-tooltip.hover class="mx-2" pill title="Edit Row"
+                  @click="handleEdit(data)">
+          <font-awesome-icon :icon="['fas', 'pen-to-square']"/>
+        </b-button>
+        <b-button v-if="!data.isEdit" v-b-tooltip.hover pill title="Delete Row" @click="handleDelete(data)">
+          <font-awesome-icon :icon="['fas', 'trash']"/>
+        </b-button>
+        <b-button v-b-tooltip.hover class="mx-2 d-sm-none" pill title="Reload"
+                  @click="update_records">
+          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+        </b-button>
+        <b-button v-b-tooltip.hover
+                  :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                  :variant="synced? 'secondary' :'warning' " class="d-sm-none" pill
+                  @click="handleSave()">
+          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+        </b-button>
+      </div>
 
     </template>
   </b-editable-table>
@@ -57,6 +70,12 @@
       </b-button>
       <b-button v-b-tooltip.hover class="mb-3 mx-1" pill title="Reload" @click="update_records">
         <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+      </b-button>
+      <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                :variant="synced? 'secondary' :'warning' "
+                class="mb-3 mx-1" pill
+                @click="handleSave()">
+        <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
       </b-button>
     </div>
 
@@ -85,6 +104,7 @@ export default {
       loading: false,
       rowUpdate: {},
       data: [],
+      synced: true,
       appstore: useAppStore(),
     }
   },
@@ -114,28 +134,6 @@ export default {
 
 
     },
-    handleAdd() {
-      const newId = Date.now();
-      this.rowUpdate = {
-        edit: true,
-        id: newId,
-        action: "add",
-        // The default add position is at the top of the list. Use the below prop to insert a new row to the very end.
-        addPosition: "end",
-        data: {
-          id: newId,
-          show_id: "",
-          show_name: "",
-          theatre_id: "",
-          start: "",
-          end: "",
-          ticket_price: "",
-          format: "",
-          language: "",
-
-        },
-      };
-    },
     async handleSubmit(data, update) {
       this.rowUpdate = {
         edit: false,
@@ -143,6 +141,10 @@ export default {
 
         action: update ? "update" : "cancel",
       };
+      this.synced = false
+
+    },
+    async handleSave() {
       const rawResponse = await fetch(this.appstore.api + '/bulk/running', {
         method: 'POST',
         headers: this.appstore.getheader(),
@@ -150,6 +152,7 @@ export default {
       });
       const content = await rawResponse.status;
       this.update_records()
+      this.synced = true
       console.log(content);
     },
 
@@ -206,170 +209,3 @@ export default {
   ]
 }
 </script>
-<style lang="less">
-
-
-.link-col {
-  max-width: 150px !important;
-  overflow: hidden;
-}
-
-.id-col {
-  max-width: 0;
-  display: none;
-}
-
-//*,
-//*:after,
-//*:before {
-//  -webkit-box-sizing: border-box;
-//  -moz-box-sizing: border-box;
-//  box-sizing: border-box;
-//}
-
-
-// Material Design shadows
-//
-.shadow-z-1 {
-  -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
-  0 1px 2px 0 rgba(0, 0, 0, .24);
-  -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
-  0 1px 2px 0 rgba(0, 0, 0, .24);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
-  0 1px 2px 0 rgba(0, 0, 0, .24);
-}
-
-
-/* -- Material Design Table style -------------- */
-
-// Variables
-// ---------------------
-@table-header-font-weight: 5000;
-@table-header-font-color: #898989;
-
-@table-cell-padding: 1.6rem;
-@table-condensed-cell-padding: @table-cell-padding/2;
-
-
-@table-bg: #171819;
-@table-bg-accent: #983423;
-@table-bg-hover: rgba(0, 0, 0, .12);
-@table-bg-active: @table-bg-hover;
-@table-border-color: #e0e0e0;
-
-
-// Mixins
-// -----------------
-.transition(@transition) {
-  -webkit-transition: @transition;
-  -o-transition: @transition;
-  transition: @transition;
-}
-
-// Tables
-//
-// -----------------
-
-// Baseline styles
-.table {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 2rem;
-  background-color: @table-bg;
-  display: block;
-  //noinspection CssInvalidPropertyValue
-  max-width: -moz-fit-content;
-  max-width: fit-content;
-  overflow-x: auto;
-  white-space: nowrap;
-
-  > thead,
-  > tbody,
-  > tfoot {
-    > tr {
-      .transition(all .3s ease);
-
-      > th,
-      > td {
-        text-align: left;
-        padding: @table-cell-padding;
-        vertical-align: top;
-        border-top: 0;
-        .transition(all .3s ease);
-      }
-    }
-  }
-
-  > thead > tr > th {
-    color: @table-header-font-color;
-    vertical-align: bottom;
-    font-weight: bolder;
-    border-bottom: 1px solid rgba(0, 0, 0, .12);
-  }
-
-  > caption + thead,
-  > colgroup + thead,
-  > thead:first-child {
-    > tr:first-child {
-      > th,
-      > td {
-        border-top: 0;
-      }
-    }
-  }
-
-  > tbody + tbody {
-    border-top: 1px solid rgba(0, 0, 0, .12);
-  }
-
-  // Nesting
-  .table {
-    background-color: @table-bg;
-  }
-
-  // Remove border
-  .no-border {
-    border: 0;
-  }
-}
-
-
-// Bordered version
-//
-// Add horizontal borders between columns.
-.table-bordered {
-  border: 0;
-
-  > thead,
-  > tbody,
-  > tfoot {
-    > tr {
-      > th,
-      > td {
-        border: 0;
-        border-bottom: 1px solid @table-border-color;
-      }
-    }
-  }
-
-  > thead > tr {
-    > th,
-    > td {
-      border-bottom-width: 2px;
-    }
-  }
-}
-
-
-// Hover effect
-//
-.table-hover {
-  > tbody > tr:hover {
-    > td,
-    > th {
-      background-color: @table-bg-hover;
-    }
-  }
-}
-
-</style>
