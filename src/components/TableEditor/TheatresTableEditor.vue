@@ -225,6 +225,7 @@ import {useAppStore} from "@/store";
 import {useEditorStore} from "@/store/useEditorStore";
 import RunningEditor from "@/components/TableEditor/RunningEditor.vue";
 // import {useTableEditorStore} from "@/store/useTableEditorStore";
+/* eslint-disable */
 
 export default {
   name: 'TheatresTableEditor',

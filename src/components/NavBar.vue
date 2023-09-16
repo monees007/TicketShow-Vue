@@ -1,5 +1,34 @@
 <template>
   <div class="NavBar">
+    <b-modal id="modal-lg" v-model="search_not_toggled" :data-bs-theme="appstore.app_theme" cancel-only size="md" static
+             title="Search">
+      <template #modal-header>
+        <div class="col">
+          <h3> Search </h3>
+        </div>
+        <b-icon icon="x-lg" @click="search_not_toggled=!search_not_toggled"/>
+      </template>
+      <b-input id="searchy" v-model="search_string" :data-bs-theme="appstore.app_theme" autocomplete="off"
+               class="text-right border-0" placeholder="supports regex"
+               @keyup="do_search">
+      </b-input>
+      <hr class="">
+      <b-row v-for="(x,index) in result" :key="index"
+             class=" py-2 " @click="openpage(x)">
+        <b-col class="align-items-start">
+          <h3 class="">{{ x.name }}</h3>
+          <span class="disabled">{{ x.place || x.director }}</span>
+          <hr>
+        </b-col>
+      </b-row>
+      <template #modal-footer>
+        <div class="">
+
+
+        </div>
+      </template>
+    </b-modal>
+
     <b-navbar class="text-primary bg-primary fixed-top"
               style="justify-content: space-between !important;">
       <b-navbar-nav>
@@ -21,44 +50,17 @@
       </b-navbar-nav>
       <div class="d-inline-flex align-items-center">
 
-        <b-modal id="modal-lg" v-model="search_not_toggled" cancel-only size="md" static title="Search">
-          <template #modal-header>
-            <div class="col">
-              <h3> Search </h3>
-            </div>
-            <b-icon icon="x-lg" @click="search_not_toggled=!search_not_toggled"/>
-          </template>
-          <b-form-input id="searchy" v-model="search_string" :data-bs-theme="appstore.app_theme"
-                        class="text-right bg-secondary border-0" placeholder="supports regex"
-                        @keyup="do_search">
-          </b-form-input>
-          <hr class="">
-          <b-row v-for="x in result" :key="x.id"
-                 class=" py-2 " @click="appstore.router.push((x.director ? '/show/': '/theatre/')+x.id )">
-            <b-col class="align-items-start">
-              <h3 class="">{{ x.name }}</h3>
-              <span class="disabled">{{ x.place || x.director }}</span>
-              <hr>
-            </b-col>
-          </b-row>
-          <template #modal-footer>
-            <div class="">
-
-
-            </div>
-          </template>
-        </b-modal>
-
-        <b-icon :icon="search_not_toggled ?  'x-lg':'search' " class="mx-3 d-sm-inline-block"
-                @click="search_not_toggled=!search_not_toggled"></b-icon>
-        <b-button pill @click="appstore.toggle_theme">
+        <b-button class="mx-3 d-sm-inline-block" pill @click="search_not_toggled=!search_not_toggled">
+          <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="lg"/>
+        </b-button>
+        <b-button class="mx-2" pill @click="appstore.toggle_theme">
           <b-icon :icon="appstore.app_theme==='dark' ? 'moon-stars-fill' :'sun-fill'" aria-hidden="true"></b-icon>
         </b-button>
         <b-button v-b-toggle.sidebar-1 class="mx-2 d-md-none" pill
-                  variant="outline-primary">
-          <b-icon icon="card-list"/>
+                  variant="">
+          <font-awesome-icon :icon="['fas', 'bars']"/>
         </b-button>
-        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 d-md-block"
+        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 d-md-block" pill
                   @click="appstore.logout()">
           <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']"/>
         </b-button>
@@ -106,17 +108,20 @@ export default {
         if (response.status === 200) {
           let res = await response.json();
           this.result = res;
-          console.log(res)
         } else {
           console.log(response.status, "Failed at TheatreList")
-
-          throw new TypeError("Token expired"); // will check for token and push to log in
         }
       } catch (e) {
         console.log("Failed at TheatreList", e)
       }
     },
 
+    openpage(x) {
+      this.appstore.router.push((x.director ? '/show/' : '/theatre/') + x.id)
+      this.search_not_toggled = !this.search_not_toggled
+      this.search_string = ''
+      this.result = []
+    }
   }
 };
 </script>

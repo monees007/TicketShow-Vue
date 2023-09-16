@@ -15,6 +15,8 @@ export const useAppStore = defineStore('AppStore', {
                 role: '',
                 email: '',
                 username: '',
+                name: '',
+                profile_pic: '',
             },
             csrf: '',
             is_logged_in: false,
@@ -37,11 +39,15 @@ export const useAppStore = defineStore('AppStore', {
 
     },
     actions: {
-        async login_with_token(token) {
+
+        async login_with_token(token, payload) {
             window.localStorage.setItem("Authentication-Token", token);
             this.auth_token = token
             this.is_logged_in = true
             await this.get_user()
+            this.user.name = payload.name
+            this.user.profile_pic = payload.picture
+
             console.log('Logged in Successfully')
 
         },

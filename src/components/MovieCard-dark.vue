@@ -15,55 +15,58 @@ export default {
     }
   },
   props: ['m', 't'],
+  methods: {
+    pushr(mid) {
+      if (this.appstore.router.currentRoute.path !== '/show/' + mid) {
+        this.appstore.router.push('/show/' + mid)
+      }
+    }
+  }
 
 }
 </script>
 
 <template>
-  <div id="bright" :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'" :data-bs-theme="appstore.app_theme"
+  <div id="ave" :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'" :data-bs-theme="appstore.app_theme"
        class="movie_card ">
     <div class="info_section d-flex flex-column">
-      <div class="movie_header">
-        <img class="locandina"
+      <div class="movie_header" @click="pushr(m.id)">
+        <b-img-lazy class="locandina" @click="pushr(m.id)"
              :src="m.image_url"/>
         <div class="d-flex flex-column align-items-start">
+          <!--suppress CssInvalidPropertyValue -->
           <h1 style="text-wrap: nowrap; overflow: hidden">{{ m.name }}</h1>
           <h4>{{m.year}}, {{ m.director}}</h4>
           <div><span class="minutes">{{ m.format}}</span>
-            <p class="type">{{ m.tags }}</p></div>
+            <p class="type text-wrap">{{ m.tags }}</p></div>
 
         </div>
 
       </div>
-      <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5">
+      <div class="align-items-start mx-sm-4 d-flex flex-column text_el align-items-start align-items-sm-center mt-sm-5 px-2"
+           @click="pushr(m.id)">
         <p class="text">
-          Set in a world where fantasy creatures live side by side with humans. A human cop is forced to work with an
-          Orc to find a weapon everyone is prepared to kill for.
+          {{ m.description }}
         </p>
 
       </div>
 
-      <div class="d-flex flex-row mb-3 mx-3">
-        <b-rating :class="appstore.app_theme==='dark'? 'bg-black' : ''" :data-bs-theme="appstore.app_theme"
-                  class="w-25 rating-el" inline no-border size="lg" variant=""></b-rating>
+      <div class="d-flex flex-row mb-3 mx-2">
+        <b-rating :value="m.rating" class=" rating-el bg-transparent" disabled inline no-border size="lg"
+                  variant=""></b-rating>
 
-        <b-button :data-bs-theme="appstore.app_theme" class="mx-2 btn-outline-secondary btn-dark">Reviews</b-button>
         <b-button v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
-                  class="mx-2 btn-outline-secondary btn-dark"
+                  class="mx-2 btn-outline-secondary btn-dark" pill
                   @click="storeX.setValue(t,m)">Book
         </b-button>
-        <b-button class="me-2" pill size="sm">
-          <b-icon icon="pen"/>
-        </b-button>
-        <b-button class="me-2" pill size="sm">
-          <b-icon icon="trash"/>
-        </b-button>
+        <b-button pill @click="pushr(m.id)">Review</b-button>
 
       </div>
     </div>
-    <div class="blur_back bright_back " style="max-width: fit-content;">
-      <img style="    max-height: -webkit-fill-available;"
-          :src="m.image_sqr">
+    <div class="blur_back bright_back " style="max-width: fit-content;" @click="pushr(m.id)">
+      <!--suppress CssInvalidPropertyValue -->
+      <b-img-lazy :src="m.image_sqr" style=" max-height: -webkit-fill-available;"
+                  @click="pushr(m.id)"/>
     </div>
   </div>
 </template>
@@ -84,201 +87,313 @@ html, body {
   font-weight: 400;
 }
 
-.movie_card {
-  position: relative;
-  display: block;
-  width: 800px;
-  height: 350px;
-  margin: 100px auto;
-  overflow: hidden;
-  border-radius: 10px;
-  transition: all 0.4s;
+[data-bs-theme='dark'] {
 
-  &:hover {
-    transform: scale(1.02);
+  .movie_card {
+    position: relative;
+    display: block;
+    width: 800px;
+    height: 350px;
+    margin: 100px auto;
+    overflow: hidden;
+    border-radius: 10px;
     transition: all 0.4s;
+
+    &:hover {
+      transform: scale(1.02);
+      transition: all 0.4s;
+    }
+
+    .info_section {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-blend-mode: multiply;
+      z-index: 2;
+      border-radius: 10px;
+
+      .movie_header {
+        position: relative;
+        padding: 25px;
+        height: 40%;
+
+        h1 {
+          color: #fff;
+          font-weight: 400;
+        }
+
+        h4 {
+          color: #9ac7fa;
+          font-weight: 400;
+        }
+
+        .minutes {
+          display: inline-block;
+          margin-top: 10px;
+          color: #fff;
+          padding: 5px;
+          border-radius: 5px;
+          border: 1px solid rgba(255, 255, 255, 0.13);
+        }
+
+        .type {
+          display: block;
+          color: #cee4fd;
+          margin-left: 2px;
+          text-align: center;
+
+        }
+
+        .locandina {
+          position: relative;
+          float: left;
+          margin-right: 20px;
+          height: 120px;
+          box-shadow: 0 0 20px -10px rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      .movie_desc {
+        padding: 25px;
+        height: 50%;
+
+        .text {
+          color: #cfd6e1;
+        }
+      }
+
+    }
+
+    .blur_back {
+      position: absolute;
+      top: 0;
+      z-index: 1;
+      height: 100%;
+      right: 0;
+      background-size: cover;
+      border-radius: 11px;
+    }
   }
 
-  .info_section {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background-blend-mode: multiply;
-    z-index: 2;
-    border-radius: 10px;
+  @media screen and (min-width: 768px) {
+    .movie_header {
+      width: 60%;
+      padding: 25px 25px 0 25px;
+    }
+    .text {
+      width: 50vh;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .movie_desc {
+      width: 50%;
+    }
+
+    .info_section {
+      background: linear-gradient(to right, #0d0d0c 50%, transparent 100%);
+      padding: 20px 0 20px;
+    }
+
+    .blur_back {
+      width: 80%;
+      background-position: -100% 10% !important;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .movie_card {
+      width: 95%;
+      margin: 70px auto;
+      min-height: auto;
+      height: auto;
+    }
+    .text {
+      text-align: center;
+    }
+  ;
+
+    .blur_back {
+      width: 100%;
+      position: absolute;
+      right: -50%;
+    }
 
     .movie_header {
-      position: relative;
-      padding: 25px;
-      height: 40%;
-
-      h1 {
-        color: #fff;
-        font-weight: 400;
-      }
-
-      h4 {
-        color: #9ac7fa;
-        font-weight: 400;
-      }
-
-      .minutes {
-        display: inline-block;
-        margin-top: 10px;
-        color: #fff;
-        padding: 5px;
-        border-radius: 5px;
-        border: 1px solid rgba(255, 255, 255, 0.13);
-      }
-
-      .type {
-        display: inline-block;
-        color: #cee4fd;
-        margin-left: 10px;
-      }
-
-      .locandina {
-        position: relative;
-        float: left;
-        margin-right: 20px;
-        height: 120px;
-        box-shadow: 0 0 20px -10px rgba(0, 0, 0, 0.5);
-      }
+      width: 100%;
+      margin: 20px;
     }
 
     .movie_desc {
-      padding: 25px;
-      height: 50%;
-
-      .text {
-        color: #cfd6e1;
-      }
+      width: 100%;
     }
 
-    .movie_social {
-      height: 10%;
-      padding-left: 15px;
-      padding-bottom: 20px;
+    .info_section {
+      background: linear-gradient(to top, rgb(20, 20, 19) 50%, transparent 100%);
+      display: inline-grid;
+    }
+  }
 
-      ul {
-        list-style: none;
-        padding: 0;
+}
 
-        li {
+[data-bs-theme='light'] {
+  .movie_card {
+    position: relative;
+    display: block;
+    width: 800px;
+    height: 350px;
+    margin: 100px auto;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: all 0.4s;
+    box-shadow: 0px 0px 120px -25px rgba(0, 0, 0, 0.5);
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0px 0px 80px -25px rgba(0, 0, 0, 0.5);
+      transition: all 0.4s;
+    }
+
+    .info_section {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-blend-mode: multiply;
+      z-index: 2;
+      border-radius: 10px;
+
+      .movie_header {
+        position: relative;
+        padding: 25px;
+        height: 40%;
+
+        h1 {
+          color: black;
+          font-weight: 400;
+        }
+
+        h4 {
+          color: #9ac7fa;
+          font-weight: 400;
+        }
+
+        .minutes {
           display: inline-block;
-          color: rgba(255, 255, 255, 0.4);
-          transition: color 0.3s;
-          transition-delay: 0.15s;
-          margin: 0 10px;
+          margin-top: 10px;
+          font-weight: 400;
+          color: #333;
+          padding: 5px;
+          border-radius: 5px;
+          border: 1px solid rgba(100, 100, 0, 0.23);
+        }
 
-          &:hover {
-            transition: color 0.3s;
-            color: rgba(255, 255, 255, 0.8);
-          }
+        .type {
+          display: inline-block;
+          color: #232353;
+          margin-left: 2px;
+          text-align: center;
+        }
 
-          i {
-            font-size: 19px;
-            cursor: pointer;
-          }
+        .locandina {
+          position: relative;
+          float: left;
+          margin-right: 20px;
+          height: 120px;
+          box-shadow: 0 0 20px -10px rgba(0, 0, 0, 0.5);
         }
       }
+
+      .movie_desc {
+        padding: 25px;
+        height: 50%;
+
+        .text {
+          color: #000;
+        }
+      }
+
+    }
+
+    .blur_back {
+      position: absolute;
+      top: 0;
+      z-index: 1;
+      height: 100%;
+      right: 0;
+      background-size: cover;
+      border-radius: 11px;
     }
   }
 
-  .blur_back {
-    position: absolute;
-    top: 0;
-    z-index: 1;
-    height: 100%;
-    right: 0;
-    background-size: cover;
-    border-radius: 11px;
+  @media screen and (min-width: 768px) {
+    .movie_header {
+      width: 60%;
+      padding: 25px 25px 0 25px;
+    }
+    .text {
+      width: 50vh;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .movie_desc {
+      width: 50%;
+    }
+
+    .info_section {
+      background: linear-gradient(to right, #e5e6e6 50%, transparent 100%);
+      padding: 20px 0 20px;
+
+    }
+
+    .blur_back {
+      width: 80%;
+      background-position: -100% 10% !important;
+    }
   }
+
+  @media screen and (max-width: 768px) {
+    .movie_card {
+      width: 95%;
+      margin: 70px auto;
+      min-height: auto;
+      height: auto;
+    }
+    .text {
+      text-align: center;
+    }
+  ;
+
+    .blur_back {
+      width: 100%;
+      background-position: 50% 50% !important;
+    }
+
+    .movie_header {
+      width: 100%;
+      margin: 20px;
+    }
+
+    .movie_desc {
+      width: 100%;
+    }
+
+    .info_section {
+      background: linear-gradient(to top, #e5e6e6 50%, transparent 100%);
+      display: inline-grid;
+    }
+  }
+
 }
 
-@media screen and (min-width: 768px) {
-  .movie_header {
-    width: 60%;
-  }
 
-  .movie_desc {
-    width: 50%;
-  }
-
-  .info_section {
-    background: linear-gradient(to right, #0d0d0c 50%, transparent 100%);
-  }
-
-  .blur_back {
-    width: 80%;
-    background-position: -100% 10% !important;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .movie_card {
-    width: 95%;
-    margin: 70px auto;
-    min-height: 350px;
-    height: auto;
-  }
-
-  .blur_back {
-    width: 100%;
-    background-position: 50% 50% !important;
-  }
-
-  .movie_header {
-    width: 100%;
-    margin-top: 85px;
-  }
-
-  .movie_desc {
-    width: 100%;
-  }
-
-  .info_section {
-    background: linear-gradient(to top, rgb(20, 20, 19) 50%, transparent 100%);
-    display: inline-grid;
-  }
-}
-
-
-#bright {
-  box-shadow: 0px 0px 150px -45px rgba(255, 51, 0, 0.5);
-
-  &:hover {
-    box-shadow: 0px 0px 120px -55px rgba(255, 51, 0, 0.5);
-  }
-}
-
-.bright_back {
-  background: url("https://occ-0-2433-448.1.nflxso.net/art/cd5c9/3e192edf2027c536e25bb5d3b6ac93ced77cd5c9.jpg");
-}
-
-#tomb {
-  box-shadow: 0px 0px 150px -45px rgba(19, 160, 134, 0.6);
-
-  &:hover {
-    box-shadow: 0px 0px 120px -55px rgba(19, 160, 134, 0.6);
-  }
-}
-
-.tomb_back {
-  background: url("https://fsmedia.imgix.net/cd/c9/5e/ba/4817/4d9a/93f0/c776ec32ecbc/lara-crofts-neck-looks-unnatural-in-the-new-poster-for-tomb-raider.png");
-}
 
 #ave {
-  box-shadow: 0px 0px 150px -45px rgba(199, 147, 75, 0.7);
-  margin-bottom: 200px;
+  box-shadow: 0px 0px 120px -55px rgba(199, 147, 75, 0.7);
+  margin-bottom: 100px;
 
   &:hover {
-    box-shadow: 0px 0px 120px -55px rgba(199, 147, 75, 0.7);
+    box-shadow: 0px 0px 150px -45px rgba(199, 147, 75, 0.7);
   }
 }
 
-.ave_back {
-  background: url("https://www.gannett-cdn.com/-mm-/c03fd140debe8ad4c05cf81a5cad7ad61a12ce52/c=0-1580-2985-3266&r=x803&c=1600x800/local/-/media/2017/06/09/USATODAY/USATODAY/636326272873599176-Black-Panther-Teaser.jpg");
-}
 </style>
 

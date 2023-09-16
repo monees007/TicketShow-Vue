@@ -1,6 +1,6 @@
 <template>
   <div id="parent1" class="d-flex position-fixed  align-items-center justify-content-evenly"
-       style="flex-direction:column; height: 100vh; left: 3px;width: 50px">
+       style="flex-direction:column; height: 95vh; left: 3px;width: 50px">
     <router-link class="rotate" to="/">HOME</router-link>
     <router-link class="rotate" to="/bookings">BOOKINGS</router-link>
     <router-link v-if="appstore.user.role==='admin'" class="rotate" to="/dashboard">DASHBOARD</router-link>
@@ -46,7 +46,7 @@ export default {
   width: 180px;
   font-weight: bold;
   color: #f8f9fa;
-//text-shadow:1px 1px 4px #fff;}
+}
 .rotate{
   font-size: medium;
   width: 180px;
@@ -58,5 +58,7 @@ export default {
   -ms-transform:rotate(270deg); /* IE 9 */
   -moz-transform:rotate(270deg); /* Firefox */
   -webkit-transform:rotate(270deg); /* Safari and Chrome */
-  -o-transform:rotate(270deg); /* Opera */}
+  -o-transform: rotate(270deg); /* Opera */
+}
+
 </style>

@@ -60,8 +60,13 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
+  scrollBehavior() { //to, from, savedPosition
+    // always scroll to top
+    return {top: -10}
+  },
 })
+
 
 // router.beforeEach(async (to, from) => {
 //   if (      to.name ===  from.name  ) {

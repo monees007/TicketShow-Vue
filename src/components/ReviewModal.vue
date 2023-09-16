@@ -1,14 +1,14 @@
 <template>
   <div>
-    <b-modal v-model="appstore.review_modal.show" :data-bs-theme="appstore.app_theme" class="text-light"
+    <b-modal v-model="appstore.review_modal.show" :data-bs-theme="appstore.app_theme" class=""
              title="Create Review">
       <template #modal-header>
-        <span class="text-light h4">Create Review</span>
-        <b-icon class="text-light" icon="x-lg" @click="appstore.review_modal.show=false"/>
+        <span class=" h4">Create Review</span>
+        <b-icon class="" icon="x-lg" @click="appstore.review_modal.show=false"/>
       </template>
       <b-alert v-if="this.error" show variant="danger">Something went wrong. Please try again.</b-alert>
 
-      <b-rating v-model="rating" :variant="check? 'warning': 'danger'" class="ml-5 my-2 bg-dark border-0" inline
+      <b-rating v-model="rating" :variant="check? 'warning': 'danger'" class="ml-5 my-2  border-0" inline
                 size="lg"></b-rating>
       <b-form-invalid-feedback :state="check">
         Please select at least 1 star and give a review to continue.

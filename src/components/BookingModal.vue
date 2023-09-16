@@ -9,7 +9,7 @@
              no-stacking
              size="lg"
              title="Book Tickets"
-             visible>
+    >
       <b-alert v-show="booking_successful" show variant="success">Booking Successful</b-alert>
       <b-row>
         <span class="left">Show</span>

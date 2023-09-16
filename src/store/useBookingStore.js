@@ -19,6 +19,7 @@ export const useBookingStore = defineStore('BookingStore', {
             console.log(t, m)
             this.theatre = t
             this.show = m
+            this.showModal1 = true
 
         },
         updateSeats(seats) {

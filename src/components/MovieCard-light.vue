@@ -13,14 +13,21 @@ export default {
     }
   },
   props: ['m', 't'],
-
+  methods: {
+    pushr(mid) {
+      if (this.appstore.router.currentRoute.path !== '/show/' + mid) {
+        this.appstore.router.push('/show/' + mid)
+      }
+    }
+  }
 }
 </script>
 
 <template>
   <div id="bright" :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'"
        :data-bs-theme="appstore.app_theme"
-       class="movie_card ">
+       class="movie_card "
+       @click="pushr(m.id)">
     <div class="info_section d-flex flex-column">
       <div class="movie_header">
         <img :src="m.image_url"
@@ -34,33 +41,29 @@ export default {
         </div>
 
       </div>
-      <div class="w-50 d-flex flex-column text_el align-items-start align-items-sm-center mt-5">
+      <div class="d-flex flex-column text_el align-items-start align-items-sm-center mt-5">
         <p class="text">
-          Set in a world where fantasy creatures live side by side with humans. A human cop is forced to work with an
-          Orc to find a weapon everyone is prepared to kill for.
+          {{ m.description }}
         </p>
 
       </div>
 
-      <div class="d-flex flex-row mb-3 mx-3">
-        <b-rating :class="appstore.app_theme==='dark'? 'bg-black' : ''" :data-bs-theme="appstore.app_theme"
-                  class="w-25 rating-el" inline no-border size="lg" variant=""></b-rating>
+      <div class="d-flex flex-row mb-3 mx-2">
+        <b-rating :value="m.rating" class=" rating-el bg-transparent" disabled inline no-border
+                  size="lg"></b-rating>
 
-        <b-button :data-bs-theme="appstore.app_theme" class="mx-2 btn-outline-secondary btn-dark">Reviews</b-button>
-        <b-button v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
-                  class="mx-2 btn-outline-secondary btn-dark"
+
+        <b-button v-b-modal.modal-booking class="mx-2 btn-outline-secondary btn-dark"
+                  pill
                   @click="storeX.setValue(t,m)">Book
         </b-button>
-        <b-button class="me-2" pill size="sm">
-          <b-icon icon="pen"/>
-        </b-button>
-        <b-button class="me-2" pill size="sm">
-          <b-icon icon="trash"/>
-        </b-button>
+        <b-button pill @click="pushr(m.id)">Review</b-button>
+
 
       </div>
     </div>
     <div class="blur_back bright_back " style="max-width: fit-content;">
+      <!--suppress CssInvalidPropertyValue -->
       <img :src="m.image_sqr"
            style="    max-height: -webkit-fill-available;">
     </div>
@@ -75,12 +78,12 @@ export default {
   margin: 0;
 }
 
-.link {
-  display: block;
-  text-align: center;
-  color: #777;
-  text-decoration: none;
-  padding: 10px;
+html, body {
+  margin: 0;
+  background: black;
+  font-family: 'Montserrat', helvetica, arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .movie_card {
@@ -88,7 +91,7 @@ export default {
   display: block;
   width: 800px;
   height: 350px;
-  margin: 80px auto;
+  margin: 100px auto;
   overflow: hidden;
   border-radius: 10px;
   transition: all 0.4s;
@@ -119,23 +122,25 @@ export default {
       }
 
       h4 {
-        color: #555;
+        color: #9ac7fa;
         font-weight: 400;
       }
 
       .minutes {
         display: inline-block;
-        margin-top: 15px;
-        color: #555;
+        margin-top: 10px;
+        font-weight: 400;
+        color: #333;
         padding: 5px;
         border-radius: 5px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(100, 100, 0, 0.23);
       }
 
       .type {
         display: inline-block;
-        color: #959595;
-        margin-left: 10px;
+        color: #232353;
+        margin-left: 2px;
+        text-align: center;
       }
 
       .locandina {
@@ -152,38 +157,10 @@ export default {
       height: 50%;
 
       .text {
-        color: #545454;
+        color: #000;
       }
     }
 
-    .movie_social {
-      height: 10%;
-      padding-left: 15px;
-      padding-bottom: 20px;
-
-      ul {
-        list-style: none;
-        padding: 0;
-
-        li {
-          display: inline-block;
-          color: rgba(0, 0, 0, 0.3);
-          transition: color 0.3s;
-          transition-delay: 0.15s;
-          margin: 0 10px;
-
-          &:hover {
-            transition: color 0.3s;
-            color: rgba(0, 0, 0, 0.7);
-          }
-
-          i {
-            font-size: 19px;
-            cursor: pointer;
-          }
-        }
-      }
-    }
   }
 
   .blur_back {
@@ -199,15 +176,22 @@ export default {
 
 @media screen and (min-width: 768px) {
   .movie_header {
-    width: 65%;
+    width: 60%;
+    padding: 25px 25px 0 25px;
   }
-
+  .text {
+    width: 50vh;
+    margin-top: 20px;
+    text-align: left;
+  }
   .movie_desc {
     width: 50%;
   }
 
   .info_section {
-    background: linear-gradient(to right, #e5e6e6 50%, transparent 100%);
+    background: linear-gradient(to right, #55e6e6 50%, transparent 100%);
+    padding: 20px 0 20px;
+
   }
 
   .blur_back {
@@ -220,9 +204,13 @@ export default {
   .movie_card {
     width: 95%;
     margin: 70px auto;
-    min-height: 350px;
+    min-height: auto;
     height: auto;
   }
+  .text {
+    text-align: center;
+  }
+;
 
   .blur_back {
     width: 100%;
@@ -231,7 +219,7 @@ export default {
 
   .movie_header {
     width: 100%;
-    margin-top: 85px;
+    margin: 20px;
   }
 
   .movie_desc {
