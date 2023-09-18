@@ -1,6 +1,24 @@
 <template>
   <div class="d-flex flex-column">
-
+    <b-button-toolbar :data-bs-theme="appstore.app_theme" class="mt-3" key-nav>
+      <b-button-group class="mx-1 mb-3">
+        <b-button v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary" @click="handleAdd()">
+          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
+        </b-button>
+        <b-button v-b-tooltip.hover class="me-2" pill title="Reload" @click="update_records">
+          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+        </b-button>
+        <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                  :variant="synced? 'secondary' :'warning' " class="me-2" pill @click="handleSave()">
+          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+        </b-button>
+      </b-button-group>
+      <b-button-group class="mx-1">
+        <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
+        <DownloadCSV obj="shows"/>
+        <b-button @click="export_csv">Download xCSV</b-button>
+      </b-button-group>
+    </b-button-toolbar>
     <Transition>
       <b-card>
         <b-editable-table
@@ -75,25 +93,7 @@
       </b-card>
     </Transition>
 
-    <b-button-toolbar :data-bs-theme="appstore.app_theme" class="mt-3" key-nav>
-      <b-button-group class="mx-1 mb-3">
-        <b-button v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary" @click="handleAdd()">
-          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
-        </b-button>
-        <b-button v-b-tooltip.hover class="me-2" pill title="Reload" @click="update_records">
-          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
-        </b-button>
-        <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
-                  :variant="synced? 'secondary' :'warning' " class="me-2" pill @click="handleSave()">
-          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
-        </b-button>
-      </b-button-group>
-      <b-button-group class="mx-1">
-        <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
-        <b-button v-if="false" @click="storeX.jsonToCSV(0)">Download CSV</b-button>
-        <b-button @click="export_csv">Download CSV</b-button>
-      </b-button-group>
-    </b-button-toolbar>
+
   </div>
 </template>
 
@@ -102,10 +102,12 @@ import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
 import {useAppStore} from "@/store";
 import {useEditorStore} from "@/store/useEditorStore";
+import DownloadCSV from "@/components/TableEditor/DownloadCSV.vue";
 
 export default {
   name: 'ShowsTableEditor',
   components: {
+    DownloadCSV,
     BEditableTable,
     BSpinner,
   },
