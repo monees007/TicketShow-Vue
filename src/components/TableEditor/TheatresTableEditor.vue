@@ -10,6 +10,8 @@
             :data-bs-theme="appstore.app_theme"
             :editMode="'row'"
             :fields="fields"
+            :current-page="currentPage"
+            per-page="5"
             :rowUpdate="rowUpdate"
             :filter="filter"
             :head-variant="appstore.app_theme==='dark'? 'dark' : 'secondary'"
@@ -58,6 +60,32 @@
           </template>
 
         </b-editable-table>
+        <b-button-toolbar :data-bs-theme="appstore.app_theme" class="" key-nav>
+          <b-pagination
+              id="pagination"
+              v-model="currentPage"
+              :data-bs-theme="appstore.app_theme"
+              :total-rows="storeX.$state.theatre_list.length"
+              align="fill"
+              class="my-0 bg-primary text-primary mx-3 mb-3"
+              per-page="5"
+              size="md"
+              style=""
+          ></b-pagination>
+          <b-button-group class="mx-1 mb-3" key-nav>
+            <b-button v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary" @click="handleAdd()">
+              <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
+            </b-button>
+            <b-button v-b-tooltip.hover class="me-2" pill title="Reload" @click="update_records">
+              <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+            </b-button>
+            <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                      :variant="synced? 'secondary' :'warning' " class="me-2" pill @click="handleSave()">
+              <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+            </b-button>
+            <DownloadCSV obj="shows" />
+          </b-button-group>
+        </b-button-toolbar>
       </b-card>
     </Transition>
 
@@ -65,6 +93,8 @@
       <KeepAlive>
         <div v-if="displaymode===1" :data-bs-theme="appstore.app_theme" class="accordion w-100" role="tablist">
           <b-card v-for="(t,index) in storeX.theatre_list" :key="t.id" class="mb-1" no-body>
+
+
             <b-card-header v-b-toggle="'acc'+index" class="p-1" header-tag="header" role="tab">
               <div class="d-flex  flex-row px-3">
                 <h1 class="align-items-start my-3 " style="min-width: fit-content">
@@ -76,11 +106,13 @@
                 </b-row>
               </div>
             </b-card-header>
-            <b-collapse :id="'acc'+index" accordion="my-accordion" role="tabpanel">
-              <RunningEditor ref="running_editor" :filter="filter" :t_id="t.id"/>
 
-
+            <b-collapse  :id="'acc'+index" accordion="my-accordion" role="tabpanel">
+<!--              <component   :is="dynamic_running_editor" v-show="state.index"  :filter="filter" :t_id="t.id" />-->
+                  <RunningEditor :ref="'running_editor'+t.id" :t_id="t.id" :filter="filter"></RunningEditor>
             </b-collapse>
+
+
           </b-card>
 
 
@@ -88,21 +120,14 @@
       </KeepAlive>
     </Transition>
 
-    <b-modal id="modal-run" body-bg-variant="dark"
-             body-text-variant="light"
-             data-bs-theme="dark"
-             footer-bg-variant="dark"
-             footer-text-variant="light"
-             header-bg-variant="dark"
-             header-text-variant="light"
-             size="xl" title="Create">
-
+    <b-modal id="modal-run" :data-bs-theme="appstore.app_theme"
+             size="xl" title="Add">
       <b-row class="my-1">
         <b-col sm="3">
           <label for="input-namet">Show</label>
         </b-col>
         <b-col>
-          <b-form-select v-model="selected_show" class="mb-3 input-field bg-dark" size="lg" @change="update_variables">
+          <b-form-select :data-bs-theme="appstore.app_theme" v-model="selected_show" class="mb-3 input-field bg-primary" size="lg" @change="update_variables">
             <b-form-select-option :value="null">Please select a Show</b-form-select-option>
             <b-form-select-option v-for="s in storeX.show_list" :key="s.id" :value="s">{{ s.name }}
             </b-form-select-option>
@@ -114,7 +139,7 @@
           <label for="input-namet">Theatre Name</label>
         </b-col>
         <b-col>
-          <b-form-select v-model="temp_run.theatre_id" class="mb-3 input-field bg-dark" size="lg">
+          <b-form-select :data-bs-theme="appstore.app_theme" v-model="temp_run.theatre_id" class="mb-3 input-field bg-primary" size="lg">
             <b-form-select-option :value="null">Please select a Show</b-form-select-option>
             <b-form-select-option v-for="t in storeX.theatre_list" :key="t.id" :value="t.id">{{ t.name }}
             </b-form-select-option>
@@ -127,7 +152,7 @@
           <label for="input-capacity">Starting time</label>
         </b-col>
         <b-col sm="9">
-          <b-form-timepicker v-model="temp_run.start" class="input-field bg-dark" locale="en"></b-form-timepicker>
+          <b-form-timepicker v-model="temp_run.start" class="input-field " @input="updateSecondTime" locale="en"></b-form-timepicker>
         </b-col>
       </b-row>
       <b-row class="my-1">
@@ -135,7 +160,7 @@
           <label for="input-capacity">Ending time</label>
         </b-col>
         <b-col sm="9">
-          <b-form-timepicker v-model="temp_run.end" class="input-field bg-dark" locale="en"></b-form-timepicker>
+          <b-form-timepicker v-model="temp_run.end" class="input-field "  locale="en"></b-form-timepicker>
 
         </b-col>
       </b-row>
@@ -145,7 +170,7 @@
         </b-col>
         <b-col sm="9">
 
-          <b-form-select v-model="temp_run.language" class="mb-3 input-field bg-dark">
+          <b-form-select v-model="temp_run.language" class="mb-3 input-field bg-primary">
             <b-form-select-option :value="null">Please select the Language</b-form-select-option>
 
             <b-form-select-option v-for="s in language_list" :key="s" :value="s">{{ s }}</b-form-select-option>
@@ -159,7 +184,7 @@
         </b-col>
         <b-col sm="9">
           <b-form-input id="input-capacity" v-model="temp_run.ticket_price" :value="selected_show.ticket_price"
-                        class="input-field bg-dark"
+                        class="input-field "
                         type="number"></b-form-input>
         </b-col>
       </b-row>
@@ -168,15 +193,15 @@
           <label for="input-capacity">Format</label>
         </b-col>
         <b-col sm="9">
-          <b-form-select v-model="temp_run.format" class="mb-3 input-field bg-dark text-light">
+          <b-form-select v-model="temp_run.format" class="mb-3 input-field bg-primary ">
             <b-form-select-option :value="null" default disabled>Please select the Format</b-form-select-option>
 
             <b-form-select-option v-for="s in format_list" :key="s" :value="s">{{ s }}</b-form-select-option>
           </b-form-select>
         </b-col>
       </b-row>
-      <template #modal-footer="{cancel}">
-        <b-button size="md" variant="success" @click="createRunning()">
+      <template #modal-footer="{cancel, hide}">
+        <b-button size="md" variant="success" @click="createRunning(hide,temp_run.theatre_id)">
           Add this show
         </b-button>
         <b-button size="md" variant="danger" @click="cancel()">
@@ -186,35 +211,7 @@
       </template>
     </b-modal>
 
-    <b-button-toolbar class="mt-3" key-nav>
-      <b-button-group class="mx-1">
-        <b-button v-if="displaymode===0" v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary"
-                  @click="handleAdd()">
-          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
-        </b-button>
-        <b-button v-if="displaymode===0" v-b-tooltip.hover class="me-2" pill title="Reload"
-                  @click="update_records">
-          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
-        </b-button>
-        <b-button v-if="displaymode===0" v-b-tooltip.hover
-                  :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
-                  :variant="synced? 'secondary' :'warning' " class="me-2" pill
-                  @click="handleSave()">
-          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
-        </b-button>
-      </b-button-group>
-      <b-button-group v-if="displaymode===0" class="mx-1">
-        <b-button @click="storeX.csvToJson(1)">
-          <font-awesome-icon :icon="['fas', 'up-long']"/>
-          CSV
-          <font-awesome-icon :icon="['fas', 'file-csv']"/>
-        </b-button>
-        <b-button @click="storeX.jsonToCSV(1)">
-          <font-awesome-icon :icon="['fas', 'down-long']"/>
-          <font-awesome-icon :icon="['fas', 'file-csv']"/>
-        </b-button>
-      </b-button-group>
-    </b-button-toolbar>
+
   </div>
 </template>
 
@@ -222,14 +219,15 @@
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
 import {useAppStore} from "@/store";
-import {useEditorStore} from "@/store/useEditorStore";
+import {useEditorStore} from "@/store/EditorStore";
 import RunningEditor from "@/components/TableEditor/RunningEditor.vue";
-// import {useTableEditorStore} from "@/store/useTableEditorStore";
+import DownloadCSV from "@/components/TableEditor/DownloadCSV.vue";
 /* eslint-disable */
 
 export default {
   name: 'TheatresTableEditor',
   components: {
+    DownloadCSV,
     RunningEditor,
     BEditableTable,
     BSpinner,
@@ -255,6 +253,9 @@ export default {
         {key: "city", sortable: true, label: "City", editable: true},
       ],
       loading: false,
+      state: {},
+      dynamic_running_editor:null,
+      currentPage: null
     };
   },
   computed: {
@@ -268,9 +269,18 @@ export default {
   },
   async created() {
     await this.update_records()
+    // await this.storeX.get_shows_of_theatre()
   },
   methods: {
-    async createRunning() {
+    updateSecondTime() {
+      if (this.temp_run.start) {
+        const firstTime = new Date(this.temp_run.start);
+        const secondTime = new Date(firstTime.getTime() + 24 * 60000); // Add 23 minutes
+        console.log(secondTime)
+        this.temp_run.end = secondTime.toTimeString().substring(0, 8); // Format as HH:MM:SS
+      }
+    },
+    async createRunning(hide, tid) {
       console.log(this.temp_run)
       const rawResponse = await fetch(this.appstore.api + '/running', {
         method: 'POST',
@@ -278,9 +288,8 @@ export default {
         body: JSON.stringify(this.temp_run)
       });
       const content = await rawResponse.status;
-      await this.$refs.running_editor[0].update_records()
-
-      console.log(content);
+      await this.$refs['running_editor'+tid][0].update_records()
+      hide()
     },
     async update_records() {
       this.loading = true;
@@ -296,7 +305,6 @@ export default {
         edit: true,
         id: newId,
         action: "add",
-        // The default add position is at the top of the list. Use the below prop to insert a new row to the very end.
         addPosition: "end",
         data: {
           id: newId,
@@ -375,7 +383,7 @@ export default {
       this.temp_run.show_id = this.selected_show.id;
       this.synced = true
 
-    }
+    },
   },
 };
 </script>
@@ -395,21 +403,7 @@ table.b-table {
   cursor: pointer;
 }
 
-/* -- import Roboto Font ---------------------------- */
-//@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
 
-
-//*,
-//*:after,
-//*:before {
-//  -webkit-box-sizing: border-box;
-//  -moz-box-sizing: border-box;
-//  box-sizing: border-box;
-//}
-
-
-// Material Design shadows
-//
 .shadow-z-1 {
   -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12),
   0 1px 2px 0 rgba(0, 0, 0, .24);
@@ -561,6 +555,7 @@ table.b-table {
       > tr {
         background: #53F025 !important;
         border-width: 5px;
+        width: 100%;
         border-color: #7D5260;
         border-radius: 5px;
         margin-bottom: 5px;

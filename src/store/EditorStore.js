@@ -5,21 +5,30 @@ export const useEditorStore = defineStore('EditorStore', {
     state: () => (
         {
             show_list: [],
-            theatre_list: [],
+            theatre_list: null,
             running_list: [],
             selected_show: {},
             selected_theatre: {},
             editorMode: 0,
             appstore: useAppStore(),
-            shows_for_theatre: {}
+            shows_for_theatre: {},
+            alert: {
+                variant: '',
+                content: '',
+                click: '',
+                show: true,
+            }
         }
     ),
     getters: {},
     actions: {
-        update_show(data) {
-            // this.show_list[data.index]= data.item
-            this.put('/shows', this.show_list[data.index])
+        set_alert(variant, content, click) {
+            this.alert.variant = variant
+            this.alert.content = content
+            this.alert.click = click
+            this.alert.show = true
         },
+
         async put(endpoint, data) {
             console.log('put-data', data)
             const asd = this.appstore
@@ -40,16 +49,16 @@ export const useEditorStore = defineStore('EditorStore', {
                 console.log("Failed to push update ", e)
             }
         },
-        async get_shows_of_theatre(tid) {
+        async get_shows_of_theatre() {
             const asd = this.appstore
             try {
                 this.loading = true;
-                const response = await fetch(asd.api + "/running?id=" + tid, {
+                const response = await fetch(asd.api + "/bulk/running", {
                     method: 'GET',
                     headers: asd.getheader()
                 });
                 if (response.status === 200) {
-                    this.shows_for_theatre[tid] = await response.json()
+                    this.shows_for_theatre = await response.json()
 
                 } else {
                     console.log(response.status, "Failed to load bulk running")
@@ -68,12 +77,13 @@ export const useEditorStore = defineStore('EditorStore', {
                     headers: asd.getheader()
                 });
                 if (response.status === 200) {
+                    const res = await response.json();
                     if (show_or_theatre === 1) {
-                        this.theatre_list = await response.json();
+                        this.theatre_list = res
                     } else if (show_or_theatre === 0) {
-                        this.show_list = await response.json();
+                        this.show_list = res
                     } else if (show_or_theatre === 2) {
-                        this.running_list = await response.json();
+                        this.running_list = res
                     }
 
                 } else {
@@ -113,40 +123,6 @@ export const useEditorStore = defineStore('EditorStore', {
             }
 
             input.click();
-        },
-        jsonToCSV(show_or_theatre, fileTitle = 'export') {
-            let items
-            if (show_or_theatre) {
-                items = this.theatre_list
-
-            } else {
-                items = this.show_list
-            }
-            const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
-            const header = Object.keys(items[0])
-            let csv = [
-                header.join(','), // header row first
-                ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer).replace(/"/g, '')).join(','))
-            ].join('\n')
-            console.log(csv)
-            let exportedFilename = fileTitle + '.csv' || 'export.csv';
-
-            let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-            if (navigator.msSaveBlob) { // IE 10+
-                navigator.msSaveBlob(blob, exportedFilename);
-            } else {
-                let link = document.createElement("a");
-                if (link.download !== undefined) { // feature detection
-                    // Browsers that support HTML5 download attribute
-                    let url = URL.createObjectURL(blob);
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", exportedFilename);
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            }
         },
 
     },

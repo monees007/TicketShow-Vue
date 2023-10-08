@@ -25,12 +25,14 @@ $enable-gradients: true;
 [data-bs-theme='dark'] {
   --bs-primary: #6750A4;
   --bs-primary-rgb: 49, 16, 29;
-  --bs-bg-opacity: 0.4;
+  --bs-bg-opacity: 0.4 !important;
   --bs-secondary: #633b48;
   --bs-secondary-rgb: 99, 59, 72;
   --bs-body-bg: #2b0013;
   --bs-body-bg-rgb: 255, 217, 227;
-
+  .bg-light{
+    background: none !important;
+  }
   .btn-secondary {
     border: 0;
     --bs-btn-bg: #{mix(#7D5260, #7D5260, .5)};

@@ -8,7 +8,7 @@
     <b-alert v-if="appstore.server_error" class="d-flex justify-content-between" dismissible show variant="danger">
       Server not found
     </b-alert>
-    <b-alert v-show="flag_error" ref="flag" show variant="danger">CSV is incorrectly formatted</b-alert>
+
     <b-button-group class="col mb-3 w-100" style=" max-width: 988px">
       <b-button :pressed="activeTab===0" class="py-3" @click="activeTab=0">Shows</b-button>
       <b-button :pressed="activeTab===1" class="py-3" @click="activeTab=1">Theatres</b-button>
@@ -48,12 +48,14 @@
 import ShowsTableEditor from "@/components/TableEditor/ShowsTableEditor.vue";
 import TheatresTableEditor from "@/components/TableEditor/TheatresTableEditor.vue";
 import {useAppStore} from "@/store";
+import {useEditorStore} from "@/store/EditorStore";
 
 export default {
   name: 'DashboardView',
   components: {TheatresTableEditor, ShowsTableEditor},
   data: () => {
     return {
+      storeX: useEditorStore(),
       searching: false,
       appstore: useAppStore(),
       displaymode: 1,

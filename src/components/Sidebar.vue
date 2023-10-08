@@ -1,5 +1,5 @@
 <template>
-  <b-sidebar id="sidebar-1" bg-variant="primary" class="opacity-100" data-bs-theme="dark" right
+  <b-sidebar id="sidebar-1" bg-variant="primary" class="opacity-100" style="opacity: 1!important;" data-bs-theme="mellow" right
              shadow text-variant="light" title="TicketShow"
   >
     <template #header="{ hide }">
@@ -58,7 +58,13 @@ export default {
 }
 </script>
 <style class="scss">
-[data-bs-theme='dark'] {
+[data-bs-theme='mellow'] {
+  --bs-primary: #6750A4;
+  --bs-primary-rgb: 49, 16, 29;
+  --bs-secondary: #633b48;
+  --bs-secondary-rgb: 99, 59, 72;
+  --bs-body-bg: #1b0013;
+  --bs-body-bg-rgb: 155, 217, 227;
   --bs-bg-opacity: 1 !important;
 }
 

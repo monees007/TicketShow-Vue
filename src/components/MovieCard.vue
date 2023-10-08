@@ -2,11 +2,11 @@
 
 <script>
 
-import {useBookingStore} from "@/store/useBookingStore";
+import {useBookingStore} from "@/store/BookingStore";
 import {useAppStore} from "@/store";
 
 export default {
-  name: "MovieCardDark",
+  name: "MovieCard",
   data: () => {
     return {
       storeX: useBookingStore()
@@ -14,7 +14,7 @@ export default {
       appstore: useAppStore()
     }
   },
-  props: ['m', 't'],
+  props: ['m', 't','buttons'],
   methods: {
     pushr(mid) {
       if (this.appstore.router.currentRoute.path !== '/show/' + mid) {
@@ -55,11 +55,11 @@ export default {
         <b-rating :value="m.rating" class=" rating-el bg-transparent" disabled inline no-border size="lg"
                   variant=""></b-rating>
 
-        <b-button v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
+        <b-button v-if="buttons" v-b-modal.modal-booking :data-bs-theme="appstore.app_theme"
                   class="mx-2 btn-outline-secondary btn-dark" pill
                   @click="storeX.setValue(t,m)">Book
         </b-button>
-        <b-button pill @click="pushr(m.id)">Review</b-button>
+        <b-button v-if="buttons" pill @click="pushr(m.id)">Review</b-button>
 
       </div>
     </div>
@@ -179,6 +179,10 @@ html, body {
     .movie_header {
       width: 60%;
       padding: 25px 25px 0 25px;
+      img{
+        min-height: 180px;
+
+      }
     }
     .text {
       width: 50vh;

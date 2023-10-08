@@ -1,5 +1,5 @@
 <script>
-import {useBookingStore} from "@/store/useBookingStore";
+import {useBookingStore} from "@/store/BookingStore";
 import {useAppStore} from "@/store";
 
 export default {

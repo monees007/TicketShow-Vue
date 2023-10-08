@@ -3,7 +3,7 @@
 
   <b-editable-table
 
-      v-model="data"
+      v-model="storeX.running_list[t_id]"
       :busy="loading"
       :class="appstore.app_theme==='dark'? 'bg-black' : 'bg-light-subtle'"
       :data-bs-theme="appstore.app_theme"
@@ -84,6 +84,7 @@
 <script>
 import BEditableTable from "bootstrap-vue-editable-table"
 import {useAppStore} from "@/store";
+import {useEditorStore} from "@/store/EditorStore";
 
 export default {
   name: 'RunningEditor',
@@ -94,8 +95,8 @@ export default {
         {key: "edit", label: ""},
         // {key: "show_id", label: "Show ID", type: "text",},
         {key: "show_name", label: "Show Name", type: "text", editable: true, sortable: true},
-        {key: "start", label: "Start", type: "text", editable: true, sortable: true},
-        {key: "end", label: "End", type: "text", editable: true, sortable: true},
+        {key: "start", label: "Start", type: "time", editable: true, sortable: true},
+        {key: "end", label: "End", type: "time", editable: true, sortable: true},
         {key: "ticket_price", label: "Ticket Price", type: "text", editable: true, sortable: true},
         {key: "format", label: "Format", type: "text", editable: true, sortable: true},
         {key: "language", label: "Language", type: "text", editable: true, sortable: true},
@@ -106,30 +107,13 @@ export default {
       data: [],
       synced: true,
       appstore: useAppStore(),
+      storeX: useEditorStore(),
     }
   },
   methods: {
     async update_records() {
       this.loading = true;
-
-      const asd = this.appstore
-      try {
-        this.loading = true;
-        const response = await fetch(asd.api + "/running?id=" + this.t_id, {
-          method: 'GET',
-          headers: asd.getheader()
-        });
-        if (response.status === 200) {
-          this.data = await response.json();
-
-        } else {
-          console.log(response.status, "Failed to load bulk running")
-          throw new TypeError("Token expired"); // will check for token and push to log in
-        }
-      } catch (e) {
-        console.log("Failed to load bulk running ", e)
-      }
-
+      await this.storeX.get_shows_of_theatre()
       this.loading = false;
 
 
@@ -141,14 +125,14 @@ export default {
 
         action: update ? "update" : "cancel",
       };
-      this.synced = false
+      this.synced = !update
 
     },
     async handleSave() {
       const rawResponse = await fetch(this.appstore.api + '/bulk/running', {
         method: 'POST',
         headers: this.appstore.getheader(),
-        body: JSON.stringify(this.data)
+        body: JSON.stringify(this.storeX.shows_for_theatre)
       });
       const content = await rawResponse.status;
       this.update_records()
@@ -202,10 +186,9 @@ export default {
   },
 
   async mounted() {
-    await this.update_records()
   },
   props: [
-    't_id', 'filter'
+    't_id', 'filter',
   ]
 }
 </script>
