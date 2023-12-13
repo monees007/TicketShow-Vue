@@ -23,6 +23,7 @@ export default {
   async beforeMount() {
 
     try { // get theatres
+      console.log('sid',this.$route.params.id)
       const response = await fetch(this.appstore.api + "/shows?id=" + this.$route.params.id, {
         method: 'GET',
         headers: this.appstore.getheader()

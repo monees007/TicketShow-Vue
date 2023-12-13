@@ -29,16 +29,16 @@
       </template>
     </b-modal>
 
-    <b-navbar class="text-primary bg-primary fixed-top"
+    <b-navbar class="text-primary  fixed-top"
               style="justify-content: space-between !important;">
       <b-navbar-nav>
-        <b-navbar-brand class="" href="/">
+        <b-navbar-brand class=""  href="/">
           <img
               class="d-inline-block mx-3"
               src="https://cdn4.iconfinder.com/data/icons/flat-design-development-set-3/24/color-wheel-512.png"
               style="height: 37px">
 
-          <span class="font-monospace text-light" style="font-size: large; font-weight: bold">TicketShow</span>
+          <span class="font-monospace bg- text-light d-none d-sm-inline-flex" style="font-size: large; font-weight: bold">TicketShow</span>
 
         </b-navbar-brand>
         <b-col>
