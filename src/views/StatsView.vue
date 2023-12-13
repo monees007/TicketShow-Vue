@@ -1,28 +1,33 @@
 <script>
 import {useAppStore} from "@/store";
+import {useEditorStore} from "@/store/EditorStore";
 
 export default {
   name: "StatsView",
+
   data: function () {
     return {
+      days: 7,
+      total_revenue: 0,
+      ticket_sold: 0,
+      no_of_shows: 0,
       appstore: useAppStore(),
-      theatres_list: [
-        "Mango",
-        "Oranges",
-        "Papaya",
-        "Apple",
-        "Manga",
-      ],
+      storeE: useEditorStore(),
+      theatres_list: [],
+      retrieved_data: [],
+      selected_theatre: null,
+      search: '',
       line_series: [
         {
-          name: "Series A",
-          data: [1.4, 2, 2.5, 1.5, 2.5, 2.8, 3.8, 4.6]
+          name: "Revenue Collected",
+          data: [1.4, 2, 2.5, 1.5, 2.5, 2.8, 3.8]
         },
         {
-          name: "Series B",
-          data: [20, 29, 37, 36, 44, 45, 50, 58]
+          name: "Tickets Sold",
+          data: [20, 29, 37, 36, 44, 45, 50]
         }
       ],
+      label_x:[],
       line_options: {
         dataLabels: {
           enabled: false
@@ -39,7 +44,14 @@ export default {
           }
         },
         xaxis: {
-          categories: [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016]
+          categories: this.label_x,
+          convertedCatToNumeric: false,
+          labels: {
+            style: {
+              colors: '#aaa',
+              fontSize: '15px'
+            }
+          }
         },
         yaxis: [
           {
@@ -52,11 +64,29 @@ export default {
             },
             labels: {
               style: {
-                colors: "#FF1654"
+                colors: "#FF1654",
+                fontSize: '15px'
+
+              },
+              formatter: function (value) {
+                const lookup = [
+                  { value: 1, symbol: "" },
+                  { value: 1e3, symbol: "k" },
+                  { value: 1e6, symbol: "M" },
+                  { value: 1e9, symbol: "G" },
+                  { value: 1e12, symbol: "T" },
+                  { value: 1e15, symbol: "P" },
+                  { value: 1e18, symbol: "E" }
+                ];
+                const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+                let item = lookup.slice().reverse().find(function(item) {
+                  return value >= item.value;
+                });
+                return "₹"+(item ? (value / item.value).toFixed(1).replace(rx, "$1") + item.symbol : "0");
               }
             },
             title: {
-              text: "Series A",
+              text: "Revenue Collected",
               style: {
                 color: "#FF1654"
               }
@@ -73,11 +103,13 @@ export default {
             },
             labels: {
               style: {
-                colors: "#247BA0"
+                colors: "#247BA0",
+                fontSize: '15px',
+
               }
             },
             title: {
-              text: "Series B",
+              text: "Tickets Sold",
               style: {
                 color: "#247BA0"
               }
@@ -93,7 +125,12 @@ export default {
         },
         legend: {
           horizontalAlign: "left",
-          offsetX: 40
+          offsetX: 40,
+          fontSize: '14px',
+          labels: {
+            colors: undefined,
+            useSeriesColors: true,
+          },
         }
       },
       radial_series: [76, 67, 61, 90],
@@ -117,17 +154,19 @@ export default {
                 }
             ,
             dataLabels: {
+              enabled: false,
               name: {
+                enabled: false,
                 show: false,
               }
               ,
               value: {
+                enabled: false,
                 show: false,
               }
             }
           }
-        }
-        ,
+        },
         colors: ['#421821', '#753033', '#532025', '#642829'],
         labels:
             ['Vimeo', 'Messenger', 'Facebook', 'LinkedIn'],
@@ -135,25 +174,26 @@ export default {
             {
               show: true,
               floating:
-                  true,
+                  false,
               fontSize:
                   '13px',
               position:
-                  'left',
+                  'bottom',
               offsetX:
                   0,
               offsetY:
-                  15,
+                  0,
               labels:
                   {
-                    useSeriesColors: true,
+                    colors:'#ccc',
+                    useSeriesColors: false,
                   }
               ,
               markers: {
                 size: 0
               },
               formatter: function (seriesName, opts) {
-                return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex]
+                return  seriesName + ":  " + "₹" + opts.w.globals.series[opts.seriesIndex]
               }
               ,
               itemMargin: {
@@ -171,88 +211,250 @@ export default {
         }]
       },
       bar_series: [
-        {name: "Net Profit", data: [44, 55, 57, 56, 61, 58, 63, 60, 66]},
-        {name: "Revenue", data: [76, 85, 101, 98, 87, 105, 91, 114, 94]},],
+        {name: "Ticket Sold", data: []},
+        {name: "Revenue", data: []},],
       bar_options: {
+        title:{
+          text:'Performance of each show',
+          style:{
+            colors:['#fff'],
+            fontSize: '21px',
+          }
+        },
+        colors: ['#421821', '#753033'],
         plotOptions: {
           bar: {
-            horizontal: true,
-            style: {
-              colors: ['#421821', '#753033'],
-            },
+            borderRadius: 10,
+            horizontal: false,
+            style: {},
 
-            dataLabels: {
-              position: 'top',
-            },
           }
+        },
+        legend:{
+          fontSize: '14px',
+          labels: {
+            colors: '#ccc',
+            useSeriesColors: false,
+          },
         },
         dataLabels: {
-          enabled: true,
-          offsetX: -6,
-          style: {
-            fontSize: '12px',
-            colors: ['#fff']
-          }
-        },
-        stroke: {
-          show: true,
-          width: 0,
-          colors: ['#000']
+          enabled: false,
         },
         tooltip: {
           shared: true,
-          colors: ['#fff'],
-          intersect: false
+          // colors: ['#565656'],
+          intersect: false,
+          theme: 'dark',
+          y: {
+            formatter: function (value, {seriesIndex,}) {
+              if (seriesIndex === 1) {
+                return "₹" + value
+              } else {
+                return value
+              }
+            }
+          }
+
+
         },
         xaxis: {
-          categories: [2001, 2002, 2003, 2004, 2005, 2006, 2007],
+          categories: [],
+          convertedCatToNumeric: false,
+          labels: {
+            style: {
+              colors: '#aaa',
+              fontSize: '15px'
+            }
+          }
         },
+        yaxis: [
+          {
+            show: false,
+          },
+          {
+            show: false,
+          }
+        ]
       }
     }
-  }
+  },
+  beforeMount() {
+    this.storeE.getData(1)
+    this.theatres_list = this.storeE.theatre_list
+
+  },
+  methods: {
+    async load_data() {
+      this.selected_theatre = this.theatres_list.find(x => x.name === this.search)
+      const asd = this.appstore
+
+      if (this.selected_theatre) {
+        try {
+          this.loading = true;
+          const response = await fetch(asd.api + "/stat/theatre?id=" + this.selected_theatre.id + '&days=' + this.days, {
+            method: 'GET',
+            headers: asd.getheader()
+          });
+          if (response.status === 200) {
+            const content = await response.json();
+            this.retrieved_data = content
+            this.total_revenue = content['total_revenue']
+            this.ticket_sold = content['ticket_sold']
+            this.no_of_shows = content['no_of_shows']
+            this.line_series = [
+              {
+                name: "Revenue Collected",
+                data: content['revenue_per_day']
+              },
+              {
+                name: "Tickets Sold",
+                data: content['ticket_sold_per_day']
+              }
+            ]
+            let line_options = JSON.parse(JSON.stringify(this.line_options))
+            line_options.yaxis = [
+              {
+                axisTicks: {
+                  show: false
+                },
+                axisBorder: {
+                  show: true,
+                  color: "#FF1654"
+                },
+                labels: {
+                  style: {
+                    colors: "#FF1654",
+                    fontSize: '15px'
+
+                  },
+                  formatter: function (value) {
+                    const lookup = [
+                      { value: 1, symbol: "" },
+                      { value: 1e3, symbol: "k" },
+                      { value: 1e6, symbol: "M" },
+                      { value: 1e9, symbol: "G" },
+                      { value: 1e12, symbol: "T" },
+                      { value: 1e15, symbol: "P" },
+                      { value: 1e18, symbol: "E" }
+                    ];
+                    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+                    let item = lookup.slice().reverse().find(function(item) {
+                      return value >= item.value;
+                    });
+                    return "₹"+(item ? (value / item.value).toFixed(1).replace(rx, "$1") + item.symbol : "0");
+                  }
+                },
+                title: {
+                  text: "Revenue Collected",
+                  style: {
+                    color: "#FF1654"
+                  }
+                }
+              },
+              {
+                opposite: true,
+                axisTicks: {
+                  show: false
+                },
+                axisBorder: {
+                  show: true,
+                  color: "#247BA0"
+                },
+                labels: {
+                  style: {
+                    colors: "#247BA0",
+                    fontSize: '15px',
+                  }
+                },
+                title: {
+                  text: "Tickets Sold",
+                  style: {
+                    color: "#247BA0"
+                  }
+                }
+              }
+            ]
+            line_options.xaxis.categories = content['label']
+            this.line_options = line_options
+            // let bar_series = JSON.parse(JSON.stringify(this.bar_series))
+            // bar_series[0].data = content.bar_series[0]
+            // bar_series[1].data = content.bar_series[1]
+            this.bar_series = content.bar_series
+            // this.bar_series = [
+            //     {name: "Ticket Sold",data: content.bar_series0},
+            //     {name: "Revenue", data: content.bar_series1}
+            // ];
+
+            let bar_options = JSON.parse(JSON.stringify(this.bar_options))
+            bar_options.xaxis.categories = content['shows_names']
+            this.bar_options = bar_options
+            let r_options = JSON.parse(JSON.stringify(this.radial_options))
+            r_options.labels = content['shows_names']
+            this.radial_options = r_options
+            console.log(content.bar_series[1])
+            this.radial_series = content.bar_series[1].data.map((float) => Math.floor(float))
+            this.loading = false;
+          } else {
+            console.log(response.status, "Failed to load bulk running")
+          }
+        } catch (e) {
+          console.log("Failed to load bulk running ", e)
+        }
+      }
+    }
+  },
 }
 </script>
 
 <template>
-  <b-container id="rox" :data-bs-theme="appstore.app_theme" fluid>
-    <b-row class="mb-3">
-      <input :data-bs-theme="appstore.app_theme" class="slk bg-primary" list="datalist"
-             placeholder="Select a Theatre to continue">
+  <b-container id="rox" :data-bs-theme="appstore.app_theme" class="d-flex flex-column justify-content-center h-100"
+               fluid>
+    <div class="mb-3">
+      <input v-model="search" :data-bs-theme="appstore.app_theme" class="slk h1  bg-primary"
+             list="datalist" placeholder="Select a Theatre to continue" type="search"
+             @change="load_data" @focusin="theatres_list = storeE.theatre_list" @focusout="load_data">
       <datalist id="datalist">
-        <option v-for="x in theatres_list" :key="x" :value="x"></option>
+        <option v-for="x in theatres_list" :key="x.id" :value="x.name"></option>
       </datalist>
-
-    </b-row>
-    <b-row>
-      <b-col class="col-12 col-md-4">
-        <b-card class="mb-3">
+      <b-form-select v-model="days" :class="appstore.app_theme==='dark'? '':''" :data-bs-theme="appstore.app_theme"
+                     class="slk h1 bg-primary text-secondary" @change="load_data">
+        <b-form-select-option value="7">Last Week</b-form-select-option>
+        <b-form-select-option value="15">Last 15 days</b-form-select-option>
+        <b-form-select-option value="30">Last Month</b-form-select-option>
+        <b-form-select-option value="365">Last Year</b-form-select-option>
+      </b-form-select>
+    </div>
+    <b-row v-show="selected_theatre">
+      <b-col class="col-12 col-md-4 ">
+        <b-card class="mb-3 bg-opacity-25">
           <h4>Total Revenue</h4>
-          <h1>100</h1>
+          <h1>₹{{ total_revenue }}</h1>
         </b-card>
-        <b-card class="mb-3">
-          <h4>Total views</h4>
-          <h1>100</h1>
+        <b-card class="mb-3 bg-opacity-25">
+          <h4>Tickets Sold</h4>
+          <h1>{{ ticket_sold }}</h1>
         </b-card>
-        <b-card class="mb-3">
-          <h4>Total views</h4>
-          <h1>100</h1>
+        <b-card class="mb-3 bg-opacity-25">
+          <h4>Shows</h4>
+          <h1>{{ no_of_shows }}</h1>
         </b-card>
-        <apexchart :options="radial_options" :series="radial_series" height="390" type="radialBar"></apexchart>
-
+        <apexchart :options="radial_options" :series="radial_series" height="390" class="mt-4" type="pie"></apexchart>
       </b-col>
-      <b-col class="col-12 col-md-8 p-0 ma-0 card bg-secondary bg-opacity-25" style="height: max-content;">
-        <apexchart :options="line_options" :series="line_series" class="p-0" type="line"></apexchart>
+      <b-col class="col-12 col-md-8 p-0 ma-0 " style="height: max-content;">
+        <apexchart :options="line_options" :series="line_series" class="p-0 mb-3 bg-secondary card bg-opacity-25" type="line"></apexchart>
+        <apexchart  :options="bar_options" :series="bar_series" height="430" class="p-0 mb-3 bg-secondary card bg-opacity-25"
+                   type="bar"></apexchart>
       </b-col>
     </b-row>
 
-    <apexchart :options="bar_options" :series="bar_series" height="430" type="bar"></apexchart>
+
   </b-container>
 </template>
 
 <style scoped>
 .slk {
-  width: 100%;
-  padding: 10px;
+//width: 80%; padding: 10px;
+  height: 90%;
 
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -261,7 +463,9 @@ export default {
 @media (min-width: 1080px) {
   #rox {
     min-width: 120vh;
+    max-width: 1080px;
   }
+
 }
 
 </style>

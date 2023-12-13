@@ -1,30 +1,24 @@
 <template>
   <div class="d-flex flex-column">
-    <b-button-toolbar :data-bs-theme="appstore.app_theme" class="mt-3" key-nav>
-      <b-button-group class="mx-1 mb-3">
-        <b-button v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary" @click="handleAdd()">
-          <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
-        </b-button>
-        <b-button v-b-tooltip.hover class="me-2" pill title="Reload" @click="update_records">
-          <font-awesome-icon :icon="['fas', 'rotate-right']"/>
-        </b-button>
-        <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
-                  :variant="synced? 'secondary' :'warning' " class="me-2" pill @click="handleSave()">
-          <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
-        </b-button>
-      </b-button-group>
-      <b-button-group class="mx-1">
-        <b-button @click="storeX.csvToJson(0)">Upload CSV</b-button>
-        <DownloadCSV obj="shows"/>
-        <b-button @click="export_csv">Download xCSV</b-button>
-      </b-button-group>
-    </b-button-toolbar>
+    <b-modal id="modelpreview" :data-bs-theme="appstore.app_theme" class=""
+             title="Image Preview">
+      <template #modal-header="{hide}">
+        <span class=" h4">Image Preview</span>
+        <b-icon class="" icon="x-lg" @click="hide"/>
+      </template>
+      <b-img :src="image" alt="Fluid image" class="d-block w-100 h-100" fluid></b-img>
+      <template #modal-footer>
+      </template>
+    </b-modal>
+
     <Transition>
       <b-card>
         <b-editable-table
             v-model="storeX.$state.show_list"
             :busy="loading"
             :class="appstore.app_theme==='dark'? 'bg-primary' : 'bg-light-subtle'"
+            :current-page="currentPage"
+            per-page="5"
             :data-bs-theme="appstore.app_theme"
             :editMode="'row'"
             :fields="fields"
@@ -81,6 +75,18 @@
           <template #cell(duration)="data">
             <span>{{ data.value }} min</span>
           </template>
+          <template #cell(image_url)="data">
+            <b-button v-b-modal.modelpreview @click="image = data.value">
+              <b-icon icon="image"></b-icon>
+            </b-button>
+            <span class="my-2 mx-1">{{ data.value }}</span>
+          </template>
+          <template #cell(image_sqr)="data">
+            <b-button v-b-modal.modelpreview @click="image = data.value">
+              <b-icon icon="image"></b-icon>
+            </b-button>
+            <span class="my-2 mx-1">{{ data.value }}</span>
+          </template>
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -90,6 +96,39 @@
 
 
         </b-editable-table>
+
+
+        <b-button-toolbar :data-bs-theme="appstore.app_theme" class="" key-nav>
+          <b-pagination
+              id="pagination"
+              v-model="currentPage"
+              :data-bs-theme="appstore.app_theme"
+              :total-rows="storeX.$state.show_list.length"
+              align="fill"
+              class="my-0 bg-primary text-primary mx-3 mb-3"
+              per-page="5"
+              size="md"
+              style=""
+          ></b-pagination>
+          <b-button-group class="mx-1 mb-3" key-nav>
+            <b-button v-b-tooltip.hover class="me-2" pill title="Add Row" variant="secondary" @click="handleAdd()">
+              <font-awesome-icon :icon="['fas', 'diagram-next']" rotation="180"/>
+            </b-button>
+            <b-button v-b-tooltip.hover class="me-2" pill title="Reload" @click="update_records">
+              <font-awesome-icon :icon="['fas', 'rotate-right']"/>
+            </b-button>
+            <b-button v-b-tooltip.hover :title="synced? 'Synced with server': 'Unsaved Changes. Save to continue' "
+                      :variant="synced? 'secondary' :'warning' " class="me-2" pill @click="handleSave()">
+              <font-awesome-icon :icon="['fas', 'floppy-disk']"/>
+            </b-button>
+          </b-button-group>
+          <b-button-group class="mx-1 mb-3">
+            <DownloadCSV obj="shows" />
+
+          </b-button-group>
+
+        </b-button-toolbar>
+
       </b-card>
     </Transition>
 
@@ -101,7 +140,7 @@
 import BEditableTable from "bootstrap-vue-editable-table";
 import {BSpinner} from "bootstrap-vue";
 import {useAppStore} from "@/store";
-import {useEditorStore} from "@/store/useEditorStore";
+import {useEditorStore} from "@/store/EditorStore";
 import DownloadCSV from "@/components/TableEditor/DownloadCSV.vue";
 
 export default {
@@ -114,6 +153,8 @@ export default {
 
   data() {
     return {
+      image: '',
+      currentPage: 1,
       storeX: useEditorStore(),
       appstore: useAppStore(),
       rowUpdate: {},
@@ -121,7 +162,7 @@ export default {
       fields: [
         {key: "edit", label: ''},
         {key: "name", sortable: true, label: "Name", type: "text", editable: true,},
-        {key: "year", sortable: true, label: "Year", editable: true, class: 'year-col'},
+        {key: "year", sortable: true, label: "Year", type: 'text', editable: true, class: 'year-col'},
         {key: "director", sortable: true, label: "Director", editable: true},
         {key: "duration", label: "Duration", editable: true},
         {key: "tags", sortable: true, label: "Tags", type: "text", editable: true},
@@ -136,52 +177,6 @@ export default {
     };
   },
   methods: {
-    download(blob, filename) {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      // the filename you want
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    },
-    async export_csv() {
-
-      try {
-        const target = this.appstore.api + '/export?' +
-            new URLSearchParams({
-              api: 'shows'
-            }) //file
-        //const target = `https://SOME_DOMAIN.com/api/data/log_csv?$"queryString"`; //target can also be api with req.query
-
-        fetch(target, {
-          method: 'get',
-          headers: {
-            'Accept': 'text/plain',
-            'Content-Type': 'text/plain',
-            "Authentication-Token": this.appstore.auth_token,
-          }
-        }).then(res => res.blob())
-            .then(blob => {
-              const link = document.createElement('a');
-              let url = URL.createObjectURL(blob);
-              link.setAttribute("href", url);
-              link.setAttribute("download", 'export.csv');
-              link.style.visibility = 'hidden';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            });
-
-      } catch (err) {
-        console.log(err)
-      }
-      // console.log(99, rawResponse);
-
-    },
 
     async update_records() {
       this.loading = true;
@@ -223,7 +218,7 @@ export default {
         id: data.id,
         action: update ? "update" : "cancel"
       };
-      this.synced = false
+      this.synced = !update
       // this.update_records()
     },
     handleEdit(data) {
@@ -284,7 +279,7 @@ export default {
 
   },
   props: ['displaymode', 'filter'],
-  async mounted() {
+  async created() {
     await this.update_records()
   },
 
@@ -293,7 +288,28 @@ export default {
 
 
 <style>
+.active > .page-link, .page-link.active {
+  background-color: #391517 !important;
+  border-color: #391517 !important;
+}
+
+.page-link {
+  background-color: #421821 !important;
+  border-color: #421821 !important;
+  color: white !important;
+}
+
+.page-link:hover {
+  background-color: #391517 !important;
+  border-color: #391517 !important;
+
+}
+
 @media (min-width: 576px ) {
+  #pagination {
+    width: 40%;
+  }
+
   .year-col {
     width: 55px !important;
   }

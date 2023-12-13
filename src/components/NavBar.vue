@@ -49,6 +49,10 @@
         </b-col>
       </b-navbar-nav>
       <div class="d-inline-flex align-items-center">
+        <b-dropdown :data-bs-theme="appstore.app_theme" id="dropdown-right" right :text="appstore.city"  class="m-2">
+          <b-dropdown-item @click="appstore.setCity('New Delhi')">New Delhi</b-dropdown-item>
+          <b-dropdown-item @click="appstore.setCity('Bangalore')">Bangalore</b-dropdown-item>
+        </b-dropdown>
 
         <b-button class="mx-3 d-sm-inline-block" pill @click="search_not_toggled=!search_not_toggled">
           <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="lg"/>
@@ -60,12 +64,38 @@
                   variant="">
           <font-awesome-icon :icon="['fas', 'bars']"/>
         </b-button>
-        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 d-md-block" pill
-                  @click="appstore.logout()">
-          <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']"/>
-        </b-button>
+        <!--        <b-button v-if="appstore.is_logged_in" class="my-3 d-none mx-3 d-md-block" pill-->
+        <!--                  @click="appstore.logout()">-->
+        <!--          <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']"/>-->
+        <!--        </b-button>-->
 
+        <b-avatar v-b-hover="(hover)=>{info=hover}" :data-bs-theme="appstore.app_theme"
+                  :href="appstore.is_logged_in ? '': '#/login' "
+                  class="d-flex justify-content-center align-items-center mx-3 bg-secondary border-0"
+                  style="height: 50px;width: 50px">
+          <b-avatar v-b-hover="(hover)=>{info=hover}"
+                    :src="appstore.user.profile_pic"
+                    class="mx-3" style="font-weight: bolder; font-size: x-large"></b-avatar>
 
+        </b-avatar>
+        <div v-show="info && appstore.is_logged_in" v-b-hover="(hover)=>{info=hover}" class=" px-3 py-3"
+             style="position: absolute; right: 0px; top:0px; height: 200px; width: 300px">
+          <div v-show="info && appstore.is_logged_in" v-b-hover="(hover)=>{info=hover}"
+               class="card px-5 py-3"
+
+               style="position: absolute; right: 50px; top:50px; text-align: left">
+            <h5>
+              <strong>
+                {{ appstore.user.name }}
+              </strong>
+            </h5>
+            <span class="disabled small text-danger-emphasis">
+        {{ appstore.user.role }}
+          </span>
+            <p>{{ appstore.user.email }}</p>
+            <b-button @click="appstore.logout()">Logout</b-button>
+          </div>
+        </div>
       </div>
 
 
@@ -89,6 +119,7 @@ export default {
   },
   data: () => {
     return {
+      info: '',
       appstore: useAppStore(),
       search_not_toggled: false,
       search_string: "",
@@ -121,7 +152,8 @@ export default {
       this.search_not_toggled = !this.search_not_toggled
       this.search_string = ''
       this.result = []
-    }
+    },
+
   }
 };
 </script>

@@ -1,6 +1,6 @@
 <script>
 import {useAppStore} from "@/store";
-import MovieCardDark from "@/components/MovieCard-dark.vue";
+import MovieCard from "@/components/MovieCard.vue";
 import app from "@/App.vue";
 
 export default {
@@ -10,7 +10,7 @@ export default {
       return app
     }
   },
-  components: {MovieCardDark},
+  components: {MovieCard},
   data() {
     return {
       compo: true,
@@ -57,7 +57,7 @@ export default {
 </script>
 <template>
   <div :data-bs-theme="appstore.app_theme">
-    <MovieCardDark :m="m"></MovieCardDark>
+    <MovieCard :m="m"></MovieCard>
     <b-button class="my-4 mx-4 btn-secondary border-0 " @click="compo=!compo">
       {{ compo ? 'Hide Reviews' : 'Show Review' }}
     </b-button>

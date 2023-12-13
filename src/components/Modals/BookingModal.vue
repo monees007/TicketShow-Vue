@@ -1,16 +1,19 @@
+<!--suppress CssUnusedSymbol -->
 <template>
   <div>
-    <b-modal id="modal-booking" v-model="storeX.showModal1" :data-bs-theme="appstore.app_theme" body-bg-variant="dark"
-             body-text-variant="light" class="d-flex flex-column"
-             footer-bg-variant="dark"
-             footer-text-variant="light"
-             header-bg-variant="dark"
-             header-text-variant="light"
+    <b-modal id="modal-booking" v-model="storeX.showModal1"
+             :data-bs-theme="appstore.app_theme"
+             class="d-flex flex-column"
              no-stacking
              size="lg"
-             title="Book Tickets"
+             @show="this.storeX.load_running"
     >
+      <template #modal-header>
+        <span class=" h4">Book Tickets</span>
+        <b-icon class="" icon="x-lg" @click="storeX.showModal1=false"/>
+      </template>
       <b-alert v-show="booking_successful" show variant="success">Booking Successful</b-alert>
+      <b-alert v-show="error" show variant="danger"> Please check all fields</b-alert>
       <b-row>
         <span class="left">Show</span>
         <b-col class="right"><h3> {{ show.name }}</h3>
@@ -29,19 +32,26 @@
         <span class="left">Date</span>
         <b-col class="right d-inline">
 
-          <b-datepicker id="datepicker" v-model="booking.date" class="my-2" required></b-datepicker>
+          <b-datepicker id="datepicker" v-model="booking.date" :data-bs-theme="appstore.app_theme" :min="new Date()"
+                        :class="appstore.app_theme==='dark' ? 'bg-primary': '' " selected-variant="secondary"
+                        class="my-2 bg-dark" required></b-datepicker>
         </b-col>
 
       </b-row>
       <b-row cols="mt-3">
         <span class="left">Slot</span>
         <b-col class="right">
-          <b-form-select v-model="selected_run" :state="is_valid" class="my-2 input-field bg-dark text-light" required
-                         @change="booking.rid = selected_run.id" @input="booking.total_price = total_p">
-            <b-form-select-option :value="null" default disabled>Please select the show</b-form-select-option>
+          <div v-if="storeX.loading">
+            Loading Slots
+            <b-icon animation="spin" class="mt-3" font-scale="2" icon="arrow-clockwise"></b-icon>
+          </div>
 
-            <b-form-select-option v-for="r in this.storeX.running" :key="r.id" :value="r">{{
-                'Starting at ' + r.start
+          <b-form-select v-model="selected_run" :state="is_valid" class="my-2 input-field bg-primary " required
+                         @change="booking.rid = selected_run.id"
+                         @input="booking.total_price = total_p">
+            <b-form-select-option :value="null" default disabled>Please select the show</b-form-select-option>
+            <b-form-select-option v-for="r in storeX.running" :key="r.id" :value="r">{{
+                'Starting at ' + formatTimeTo12Hour(r.start)
               }}
             </b-form-select-option>
           </b-form-select>
@@ -50,29 +60,33 @@
       <b-row class="mt-3">
         <span class="left">Seats</span>
         <b-col class="right">
-          <span v-for="x in (this.storeX.selectedSeats.split(',').splice(1))" :key="x" class="pillx">{{ x }}</span>
-          <b-button v-b-modal.modal-multi-2>Select Seats</b-button>
+          <span v-for="x in (storeX.selectedSeats.split(',').splice(1))" :key="x" class="pillx">{{ x }}</span>
+          <b-button :disabled="!selected_run.ticket_price" v-b-modal.modal-multi-2>Select Seats</b-button>
+          <span v-show="!selected_run.ticket_price" class="text-warning"> Please select a slot first</span>
         </b-col>
 
       </b-row>
       <b-row>
         <span class="left">Person</span>
         <b-col class="right my-3">
-          <b-form-input v-model="person" min="1" required type="number"
+          <b-form-input v-model="person" min="1" readonly required type="number"
           ></b-form-input>
         </b-col>
       </b-row>
       <b-row>
         <span class="left">Price</span>
-        <b-col class="right my-3">
-          <b-input-group prepend="₹">
-            <b-form-input v-model="total_p" disabled type="number"></b-form-input>
+        <b-col :data-bs-theme="appstore.app_theme" class="right my-3 ">
+          <b-input-group>
+            <div class="input-group-prepend ">
+              <div class="input-group-text bg-transparent border-end-0 rounded-end-0">₹</div>
+            </div>
+            <b-form-input v-model="total_p" class="border-start-0" readonly type="number"></b-form-input>
           </b-input-group>
         </b-col>
       </b-row>
-      <template #modal-footer>
+      <template #modal-footer="{}">
 
-        <b-button size="md" variant="danger" @click="storeX.showModal1=false">
+        <b-button size="md" variant="danger"  @click="storeX.$reset()">
           {{ 'Cancel' }}
         </b-button>
         <b-button size="md" variant="success" @click="booking_successful? storeX.showModal1=false : bookticket()">
@@ -82,14 +96,11 @@
     </b-modal>
 
     <b-modal id="modal-multi-2" v-model="storeX.showModal2"
-             :data-bs-theme="appstore.app_theme"
-             body-bg-variant="dark"
-             body-text-variant="light"
-             footer-bg-variant="dark"
-             footer-text-variant="light"
-             header-bg-variant="dark"
-             header-text-variant="light"
-             ok-only title="Select seats">
+             :data-bs-theme="appstore.app_theme" ok-only >
+      <template #modal-header="{cancel}">
+        <span class=" h4">Select seats</span>
+        <b-icon v-b-modal.modal-booking class="" icon="x-lg" @click="cancel"/>
+      </template>
       <div class="movie-container">
 
 
@@ -111,7 +122,7 @@
         <div class="container">
           <div class="screen">Screen this side.</div>
 
-          <div v-for="j in alphas" :key="j" class="row">
+          <div  v-for="j in alphas" :key="j" class="row">
             <div v-for="i in 8" :id="j+i" :key="i"
                  :class="['seat', (selected_run.occupied_seats.includes(''+j+i))? 'occupied': '',(storeX.selectedSeats.includes(''+j+i))? 'selected': ''  ]"
                  @click="seatclick">{{ j + i }}
@@ -119,7 +130,7 @@
 
           </div>
           <p class="mt-3">
-            <span v-for="x in (this.storeX.selectedSeats.split(',').splice(1))" :key="x" class="pillx">{{ x }}</span>
+            <span v-for="x in (storeX.selectedSeats.split(',').splice(1))" :key="x" class="pillx">{{ x }}</span>
 
           </p>
         </div>
@@ -138,7 +149,7 @@
   </div>
 </template>
 <script>
-import {useBookingStore} from "@/store/useBookingStore";
+import {useBookingStore} from "@/store/BookingStore";
 import {useAppStore} from "@/store";
 
 export default {
@@ -163,6 +174,7 @@ export default {
 
 
       booking_successful: false,
+      error:false,
     }
   },
 
@@ -193,47 +205,67 @@ export default {
         e.target.classList.toggle('selected');
       }
     },
+    formatTimeTo12Hour(timeString) {
+      // eslint-disable-next-line no-unused-vars
+      const [hours, minutes, seconds] = timeString.split(':');
+      let period = 'AM';
+
+      let hour = parseInt(hours, 10);
+
+      if (hour >= 12) {
+        period = 'PM';
+        if (hour > 12) {
+          hour -= 12;
+        }
+      } else if (hour === 0) {
+        hour = 12; // 0:00:00 should be formatted as 12:00:00 AM
+      }
+
+      return `${hour}:${minutes} ${period}`;
+    },
     async bookticket() {
-      const rawResponse = await fetch(this.appstore.api + '/booking', {
-        method: 'POST',
-        headers: this.appstore.getheader(),
-        body: JSON.stringify({
-          running_id: this.selected_run.id,
-          theatre_name: this.storeX.theatre.name,
-          theatre_place: this.storeX.theatre.place,
-          show_name: this.selected_run.show_name,
-          language: this.selected_run.language,
-          format: this.selected_run.format,
-          person: this.person,
-          date: this.booking.date,
-          start: this.selected_run.start,
-          end: this.selected_run.end,
-          seats: this.storeX.selectedSeats,
-          total_price: this.total_p,
-        })
-      });
-      const content = await rawResponse.status;
-      console.log('booking', content);
-      const rawResponse2 = await fetch(this.appstore.api + '/running',
-          {
-            method: 'PATCH',
-            headers: this.appstore.getheader(),
-            body: JSON.stringify({
-              id: this.selected_run.id,
-              occupied_seats: this.selected_run.occupied_seats + this.storeX.selectedSeats
-            })
+      if (this.total_p < 1 || !this.booking.date){
+        this.error =true
+      }else{
+        this.error=false
+        const rawResponse = await fetch(this.appstore.api + '/booking', {
+          method: 'POST',
+          headers: this.appstore.getheader(),
+          body: JSON.stringify({
+            running_id: this.selected_run.id,
+            theatre_name: this.storeX.theatre.name,
+            theatre_place: this.storeX.theatre.place,
+            show_name: this.selected_run.show_name,
+            language: this.selected_run.language,
+            format: this.selected_run.format,
+            person: this.person,
+            date: this.booking.date,
+            start: this.selected_run.start,
+            end: this.selected_run.end,
+            seats: this.storeX.selectedSeats,
+            total_price: this.total_p,
+          })
+        });
+        await rawResponse.status;
+        const rawResponse2 = await fetch(this.appstore.api + '/running',
+            {
+              method: 'PATCH',
+              headers: this.appstore.getheader(),
+              body: JSON.stringify({
+                id: this.selected_run.id,
+                occupied_seats: this.selected_run.occupied_seats + this.storeX.selectedSeats
+              })
 
 
-          });
-      const content2 = await rawResponse2.status;
-      console.log('running', content2);
-      this.booking_successful = true;
-      setTimeout(() => {
-            this.storeX.$reset()
-          },
-          3000
-      )
-
+            });
+        await rawResponse2.status;
+        this.booking_successful = true;
+        setTimeout(() => {
+              this.storeX.$reset()
+            },
+            3000
+        )
+      }
 
     },
 

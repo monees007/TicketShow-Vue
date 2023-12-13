@@ -7,25 +7,25 @@
     </b-alert>
     <b-alert v-if="appstore.server_error" class="d-flex justify-content-between" show variant="danger">Server not found
     </b-alert>
-    <CarouselM class=""/>
-    <TheatreListAsync/>
+    <CarouselM class="d-none"/>
+    <TheaterList ref="theatre_list"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import CarouselM from "@/components/Carousel.vue";
-import {defineAsyncComponent} from "vue";
+// import {defineAsyncComponent} from "vue";
 import {useAppStore} from "@/store";
+import TheaterList from "@/components/TheaterList.vue";
 
 export default {
   name: 'HomeView',
   components: {
+    TheaterList,
 
     CarouselM,
-    TheatreListAsync: defineAsyncComponent(() =>
-        import('@/components/TheaterList.vue')
-    )
+
   },
   data: () => {
     return {

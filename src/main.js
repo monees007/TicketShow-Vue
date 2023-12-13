@@ -43,23 +43,3 @@ Vue.config.productionTip = true
 new Vue({
     router, pinia, render: h => h(App)
 }).$mount('#app')
-
-// App.$appname = 'TicketShow'
-// App.$server = 'http://localhost:4433'
-// App.$api = 'http://localhost:8080/api'
-// App.$next = ''
-// App.$router = router
-// App.$header = () => {
-//     if (App.$auth_token == null) {
-//         App.$auth_token = window.localStorage.getItem('Authentication-Token');
-//         App.$$csrf = window.localStorage.getItem('csrf_token');
-//     } else if (App.$auth_token) {
-//         return {
-//             "Content-Type": "application/json", "Authentication-Token": App.$auth_token,
-//         }
-//     } else {
-//         console.log('token missing')
-//         App.$next = router.currentRoute.path
-//         router.push({path: 'login'})
-//     }
-// }

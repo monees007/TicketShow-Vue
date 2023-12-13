@@ -17,7 +17,6 @@ function decodeJwtResponse(token) {
 window.handleCredentialResponse = async (response) => {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
-  console.log(response.credential)
   const responsePayload = decodeJwtResponse(response.credential);
   await axios.post('http://127.0.0.1:4433' + '/login/google', {
         token: response.credential
@@ -28,17 +27,17 @@ window.handleCredentialResponse = async (response) => {
           'accept': 'application/json'
         },
       }).then(function (response) {
-    useAppStore().login_with_token(response.data.token)
+    useAppStore().login_with_token(response.data.token, responsePayload)
     router.push('/')
   }).catch(function (error) {
     console.log(error);
   });
-  console.log("ID: " + responsePayload.sub);
-  console.log('Full Name: ' + responsePayload.name);
-  console.log('Given Name: ' + responsePayload.given_name);
-  console.log('Family Name: ' + responsePayload.family_name);
-  console.log("Image URL: " + responsePayload.picture);
-  console.log("Email: " + responsePayload.email);
+  // console.log("ID: " + responsePayload.sub);
+  // console.log('Full Name: ' + responsePayload.name);
+  // console.log('Given Name: ' + responsePayload.given_name);
+  // console.log('Family Name: ' + responsePayload.family_name);
+  // console.log("Image URL: " + responsePayload.picture);
+  // console.log("Email: " + responsePayload.email);
 }
 export default defineComponent({
   name: "LoginPage",
@@ -55,6 +54,10 @@ export default defineComponent({
       password:'',
       email:'',
       remember:true,
+      password2: '',
+      signup_form: false,
+      username: null,
+      password_match: null
     }
   },
   beforeMount() {
@@ -67,11 +70,16 @@ export default defineComponent({
   methods: {
     async login() {
       this.disable_button = true
-      await this.appstore.login(this.email, this.password)
+      await this.appstore.login(this.email, this.password, this.remember)
       this.disable_button = false
 
 
     },
+    async signup() {
+      this.disable_button = true
+      await this.appstore.signup(this.email, this.password)
+      this.disable_button = false
+    }
 
   }
 })
@@ -83,37 +91,57 @@ export default defineComponent({
       <div class="offset-md-2 col-lg-11 col-md-7 offset-lg-4 offset-md-3">
         <b-card class="panel border  ">
           <b-card-header class="panel-heading">
-            <h4 class="py-2 font-weight-bold">Login</h4>
+            <h4 class="py-2 font-weight-bold">{{signup_form? 'Signup' :'Login'}}</h4>
           </b-card-header>
           <b-card-body class="panel-body p-3">
+            <b-alert v-if="appstore.signup_status" :variant="appstore.signup_status===400? 'danger':'warning'">
+              {{appstore.signup_status===200? 'User Registered Successfully': appstore.signup_status===400? "Email Already registered.": ''}}</b-alert>
+            <b-form>
+              <b-form-group class="form-group py-2">
 
-            <b-form action="" method="POST">
-              <b-form-group class=" py-2">
+
                 <b-input-group class="input-field row py-2">
                   <b-col cols="2">
                     <b-icon class="primary far fa-user " icon="person"/>
                   </b-col>
                   <b-col cols="10">
-                    <b-form-input v-model="email"  class="" placeholder="Username or Email" required type="text"/>
-
+                    <b-form-input v-model="email" class="" placeholder="Email" required type="email"/>
                   </b-col>
                 </b-input-group>
+
                 <b-input-group class="input-field row py-2 mt-2">
                   <b-col cols="2">
                     <b-icon class="primary far " icon="lock"/>
                   </b-col>
                   <b-col cols="">
-                    <b-form-input v-model="password" :type="eye ?'text' : 'password'" placeholder="Enter your Password" required/>
-
+                    <b-form-input v-model="password" :type="eye ?'text' : 'password'" placeholder="Enter your Password"
+                                  />
                   </b-col>
                   <b-col cols="2">
-                    <b-button variant="outline" class="border-0 btn text-muted" @click="eye = !eye">
+                    <button class="btn text-muted" @click="eye = !eye">
                       <b-icon :icon="eye ? 'eye-fill': 'eye-slash-fill' " class="primary"></b-icon>
-                    </b-button>
+                    </button>
                   </b-col>
                 </b-input-group>
 
+                <b-input-group v-if="signup_form" class="input-field row py-2 mt-2">
+                  <b-col cols="2">
+                    <b-icon class="primary far " icon="lock"/>
+                  </b-col>
+                  <b-col cols="">
+                    <b-form-input v-model="password2" :type="eye ?'text' : 'password'" placeholder="Repeat your Password"
+                                  :state="password_match" @focusout="password_match=(password===password2)"/>
+                    <b-form-invalid-feedback id="input-live-feedback">
+                      Your passwords do not match.
+                    </b-form-invalid-feedback>
+                  </b-col>
+
+                </b-input-group>
+
+
+
               </b-form-group>
+
 
 
               <b-form  class="form-inline" inline>
@@ -122,10 +150,10 @@ export default defineComponent({
                 <a id="forgot" class="d-none font-weight-bold" href="#">Forgot password?</a></b-form>
 
               <b-button :disabled="disable_button" class=" btn btn-primary btn-block px-3 py-1 mt-3" pill
-                        @click="login">Login
+                        @click="signup_form? signup() :login()"> {{signup_form? 'Signup' : "Login"}}
               </b-button>
 
-              <div class="text-center pt-4 text-muted">Don't have an account? <a href="#/signup">Sign up</a></div>
+              <div class="text-center pt-4 text-muted">{{signup_form? 'Already have an account?' : "Don't have an account?"}}  <span class="btn-link"  @click="signup_form=!signup_form">{{!signup_form? 'Signup' : "Login"}}</span></div>
             </b-form>
 
           </b-card-body>
@@ -145,15 +173,6 @@ export default defineComponent({
                  data-type="standard"
                  style="color-scheme: light">
             </div>
-            <div class="text-center py-3"><a class="px-2" href="https://wwww.facebook.com" target="_blank"> <img
-                alt="" src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg"> </a> <a
-                class="px-2" :href="App.$server+'/login/oauthstart/google'" target="_blank"> <img
-                alt=""
-                src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png">
-            </a> <a class="px-2" href="https://www.github.com" target="_blank"> <img
-                alt="" src="https://www.freepnglogos.com/uploads/512x512-logo-png/512x512-logo-github-icon-35.png"> </a>
-            </div>
-
           </b-card-footer>
         </b-card>
       </div>
@@ -264,7 +283,7 @@ a[target='_blank'] {
   padding: 0px 8px
 }
 
-@media (max-width: 360px) {
+@media (max-width: 980px) {
   #forgot {
     margin-left: 0;
     padding-top: 10px

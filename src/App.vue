@@ -24,12 +24,12 @@
 
 <script>
 import NavBar from "@/components/NavBar.vue";
-import NewShowModal from "@/components/NewShowModal.vue";
+import NewShowModal from "@/components/Modals/NewShowModal.vue";
 import FloatingActionButton from "@/components/FloatingActionButton.vue";
-import MTab from "@/components/MTab.vue";
+import MTab from "@/components/RotatedTabs.vue";
 import {useAppStore} from "@/store";
 import Sidebar from "@/components/Sidebar.vue";
-import ReviewModal from "@/components/ReviewModal.vue";
+import ReviewModal from "@/components/Modals/ReviewModal.vue";
 import axios from "axios";
 
 

@@ -1,5 +1,5 @@
 <template>
-  <b-button
+  <b-button class="rounded-5"
       @click="status === 'SUCCESS'? downloadfile() : startTask()">{{
       status === 'PENDING' ? 'Generating...' : status === 'FAILED' ? 'Generate CSV' : status === 'SUCCESS' ? 'Download CSV' : 'Generate CSV'
     }}
@@ -21,7 +21,7 @@ export default {
 
   methods: {
     startTask() {
-      fetch(this.appstore.api + '/export/' + this.obj, {
+      fetch(this.appstore.api + '/export?obj=' + this.obj, {
         method: 'GET',
         headers: this.appstore.getheader()
       })
@@ -31,14 +31,13 @@ export default {
             this.status = 'PENDING'
             this.task_id = data.task_id
             this.checkTaskStatus();
-            // You can save the task_id to check the status or retrieve results later
           })
           .catch(error => {
             console.error('Error starting task:', error);
           });
     },
     checkTaskStatus() {
-      const eventSource = new EventSource(this.appstore.api + `/export/status/${this.task_id}`);
+      const eventSource = new EventSource(this.appstore.api + `/export/status?task_id=${this.task_id}`);
 
       eventSource.onmessage = (event) => {
 
@@ -70,7 +69,7 @@ export default {
       };
     },
     downloadfile() {
-      fetch(this.appstore.api + `/export/download/${this.task_id}`)
+      fetch(this.appstore.api + `/export/download?task_id=${this.task_id}`)
           .then(response => {
             if (response.ok) {
               response.blob().then(blob => {
