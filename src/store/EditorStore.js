@@ -94,36 +94,36 @@ export const useEditorStore = defineStore('EditorStore', {
                 console.log("Failed to load bulk" + steam, e)
             }
         },
-        csvToJson(show_or_theatre) {
-            var input = document.createElement('input');
-            input.type = 'file';
-
-            input.onchange = e => {
-
-                // getting a hold of the file reference
-                let file = e.target.files[0];
-
-                // setting up the reader
-                let reader = new FileReader();
-                reader.readAsText(file, 'UTF-8');
-
-                // here we tell the reader what to do when it's done reading...
-                reader.onload = readerEvent => {
-                    let csv = readerEvent.target.result; // this is the content!
-                    let data = require('jquery-csv').toObjects(csv);
-                    console.log(data)
-                    if (show_or_theatre) {
-                        this.theatre_list = data
-
-                    } else {
-                        this.show_list = data
-                    }
-                }
-
-            }
-
-            input.click();
-        },
+        // csvToJson(show_or_theatre) {
+        //     var input = document.createElement('input');
+        //     input.type = 'file';
+        //
+        //     input.onchange = e => {
+        //
+        //         // getting a hold of the file reference
+        //         let file = e.target.files[0];
+        //
+        //         // setting up the reader
+        //         let reader = new FileReader();
+        //         reader.readAsText(file, 'UTF-8');
+        //
+        //         // here we tell the reader what to do when it's done reading...
+        //         reader.onload = readerEvent => {
+        //             let csv = readerEvent.target.result; // this is the content!
+        //             let data = require('jquery-csv').toObjects(csv);
+        //             console.log(data)
+        //             if (show_or_theatre) {
+        //                 this.theatre_list = data
+        //
+        //             } else {
+        //                 this.show_list = data
+        //             }
+        //         }
+        //
+        //     }
+        //
+        //     input.click();
+        // },
 
     },
 })
