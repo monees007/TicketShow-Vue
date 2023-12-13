@@ -5,6 +5,7 @@ import {useAppStore} from "@/store";
 import axios from "axios";
 import router from "@/router";
 
+const appstore = useAppStore()
 function decodeJwtResponse(token) {
   let base64Url = token.split('.')[1]
   let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -13,12 +14,11 @@ function decodeJwtResponse(token) {
   }).join(''));
   return JSON.parse(jsonPayload)
 }
-
 window.handleCredentialResponse = async (response) => {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
   const responsePayload = decodeJwtResponse(response.credential);
-  await axios.post('http://127.0.0.1:4433' + '/login/google', {
+  await axios.post(appstore.server + '/login/google', {
         token: response.credential
       },
       {

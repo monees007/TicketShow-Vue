@@ -8,7 +8,10 @@ export const useAppStore = defineStore('AppStore', {
             app_name: 'TicketShow',
             app_theme: 'light',
             server: 'https://ticketshow-backend.onrender.com',
-            api: 'https://ticketshow-backend.onrender.com//api',
+            // server: 'http://127.0.0.1:4433/',
+            api: 'https://ticketshow-backend.onrender.com/api',
+            // api: 'http://127.0.0.1:4433/api',
+
             next_page: '/',
             auth_token: '',
             city: 'New Delhi',
